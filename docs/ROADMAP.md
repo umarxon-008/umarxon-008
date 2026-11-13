@@ -55,7 +55,7 @@ PROJECT_AUDIT, ARCHITECTURE, ROADMAP, RISK_REGISTER.
 
 **Qabul mezonlari:** ruxsat etilgan ildizdan tashqaridagi path bloklanishi testlangan; bir nechta natija topilsa, foydalanuvchiga tanlash ro'yxati ko'rsatiladi.
 
-## PHASE 6 — Brauzer va YouTube (~1–2 sessiya)
+## PHASE 6 — Brauzer va YouTube ✅ (`PHASE_6_REPORT.md`)
 - `openWebSearch` (default brauzerda ochish, faqat https).
 - YouTube: API kaliti bo'lsa YouTube Data API orqali real natija kartalari; kalit bo'lmasa brauzerda qidiruv ochiladi va bu UI'da aniq ko'rsatiladi.
 

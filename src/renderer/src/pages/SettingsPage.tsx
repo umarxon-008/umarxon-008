@@ -7,6 +7,7 @@ import { useSettings } from '../store/settings';
 import { AiSettingsSection } from '../features/settings/AiSettingsSection';
 import { PrivacySection } from '../features/settings/PrivacySection';
 import { VoiceSettingsSection } from '../features/settings/VoiceSettingsSection';
+import { InternetSection } from '../features/settings/InternetSection';
 import { uz } from '../i18n/uz';
 
 const themes: { value: Theme; label: string; icon: typeof Moon }[] = [
@@ -41,6 +42,8 @@ export function SettingsPage() {
       <AiSettingsSection />
 
       <VoiceSettingsSection />
+
+      <InternetSection />
 
       <section className="card settings-section" aria-labelledby="appearance-title">
         <h2 id="appearance-title">Ko‘rinish</h2>

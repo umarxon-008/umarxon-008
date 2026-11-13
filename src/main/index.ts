@@ -38,6 +38,8 @@ import { searchFiles } from './files/file-search';
 import { existsSync } from 'node:fs';
 import { realpath } from 'node:fs/promises';
 import type { FolderKey } from '@shared/ipc';
+import { createWebTools } from './web/web-tools';
+import { createYoutubeClient } from '../modules/ai/youtube';
 
 const APP_ID = 'uz.marius.app';
 
@@ -55,6 +57,10 @@ if (testDataDir && !app.isPackaged) app.setPath('userData', testDataDir);
 
 // Faqat development/test uchun: E2E testda Gemini o'rniga lokal soxta server ishlatiladi.
 const geminiBaseUrl = !app.isPackaged ? process.env['MARIUS_GEMINI_BASE_URL'] || undefined : undefined;
+
+// Faqat development/test uchun: YouTube API o'rniga soxta server (E2E)
+const youtubeBaseUrl = !app.isPackaged ? process.env['MARIUS_YOUTUBE_BASE_URL'] || undefined : undefined;
+const YOUTUBE_SECRET = 'youtube.apiKey';
 
 // Faqat development/test uchun: haqiqiy dasturlarni ochmasdan sinash (paketlangan ilovada e'tiborga olinmaydi)
 const useFakeOs = !app.isPackaged && process.env['MARIUS_FAKE_OS'] === '1';
@@ -172,6 +178,21 @@ function registerIpc(settings: SettingsRepository, database: Database): void {
     }
     folders.add(real, label);
   };
+
+  // ---- Internet (PHASE 6) ----
+  const secrets = new SecretStore(database, electronEncryptor);
+  const youtube = createYoutubeClient({
+    apiKey: () => secrets.get(YOUTUBE_SECRET),
+    ...(youtubeBaseUrl ? { baseUrl: youtubeBaseUrl } : {}),
+  });
+  for (const tool of createWebTools({
+    engine: () => settings.getAll().searchEngine,
+    openExternal: (url) => shell.openExternal(url),
+    youtube,
+    hasYoutubeKey: () => secrets.has(YOUTUBE_SECRET),
+  })) {
+    registry.register(tool);
+  }
 
   const broker = new ConfirmationBroker(emitConfirmation);
   const executor = new ToolExecutor(registry, broker, audit, logger);
@@ -302,6 +323,34 @@ function registerIpc(settings: SettingsRepository, database: Database): void {
     },
     'files:open': ({ path: p }) => runUserAction('open_file', { path: p }),
     'files:showInFolder': ({ path: p }) => runUserAction('show_in_folder', { path: p }),
+
+    'youtube:status': async () => ({
+      hasKey: secrets.has(YOUTUBE_SECRET),
+      secretStorageAvailable: await secrets.isAvailable(),
+    }),
+    'youtube:setKey': async ({ key }) => {
+      await secrets.set(YOUTUBE_SECRET, key);
+      try {
+        const videos = await youtube.search('MARIUS test', 1);
+        return {
+          ok: true,
+          models: [],
+          message: `Kalit saqlandi va ishlayapti (${videos.length} ta sinov natijasi).`,
+        };
+      } catch (error) {
+        const code =
+          error instanceof Error && 'code' in error ? String((error as { code: unknown }).code) : '';
+        return {
+          ok: false,
+          models: [],
+          message:
+            code === 'AI_AUTH_INVALID'
+              ? 'Kalit saqlandi, lekin YouTube uni qabul qilmadi: kalit noto‘g‘ri yoki loyihada “YouTube Data API v3” yoqilmagan.'
+              : 'Kalit saqlandi, lekin tekshirib bo‘lmadi (internet yoki limit). Keyinroq qayta urinib ko‘ring.',
+        };
+      }
+    },
+    'youtube:deleteKey': () => secrets.delete(YOUTUBE_SECRET),
 
     'voice:transcribe': async ({ audio, mimeType }) => ({ text: await voice.transcribe(audio, mimeType) }),
     'voice:synthesize': ({ text }) => voice.synthesize(text),

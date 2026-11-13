@@ -45,3 +45,18 @@ describe('plainPreview', () => {
     expect(plainPreview('a'.repeat(300))).toHaveLength(140);
   });
 });
+
+describe('havolalar', () => {
+  it('faqat https havolalar bosiladigan bo‘ladi', () => {
+    expect(parseInline('[Video](https://www.youtube.com/watch?v=abc) va https://example.uz/a.')).toEqual([
+      { type: 'link', text: 'Video', href: 'https://www.youtube.com/watch?v=abc' },
+      { type: 'text', text: ' va ' },
+      { type: 'link', text: 'https://example.uz/a', href: 'https://example.uz/a' },
+      { type: 'text', text: '.' },
+    ]);
+    expect(parseInline('[bos](javascript:alert(1))')).toEqual([
+      { type: 'text', text: '[bos](javascript:alert(1))' },
+    ]);
+    expect(parseInline('http://eski.uz')).toEqual([{ type: 'text', text: 'http://eski.uz' }]);
+  });
+});

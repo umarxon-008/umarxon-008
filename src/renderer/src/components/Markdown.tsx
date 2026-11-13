@@ -16,6 +16,13 @@ function InlineNodes({ nodes }: { nodes: Inline[] }) {
                 <InlineNodes nodes={n.children} />
               </strong>
             );
+          case 'link':
+            // target=_blank → main process'dagi setWindowOpenHandler faqat https'ni tizim brauzerida ochadi
+            return (
+              <a key={i} href={n.href} target="_blank" rel="noreferrer noopener" title={n.href}>
+                {n.text}
+              </a>
+            );
           case 'italic':
             return (
               <em key={i}>

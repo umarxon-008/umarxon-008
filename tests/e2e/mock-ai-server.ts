@@ -6,6 +6,7 @@ import type { AddressInfo } from 'node:net';
  * Ilova unga haqiqiy HTTP so'rovlar yuboradi, ya'ni butun zanjir (main → fetch → oqim → IPC → UI) sinaladi.
  */
 export const MOCK_GEMINI_KEY = 'AIza-E2E-TEST-KEY-0123456789';
+export const MOCK_YOUTUBE_KEY = 'AIza-E2E-YOUTUBE-KEY-123';
 export const MOCK_THOUGHT_SIGNATURE = 'SIG-E2E-THOUGHT';
 export const MOCK_TRANSCRIPT = 'Salom MARIUS, qalaysan?';
 export const MOCK_REPLY = 'Assalomu alaykum! Men **MARIUS**man. O‘zbek tilida yordam beraman.';
@@ -106,6 +107,31 @@ export async function startMockAiServer(): Promise<MockAiServer> {
         await sleep(slow ? 150 : 20);
       }
       res.end(`${JSON.stringify({ message: { role: 'assistant', content: '' }, done: true })}\n`);
+      return;
+    }
+
+    // ---- YouTube Data API ----
+    if (url.pathname === '/youtube/v3/search') {
+      if (req.headers['x-goog-api-key'] !== MOCK_YOUTUBE_KEY) {
+        res.writeHead(400, { 'content-type': 'application/json' });
+        res.end(JSON.stringify({ error: { code: 400, errors: [{ reason: 'keyInvalid' }] } }));
+        return;
+      }
+      res.writeHead(200, { 'content-type': 'application/json' });
+      res.end(
+        JSON.stringify({
+          items: [
+            {
+              id: { videoId: 'uzCpp01' },
+              snippet: {
+                title: 'C++ for sikli &#39;o‘zbek tilida&#39;',
+                channelTitle: 'Dasturlash Darslari',
+                publishedAt: '2025-01-10T00:00:00Z',
+              },
+            },
+          ],
+        }),
+      );
       return;
     }
 

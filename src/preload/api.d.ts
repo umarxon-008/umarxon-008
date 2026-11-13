@@ -94,6 +94,12 @@ export interface MariusApi {
     open(path: string): Promise<IpcResult<ActionResult>>;
     showInFolder(path: string): Promise<IpcResult<ActionResult>>;
   };
+  youtube: {
+    status(): Promise<IpcResult<{ hasKey: boolean; secretStorageAvailable: boolean }>>;
+    /** Kalit main process'da shifrlanadi va sinov qidiruvi bilan tekshiriladi */
+    setKey(key: string): Promise<IpcResult<ConnectionTest>>;
+    deleteKey(): Promise<IpcResult<void>>;
+  };
   voice: {
     /** 16 kHz mono WAV (base64). Faqat rozilik berilgan bo'lsa Gemini'ga yuboriladi. */
     transcribe(audioBase64: string): Promise<IpcResult<{ text: string }>>;

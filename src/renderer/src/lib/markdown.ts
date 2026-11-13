@@ -6,7 +6,8 @@ export type Inline =
   | { type: 'text'; text: string }
   | { type: 'code'; text: string }
   | { type: 'bold'; children: Inline[] }
-  | { type: 'italic'; children: Inline[] };
+  | { type: 'italic'; children: Inline[] }
+  | { type: 'link'; text: string; href: string };
 
 export type Block =
   | { type: 'paragraph'; children: Inline[] }
@@ -16,13 +17,19 @@ export type Block =
 
 export function parseInline(text: string): Inline[] {
   const out: Inline[] = [];
-  const re = /(`[^`\n]+`)|(\*\*[^*\n]+\*\*)|(\*[^*\n]+\*)/g;
+  // Havolalar faqat https (javascript:, file:, data: va boshqalar oddiy matn bo'lib qoladi)
+  const re =
+    /(`[^`\n]+`)|(\[[^\]\n]+\]\(https:\/\/[^\s)]+\))|(https:\/\/[^\s<>()]+[^\s<>().,;:!?'"»”])|(\*\*[^*\n]+\*\*)|(\*[^*\n]+\*)/g;
   let last = 0;
   let m: RegExpExecArray | null;
   while ((m = re.exec(text))) {
     if (m.index > last) out.push({ type: 'text', text: text.slice(last, m.index) });
     const tok = m[0];
     if (tok.startsWith('`')) out.push({ type: 'code', text: tok.slice(1, -1) });
+    else if (tok.startsWith('[')) {
+      const m2 = /^\[([^\]]+)\]\((https:\/\/[^\s)]+)\)$/.exec(tok)!;
+      out.push({ type: 'link', text: m2[1]!, href: m2[2]! });
+    } else if (tok.startsWith('https://')) out.push({ type: 'link', text: tok, href: tok });
     else if (tok.startsWith('**')) out.push({ type: 'bold', children: parseInline(tok.slice(2, -2)) });
     else out.push({ type: 'italic', children: parseInline(tok.slice(1, -1)) });
     last = m.index + tok.length;

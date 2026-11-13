@@ -33,6 +33,9 @@ export const SettingsSchema = z.object({
   ttsRate: z.number().min(0.5).max(2),
   /** Ovozli savolga javobni avtomatik ovoz chiqarib o'qish */
   speakVoiceReplies: z.boolean(),
+
+  /* --- Internet (PHASE 6) --- */
+  searchEngine: z.enum(['google', 'bing', 'duckduckgo', 'yandex']),
 });
 export type Settings = z.infer<typeof SettingsSchema>;
 
@@ -49,6 +52,7 @@ export const DEFAULT_SETTINGS: Settings = {
   ttsGeminiModel: null,
   ttsRate: 1,
   speakVoiceReplies: true,
+  searchEngine: 'google',
 };
 
 /** Faqat ma'lum kalitlar, noma'lum kalit rad etiladi. */
@@ -362,7 +366,15 @@ export const IPC = {
   'ai:setGeminiKey': {
     input: z
       .object({
-        key: z.string().trim().min(10).max(300).regex(/^\S+$/, "Kalitda bo'sh joy bo'lmasligi kerak"),
+        key: z
+          .string()
+          .trim()
+          .min(10)
+          .max(300)
+          .regex(
+            /^[\x21-\x7e]+$/,
+            "Kalitda faqat lotin harflari, raqamlar va belgilar bo'lishi kerak (bo'sh joysiz)",
+          ),
       })
       .strict(),
     output: AiSettingsSchema,
@@ -452,6 +464,28 @@ export const IPC = {
     input: z.object({ path: z.string().min(1).max(1000) }).strict(),
     output: ActionResultSchema,
   },
+
+  'youtube:status': {
+    input: NoInput,
+    output: z.object({ hasKey: z.boolean(), secretStorageAvailable: z.boolean() }),
+  },
+  'youtube:setKey': {
+    input: z
+      .object({
+        key: z
+          .string()
+          .trim()
+          .min(10)
+          .max(300)
+          .regex(
+            /^[\x21-\x7e]+$/,
+            "Kalitda faqat lotin harflari, raqamlar va belgilar bo'lishi kerak (bo'sh joysiz)",
+          ),
+      })
+      .strict(),
+    output: ConnectionTestSchema,
+  },
+  'youtube:deleteKey': { input: NoInput, output: z.void() },
 
   'voice:transcribe': { input: TranscribeInputSchema, output: z.object({ text: z.string() }) },
   'voice:synthesize': {

@@ -53,7 +53,20 @@ test('renderer’da Node yoki Electron API yo‘q, faqat window.marius bor', asy
       module: 'undefined',
       marius: 'object',
       frozen: true,
-      keys: ['ai', 'app', 'audit', 'chat', 'computer', 'files', 'logs', 'settings', 'system', 'tools', 'voice'],
+      keys: [
+        'ai',
+        'app',
+        'audit',
+        'chat',
+        'computer',
+        'files',
+        'logs',
+        'settings',
+        'system',
+        'tools',
+        'voice',
+        'youtube',
+      ],
     });
 
     const prefs = await app.evaluate(({ BrowserWindow }) => {

@@ -304,7 +304,8 @@ export function createFileTools(deps: FileToolDeps): ToolManifest<unknown>[] {
             if ((e as NodeJS.ErrnoException).code !== 'EXDEV') throw e;
             // Boshqa diskka: avval nusxa, tekshiruv, keyin asl faylni olib tashlash
             await copyFile(t.src, t.dest, constants.COPYFILE_EXCL);
-            if ((await stat(t.dest)).size !== (await stat(t.src)).size) throw new Error('copy size mismatch', { cause: e });
+            if ((await stat(t.dest)).size !== (await stat(t.src)).size)
+              throw new Error('copy size mismatch', { cause: e });
             await unlink(t.src);
           }
           const ok = existsSync(t.dest) && !existsSync(t.src);

@@ -28,8 +28,9 @@ async function configureOllamaViaUi(page: Page, url: string) {
   await page.getByRole('radio', { name: /Ollama/ }).click();
   const input = page.getByLabel('Ollama manzili');
   await input.fill(url);
-  await page.getByRole('button', { name: 'Saqlash' }).click();
-  await page.getByRole('button', { name: 'Ulanishni tekshirish' }).click();
+  const ai = page.locator('#ai');
+  await ai.getByRole('button', { name: 'Saqlash' }).click();
+  await ai.getByRole('button', { name: 'Ulanishni tekshirish' }).click();
   await expect(page.getByText('Ulanish muvaffaqiyatli. 1 ta model topildi.')).toBeVisible();
   await page.getByRole('combobox', { name: 'AI model' }).selectOption('mock-uz:latest');
 }
@@ -136,7 +137,7 @@ test('Gemini API kaliti: Windows’da shifrlab saqlanadi, boshqa tizimlarda ochi
 
     if (encryptionAvailable) {
       await page.getByLabel('Gemini API kalit').fill(MOCK_GEMINI_KEY);
-      await page.getByRole('button', { name: 'Saqlash' }).click();
+      await page.locator('#ai').getByRole('button', { name: 'Saqlash' }).click();
       await expect(page.getByText('API kalit saqlangan')).toBeVisible();
       await expect(page.getByText('Ulanish muvaffaqiyatli. 1 ta model topildi.')).toBeVisible();
       await expect(page.getByLabel('Gemini API kalit')).toHaveValue(''); // UI'da qolmaydi
@@ -153,7 +154,7 @@ test('Gemini API kaliti: Windows’da shifrlab saqlanadi, boshqa tizimlarda ochi
       // Shifrlash yo'q: ogohlantirish ko'rinadi va saqlash tugmasi o'chiq
       await expect(page.getByText(/kalitni shifrlab saqlash imkoni yo‘q/)).toBeVisible();
       await page.getByLabel('Gemini API kalit').fill(MOCK_GEMINI_KEY);
-      await expect(page.getByRole('button', { name: 'Saqlash' })).toBeDisabled();
+      await expect(page.locator('#ai').getByRole('button', { name: 'Saqlash' })).toBeDisabled();
       const direct = await page.evaluate((k) => window.marius.ai.setGeminiKey(k), MOCK_GEMINI_KEY);
       expect(direct).toMatchObject({ ok: false, error: { code: 'SECRET_STORAGE_UNAVAILABLE' } });
     }

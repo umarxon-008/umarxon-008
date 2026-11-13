@@ -75,6 +75,11 @@ const api: MariusApi = {
     open: (path) => ipcRenderer.invoke('files:open', { path }),
     showInFolder: (path) => ipcRenderer.invoke('files:showInFolder', { path }),
   },
+  youtube: {
+    status: () => ipcRenderer.invoke('youtube:status'),
+    setKey: (key) => ipcRenderer.invoke('youtube:setKey', { key }),
+    deleteKey: () => ipcRenderer.invoke('youtube:deleteKey'),
+  },
   voice: {
     transcribe: (audio) => ipcRenderer.invoke('voice:transcribe', { audio, mimeType: 'audio/wav' }),
     synthesize: (text) => ipcRenderer.invoke('voice:synthesize', { text }),

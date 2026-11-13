@@ -91,11 +91,12 @@ Har bir push'da GitHub Actions (`.github/workflows/windows-build.yml`) Windows'd
 
 Hozircha kerak emas. API kalitlar `.env` faylida emas, ilova ichida shifrlangan holda saqlanadi (2-bosqich).
 
-| O‘zgaruvchi              | Vazifasi                                                                                                              |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------- |
-| `MARIUS_USER_DATA_DIR`   | Faqat dev/test: ma’lumotlar papkasini almashtiradi. Paketlangan ilovada e’tiborga olinmaydi                           |
-| `MARIUS_FAKE_OS`         | Faqat dev/test: `1` bo‘lsa haqiqiy dasturlar o‘rniga soxta OS adapteri (E2E). Paketlangan ilovada e’tiborga olinmaydi |
-| `MARIUS_GEMINI_BASE_URL` | Faqat dev/test: Gemini API o‘rniga soxta server (E2E). Paketlangan ilovada e’tiborga olinmaydi                        |
+| O‘zgaruvchi               | Vazifasi                                                                                                              |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `MARIUS_USER_DATA_DIR`    | Faqat dev/test: ma’lumotlar papkasini almashtiradi. Paketlangan ilovada e’tiborga olinmaydi                           |
+| `MARIUS_FAKE_OS`          | Faqat dev/test: `1` bo‘lsa haqiqiy dasturlar o‘rniga soxta OS adapteri (E2E). Paketlangan ilovada e’tiborga olinmaydi |
+| `MARIUS_YOUTUBE_BASE_URL` | Faqat dev/test: YouTube API o‘rniga soxta server (E2E)                                                                |
+| `MARIUS_GEMINI_BASE_URL`  | Faqat dev/test: Gemini API o‘rniga soxta server (E2E). Paketlangan ilovada e’tiborga olinmaydi                        |
 
 ### Tuzilma
 
