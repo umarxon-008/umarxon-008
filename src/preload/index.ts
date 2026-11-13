@@ -1,5 +1,9 @@
-import { contextBridge, ipcRenderer } from 'electron';
+import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron';
+import type { ChatEvent } from '../shared/ipc';
 import type { MariusApi } from './api';
+
+// Sandbox'dagi preload faqat 'electron' modulini import qila oladi, shuning uchun kanal nomi shu yerda.
+const CHAT_EVENT_CHANNEL = 'chat:event';
 
 /**
  * Preload: sandbox ichida ishlaydi. Faqat aniq nomlangan funksiyalarni ochadi.
@@ -18,6 +22,28 @@ const api: MariusApi = {
   },
   logs: {
     openFolder: () => ipcRenderer.invoke('logs:openFolder'),
+  },
+  ai: {
+    getSettings: () => ipcRenderer.invoke('ai:getSettings'),
+    updateSettings: (patch) => ipcRenderer.invoke('ai:updateSettings', patch),
+    setGeminiKey: (key) => ipcRenderer.invoke('ai:setGeminiKey', { key }),
+    deleteGeminiKey: () => ipcRenderer.invoke('ai:deleteGeminiKey'),
+    testConnection: (provider) => ipcRenderer.invoke('ai:testConnection', { provider }),
+  },
+  chat: {
+    listConversations: () => ipcRenderer.invoke('chat:listConversations'),
+    getConversation: (id) => ipcRenderer.invoke('chat:getConversation', { id }),
+    send: (conversationId, text) => ipcRenderer.invoke('chat:send', { conversationId, text }),
+    regenerate: (conversationId) => ipcRenderer.invoke('chat:regenerate', { conversationId }),
+    cancel: (requestId) => ipcRenderer.invoke('chat:cancel', { requestId }),
+    deleteConversation: (id) => ipcRenderer.invoke('chat:deleteConversation', { id }),
+    clearAll: () => ipcRenderer.invoke('chat:clearAll'),
+    onEvent: (listener) => {
+      // IpcRendererEvent obyekti renderer'ga berilmaydi, faqat ma'lumot
+      const handler = (_e: IpcRendererEvent, event: ChatEvent) => listener(event);
+      ipcRenderer.on(CHAT_EVENT_CHANNEL, handler);
+      return () => ipcRenderer.removeListener(CHAT_EVENT_CHANNEL, handler);
+    },
   },
 };
 

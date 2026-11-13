@@ -14,6 +14,8 @@ export const SettingsSchema = z.object({
   language: z.literal('uz'),
   reducedMotion: z.boolean(),
   onboardingCompleted: z.boolean(),
+  /** Suhbat tarixini lokal bazada saqlash. O'chirilsa, suhbat faqat ilova ochiq turgan paytda xotirada turadi. */
+  saveHistory: z.boolean(),
 });
 export type Settings = z.infer<typeof SettingsSchema>;
 
@@ -22,6 +24,7 @@ export const DEFAULT_SETTINGS: Settings = {
   language: 'uz',
   reducedMotion: false,
   onboardingCompleted: false,
+  saveHistory: true,
 };
 
 /** Faqat ma'lum kalitlar, noma'lum kalit rad etiladi. */
@@ -52,7 +55,128 @@ export const SystemMetricsSchema = z.object({
 });
 export type SystemMetrics = z.infer<typeof SystemMetricsSchema>;
 
+/* ===================== AI provayderlar ===================== */
+
+export const ProviderIdSchema = z.enum(['gemini', 'ollama']);
+export type ProviderId = z.infer<typeof ProviderIdSchema>;
+
+const ModelName = z
+  .string()
+  .min(1)
+  .max(200)
+  .regex(/^[\w.:\-/]+$/, "Model nomida faqat harf, raqam va . : - / _ bo'lishi mumkin");
+
+const HttpUrl = z
+  .string()
+  .max(300)
+  .refine((v) => {
+    try {
+      const u = new URL(v);
+      return (u.protocol === 'http:' || u.protocol === 'https:') && !u.username && !u.password;
+    } catch {
+      return false;
+    }
+  }, 'Manzil http:// yoki https:// bilan boshlanishi kerak');
+
+/** Renderer'ga ko'rinadigan AI sozlamalari. API kalitning o'zi HECH QACHON bu yerda bo'lmaydi. */
+export const AiSettingsSchema = z.object({
+  provider: ProviderIdSchema.nullable(),
+  gemini: z.object({ model: ModelName.nullable(), hasKey: z.boolean() }),
+  ollama: z.object({ baseUrl: HttpUrl, model: ModelName.nullable(), isLocal: z.boolean() }),
+  secretStorageAvailable: z.boolean(),
+});
+export type AiSettings = z.infer<typeof AiSettingsSchema>;
+
+export const AiSettingsPatchSchema = z
+  .object({
+    provider: ProviderIdSchema.nullable(),
+    geminiModel: ModelName.nullable(),
+    ollamaBaseUrl: HttpUrl,
+    ollamaModel: ModelName.nullable(),
+  })
+  .partial()
+  .strict();
+export type AiSettingsPatch = z.infer<typeof AiSettingsPatchSchema>;
+
+export const ConnectionTestSchema = z.object({
+  ok: z.boolean(),
+  message: z.string(),
+  models: z.array(z.string()),
+});
+export type ConnectionTest = z.infer<typeof ConnectionTestSchema>;
+
+/* ===================== Suhbat ===================== */
+
+const Id = z.string().uuid();
+
+export const MessageStatusSchema = z.enum(['complete', 'streaming', 'cancelled', 'error']);
+export const ChatMessageSchema = z.object({
+  id: Id,
+  conversationId: Id,
+  role: z.enum(['user', 'assistant']),
+  content: z.string(),
+  status: MessageStatusSchema,
+  provider: ProviderIdSchema.nullable(),
+  model: z.string().nullable(),
+  errorCode: z.string().nullable(),
+  createdAt: z.string(),
+});
+export type ChatMessage = z.infer<typeof ChatMessageSchema>;
+
+export const ConversationSummarySchema = z.object({
+  id: Id,
+  title: z.string(),
+  updatedAt: z.string(),
+  persisted: z.boolean(),
+});
+export type ConversationSummary = z.infer<typeof ConversationSummarySchema>;
+
+export const ConversationSchema = ConversationSummarySchema.extend({ messages: z.array(ChatMessageSchema) });
+export type Conversation = z.infer<typeof ConversationSchema>;
+
+export const MAX_MESSAGE_LENGTH = 8000;
+
+export const ChatSendInputSchema = z
+  .object({
+    conversationId: Id.nullable(),
+    text: z.string().trim().min(1).max(MAX_MESSAGE_LENGTH),
+  })
+  .strict();
+
+export const ChatSendResultSchema = z.object({
+  conversationId: Id,
+  requestId: Id,
+  userMessage: ChatMessageSchema,
+  assistantMessage: ChatMessageSchema,
+});
+export type ChatSendResult = z.infer<typeof ChatSendResultSchema>;
+
+/** Main → renderer oqim hodisalari (`chat:event` kanali). */
+export type ChatEvent =
+  | { type: 'delta'; requestId: string; conversationId: string; messageId: string; text: string }
+  | {
+      type: 'done';
+      requestId: string;
+      conversationId: string;
+      messageId: string;
+      status: 'complete' | 'cancelled';
+    }
+  | {
+      type: 'error';
+      requestId: string;
+      conversationId: string;
+      messageId: string;
+      code: AiErrorCode;
+      message: string;
+      retryable: boolean;
+    };
+
+export const CHAT_EVENT_CHANNEL = 'chat:event';
+
+/* ===================== Kanallar ===================== */
+
 const NoInput = z.undefined();
+const IdInput = z.object({ id: Id }).strict();
 
 export const IPC = {
   'app:getInfo': { input: NoInput, output: AppInfoSchema },
@@ -60,6 +184,33 @@ export const IPC = {
   'settings:getAll': { input: NoInput, output: SettingsSchema },
   'settings:update': { input: SettingsPatchSchema, output: SettingsSchema },
   'logs:openFolder': { input: NoInput, output: z.void() },
+
+  'ai:getSettings': { input: NoInput, output: AiSettingsSchema },
+  'ai:updateSettings': { input: AiSettingsPatchSchema, output: AiSettingsSchema },
+  'ai:setGeminiKey': {
+    input: z
+      .object({
+        key: z.string().trim().min(10).max(300).regex(/^\S+$/, "Kalitda bo'sh joy bo'lmasligi kerak"),
+      })
+      .strict(),
+    output: AiSettingsSchema,
+  },
+  'ai:deleteGeminiKey': { input: NoInput, output: AiSettingsSchema },
+  'ai:testConnection': {
+    input: z.object({ provider: ProviderIdSchema }).strict(),
+    output: ConnectionTestSchema,
+  },
+
+  'chat:listConversations': { input: NoInput, output: z.array(ConversationSummarySchema) },
+  'chat:getConversation': { input: IdInput, output: ConversationSchema },
+  'chat:send': { input: ChatSendInputSchema, output: ChatSendResultSchema },
+  'chat:regenerate': {
+    input: z.object({ conversationId: Id }).strict(),
+    output: z.object({ requestId: Id, assistantMessage: ChatMessageSchema }),
+  },
+  'chat:cancel': { input: z.object({ requestId: Id }).strict(), output: z.boolean() },
+  'chat:deleteConversation': { input: IdInput, output: z.void() },
+  'chat:clearAll': { input: NoInput, output: z.void() },
 } as const;
 
 export type IpcChannel = keyof typeof IPC;
@@ -72,13 +223,35 @@ export function isIpcChannel(value: unknown): value is IpcChannel {
   return typeof value === 'string' && Object.prototype.hasOwnProperty.call(IPC, value);
 }
 
+/* ===================== Xatoliklar ===================== */
+
+/** AI provayder xatolari: foydalanuvchiga o'zbekcha, keyingi qadam bilan. */
+export const AiErrorMessages = {
+  AI_NOT_CONFIGURED:
+    'AI hali sozlanmagan. Sozlamalar → Sun’iy intellekt bo‘limida Gemini yoki Ollama’ni ulang.',
+  AI_AUTH_INVALID: 'API kalit noto‘g‘ri yoki muddati o‘tgan. Sozlamalarda kalitni tekshiring.',
+  AI_RATE_LIMITED: 'So‘rovlar limiti tugadi (bepul limit). Biroz kutib, qayta urinib ko‘ring.',
+  AI_NETWORK: 'Internetga ulanib bo‘lmadi. Ulanishni tekshirib, qayta urinib ko‘ring.',
+  AI_TIMEOUT: 'AI javob berishi juda uzoq cho‘zildi. Qayta urinib ko‘ring.',
+  AI_UNAVAILABLE: 'AI xizmati hozir ishlamayapti. Ollama ishlatilsa, u ishga tushirilganini tekshiring.',
+  AI_MODEL_NOT_FOUND: 'Tanlangan model topilmadi. Sozlamalarda boshqa modelni tanlang.',
+  AI_BLOCKED: 'AI bu so‘rovga javob berishni xavfsizlik sababli rad etdi.',
+  AI_BAD_RESPONSE: 'AI’dan tushunarsiz javob keldi. Qayta urinib ko‘ring.',
+} as const;
+export type AiErrorCode = keyof typeof AiErrorMessages;
+
 /** Xatolik kodlari: foydalanuvchiga o'zbekcha xabar, logga esa kod yoziladi. */
 export const ErrorCodes = {
   INVALID_INPUT: "Noto'g'ri ma'lumot yuborildi.",
   UNKNOWN_CHANNEL: 'Bunday amal mavjud emas.',
   FORBIDDEN_SENDER: "Bu so'rov ishonchsiz manbadan keldi va rad etildi.",
   DATABASE_ERROR: "Ma'lumotlar bazasida xatolik yuz berdi.",
+  NOT_FOUND: 'So‘ralgan ma’lumot topilmadi.',
+  BUSY: 'MARIUS hali oldingi javobni yozmoqda. Uni to‘xtating yoki kuting.',
+  SECRET_STORAGE_UNAVAILABLE:
+    'Bu kompyuterda kalitni xavfsiz (shifrlangan) saqlab bo‘lmaydi, shuning uchun u saqlanmadi.',
   UNEXPECTED: "Kutilmagan xatolik yuz berdi. Iltimos, qayta urinib ko'ring.",
+  ...AiErrorMessages,
 } as const;
 export type ErrorCode = keyof typeof ErrorCodes;
 

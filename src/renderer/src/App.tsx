@@ -8,6 +8,7 @@ import { Onboarding } from './features/onboarding/Onboarding';
 import { DashboardPage } from './pages/DashboardPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
+import { ChatPage } from './features/chat/ChatPage';
 import { uz } from './i18n/uz';
 
 export function App() {
@@ -38,16 +39,7 @@ export function App() {
         <main className="shell__main" id="main" tabIndex={-1}>
           <Routes>
             <Route path="/" element={<DashboardPage />} />
-            <Route
-              path="/chat"
-              element={
-                <PlaceholderPage
-                  title={uz.nav.chat}
-                  phase={2}
-                  description="Matnli AI suhbat (Gemini yoki lokal Ollama), javobni to‘xtatish, bajarilgan amallar va tasdiq kartalari."
-                />
-              }
-            />
+            <Route path="/chat" element={<ChatPage />} />
             <Route
               path="/memory"
               element={

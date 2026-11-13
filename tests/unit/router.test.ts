@@ -1,7 +1,7 @@
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
-import { DEFAULT_SETTINGS } from '@shared/ipc';
+import { DEFAULT_SETTINGS, IPC_CHANNELS } from '@shared/ipc';
 import { AppError, createSenderGuard, dispatchIpc, type IpcHandlers } from '../../src/main/ipc/router';
 import type { Logger } from '../../src/main/logging/logger';
 
@@ -9,7 +9,16 @@ const logger: Logger = { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi
 const trusted = () => true;
 
 function makeHandlers(overrides: Partial<IpcHandlers> = {}): IpcHandlers {
+  const unused = Object.fromEntries(
+    IPC_CHANNELS.map((c) => [
+      c,
+      () => {
+        throw new Error(`unused handler ${c}`);
+      },
+    ]),
+  ) as unknown as IpcHandlers;
   return {
+    ...unused,
     'app:getInfo': () => ({
       name: 'MARIUS',
       version: '0.0.0',

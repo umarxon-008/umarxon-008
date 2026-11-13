@@ -1,0 +1,174 @@
+import {
+  createStreamGuard,
+  mapFetchError,
+  ProviderError,
+  type AIProvider,
+  type ChatRequest,
+  type FetchLike,
+} from './types';
+import { sseData } from './stream-parsers';
+
+/**
+ * Google Gemini (Generative Language API, v1beta) adapteri.
+ * Endpoint, header va maydon nomlari Google'ning rasmiy `@google/genai` SDK manba kodidan tasdiqlangan
+ * (docs/PHASE_2_REPORT.md). Model nomlari kodga yozilmaydi: `listModels()` orqali API'dan olinadi.
+ */
+export const GEMINI_DEFAULT_BASE_URL = 'https://generativelanguage.googleapis.com';
+const API_VERSION = 'v1beta';
+
+interface GeminiOptions {
+  apiKey: () => Promise<string | null>;
+  fetch?: FetchLike;
+  baseUrl?: string;
+  firstChunkTimeoutMs?: number;
+  idleTimeoutMs?: number;
+}
+
+interface GeminiErrorBody {
+  error?: { code?: number; message?: string; status?: string; details?: { reason?: string }[] };
+}
+
+async function errorFromResponse(res: Response): Promise<ProviderError> {
+  let body: GeminiErrorBody = {};
+  try {
+    body = (await res.json()) as GeminiErrorBody;
+  } catch {
+    /* JSON emas */
+  }
+  const status = body.error?.status ?? '';
+  const reason = body.error?.details?.find((d) => d.reason)?.reason ?? '';
+  const detail = `${res.status} ${status} ${reason}`.trim();
+  if (
+    res.status === 401 ||
+    res.status === 403 ||
+    reason === 'API_KEY_INVALID' ||
+    status === 'UNAUTHENTICATED'
+  ) {
+    return new ProviderError('AI_AUTH_INVALID', detail);
+  }
+  if (res.status === 429 || status === 'RESOURCE_EXHAUSTED')
+    return new ProviderError('AI_RATE_LIMITED', detail);
+  if (res.status === 404) return new ProviderError('AI_MODEL_NOT_FOUND', detail);
+  if (res.status >= 500) return new ProviderError('AI_UNAVAILABLE', detail);
+  return new ProviderError('AI_BAD_RESPONSE', detail);
+}
+
+export function createGeminiProvider(options: GeminiOptions): AIProvider {
+  const doFetch = options.fetch ?? fetch;
+  const base = (options.baseUrl ?? GEMINI_DEFAULT_BASE_URL).replace(/\/+$/, '');
+
+  const requireKey = async (): Promise<string> => {
+    const key = await options.apiKey();
+    if (!key) throw new ProviderError('AI_NOT_CONFIGURED');
+    return key;
+  };
+
+  return {
+    id: 'gemini',
+    getCapabilities: () => ({ streaming: true, tools: true, vision: true, cloud: true }),
+
+    async listModels(signal) {
+      const key = await requireKey();
+      const models: string[] = [];
+      let pageToken: string | undefined;
+      for (let page = 0; page < 10; page++) {
+        const url = new URL(`${base}/${API_VERSION}/models`);
+        url.searchParams.set('pageSize', '100');
+        if (pageToken) url.searchParams.set('pageToken', pageToken);
+        let res: Response;
+        try {
+          res = await doFetch(url, {
+            headers: { 'x-goog-api-key': key },
+            signal: signal ?? AbortSignal.timeout(15_000),
+          });
+        } catch (error) {
+          throw mapFetchError(error, signal, false);
+        }
+        if (!res.ok) throw await errorFromResponse(res);
+        const body = (await res.json()) as {
+          models?: { name?: string; supportedGenerationMethods?: string[] }[];
+          nextPageToken?: string;
+        };
+        for (const m of body.models ?? []) {
+          if (m.name && m.supportedGenerationMethods?.includes('generateContent')) {
+            models.push(m.name.replace(/^models\//, ''));
+          }
+        }
+        pageToken = body.nextPageToken;
+        if (!pageToken) break;
+      }
+      return models;
+    },
+
+    async *streamChat(request: ChatRequest, signal: AbortSignal) {
+      const key = await requireKey();
+      const guard = createStreamGuard(
+        signal,
+        options.firstChunkTimeoutMs ?? 30_000,
+        options.idleTimeoutMs ?? 60_000,
+      );
+      try {
+        const url = `${base}/${API_VERSION}/models/${encodeURIComponent(request.model)}:streamGenerateContent?alt=sse`;
+        // So'rov boshlanishidan oldin to'xtatilgan bo'lsa, tarmoqqa umuman chiqilmaydi
+        if (guard.signal.aborted) throw mapFetchError(null, guard.signal, false);
+        let res: Response;
+        try {
+          res = await doFetch(url, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json', 'x-goog-api-key': key },
+            body: JSON.stringify({
+              systemInstruction: { parts: [{ text: request.system }] },
+              contents: request.messages.map((m) => ({
+                role: m.role === 'assistant' ? 'model' : 'user',
+                parts: [{ text: m.content }],
+              })),
+              generationConfig: { temperature: 0.7 },
+            }),
+            signal: guard.signal,
+          });
+        } catch (error) {
+          throw mapFetchError(error, guard.signal, false);
+        }
+        if (!res.ok) throw await errorFromResponse(res);
+        if (!res.body) throw new ProviderError('AI_BAD_RESPONSE', 'empty body');
+
+        let produced = false;
+        try {
+          for await (const data of sseData(res.body)) {
+            guard.touch();
+            let chunk: {
+              candidates?: {
+                content?: { parts?: { text?: string; thought?: boolean }[] };
+                finishReason?: string;
+              }[];
+              promptFeedback?: { blockReason?: string };
+            };
+            try {
+              chunk = JSON.parse(data);
+            } catch {
+              throw new ProviderError('AI_BAD_RESPONSE', 'invalid JSON chunk');
+            }
+            if (chunk.promptFeedback?.blockReason)
+              throw new ProviderError('AI_BLOCKED', chunk.promptFeedback.blockReason);
+            const candidate = chunk.candidates?.[0];
+            const text = (candidate?.content?.parts ?? [])
+              .filter((p) => !p.thought && typeof p.text === 'string')
+              .map((p) => p.text)
+              .join('');
+            if (text) {
+              produced = true;
+              yield text;
+            }
+            if (candidate?.finishReason === 'SAFETY' && !produced)
+              throw new ProviderError('AI_BLOCKED', 'SAFETY');
+          }
+        } catch (error) {
+          throw mapFetchError(error, guard.signal, false);
+        }
+        if (!produced) throw new ProviderError('AI_BAD_RESPONSE', 'no text');
+      } finally {
+        guard.dispose();
+      }
+    },
+  };
+}

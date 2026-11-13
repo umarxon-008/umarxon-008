@@ -4,6 +4,8 @@ import type { AppInfo, Theme } from '@shared/ipc';
 import { PageHeader } from '../components/PageHeader';
 import { ErrorState, LoadingState } from '../components/StateViews';
 import { useSettings } from '../store/settings';
+import { AiSettingsSection } from '../features/settings/AiSettingsSection';
+import { PrivacySection } from '../features/settings/PrivacySection';
 import { uz } from '../i18n/uz';
 
 const themes: { value: Theme; label: string; icon: typeof Moon }[] = [
@@ -34,6 +36,8 @@ export function SettingsPage() {
           {error}
         </p>
       )}
+
+      <AiSettingsSection />
 
       <section className="card settings-section" aria-labelledby="appearance-title">
         <h2 id="appearance-title">Ko‘rinish</h2>
@@ -97,6 +101,8 @@ export function SettingsPage() {
           </button>
         </div>
       </section>
+
+      <PrivacySection />
 
       <section className="card settings-section" aria-labelledby="about-title">
         <h2 id="about-title">Dastur haqida</h2>

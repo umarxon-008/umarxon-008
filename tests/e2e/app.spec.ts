@@ -53,7 +53,7 @@ test('renderer’da Node yoki Electron API yo‘q, faqat window.marius bor', asy
       module: 'undefined',
       marius: 'object',
       frozen: true,
-      keys: ['app', 'logs', 'settings', 'system'],
+      keys: ['ai', 'app', 'chat', 'logs', 'settings', 'system'],
     });
 
     const prefs = await app.evaluate(({ BrowserWindow }) => {
@@ -100,7 +100,10 @@ test('tanishuv → bosh sahifa → sozlamalar; mavzu qayta ishga tushganda saqla
     await expect(nav).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Kompyuter holati' })).toBeVisible();
 
-    for (const name of ['Suhbat', 'Xotira', 'Vazifalar', 'Tarix', 'Kompyuter']) {
+    await nav.getByRole('link', { name: 'Suhbat' }).click();
+    await expect(page.getByRole('heading', { name: 'Yangi suhbat', level: 1 })).toBeVisible();
+
+    for (const name of ['Xotira', 'Vazifalar', 'Tarix', 'Kompyuter']) {
       await nav.getByRole('link', { name }).click();
       await expect(page.getByRole('heading', { name, level: 1, exact: true })).toBeVisible();
       await expect(page.getByText(/bosqichda qo'shiladi/)).toBeVisible();

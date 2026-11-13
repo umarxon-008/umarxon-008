@@ -2,8 +2,8 @@
 
 O‘zbek tilida gaplashadigan shaxsiy AI desktop yordamchi. Windows 10/11 uchun mo‘ljallangan.
 
-> **Holat:** 1-bosqich (PHASE 1): ilova poydevori, xavfsiz arxitektura va interfeys skeleti.
-> AI suhbat, ovoz va kompyuter amallari keyingi bosqichlarda qo‘shiladi. Reja: [`docs/ROADMAP.md`](docs/ROADMAP.md).
+> **Holat:** 2-bosqich (PHASE 2): o‘zbekcha AI suhbat (Gemini yoki lokal Ollama), real tizim monitoringi, ovozga javob beruvchi shar.
+> Ovozni matnga aylantirish va kompyuter amallari keyingi bosqichlarda qo‘shiladi. Reja: [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Windows'da sinab ko‘rish (dasturchi bo‘lmaganlar uchun)
 
@@ -16,6 +16,26 @@ O‘zbek tilida gaplashadigan shaxsiy AI desktop yordamchi. Windows 10/11 uchun 
 
 Dastur ma’lumotlari `%APPDATA%\MARIUS` papkasida saqlanadi (`marius.db`, `logs\`).
 O‘chirish: _Sozlamalar → Ilovalar → MARIUS → Uninstall_. Ma’lumotlar papkasi saqlanib qoladi.
+
+## AI’ni ulash (bepul)
+
+Sozlamalar → **Sun’iy intellekt** bo‘limida ikkitadan birini tanlang:
+
+**Google Gemini** (internet orqali, o‘zbek tilini yaxshi tushunadi)
+
+1. [Google AI Studio](https://aistudio.google.com/apikey) sahifasida Google akkaunt bilan kiring va **Create API key** tugmasini bosing.
+2. Kalitni MARIUS’dagi maydonga qo‘ying va **Saqlash**ni bosing. Kalit Windows himoyasi (DPAPI) bilan shifrlanadi.
+3. Ro‘yxatdan modelni tanlang.
+
+> Gemini ishlatilganda yozgan xabarlaringiz Google serverlariga yuboriladi.
+
+**Ollama** (kompyuterning o‘zida, internetsiz)
+
+1. [ollama.com](https://ollama.com/download) saytidan Windows uchun o‘rnating.
+2. Buyruqlar oynasida model yuklang: `ollama pull <model-nomi>`.
+3. MARIUS’da **Ulanishni tekshirish**ni bosing va modelni tanlang.
+
+> Kuchli kompyuter (16 GB+ RAM) tavsiya etiladi. O‘zbek tili sifati modelga bog‘liq.
 
 ## Dasturchilar uchun
 
@@ -57,9 +77,10 @@ Har bir push'da GitHub Actions (`.github/workflows/windows-build.yml`) Windows'd
 
 Hozircha kerak emas. API kalitlar `.env` faylida emas, ilova ichida shifrlangan holda saqlanadi (2-bosqich).
 
-| O‘zgaruvchi            | Vazifasi                                                                                    |
-| ---------------------- | ------------------------------------------------------------------------------------------- |
-| `MARIUS_USER_DATA_DIR` | Faqat dev/test: ma’lumotlar papkasini almashtiradi. Paketlangan ilovada e’tiborga olinmaydi |
+| O‘zgaruvchi              | Vazifasi                                                                                       |
+| ------------------------ | ---------------------------------------------------------------------------------------------- |
+| `MARIUS_USER_DATA_DIR`   | Faqat dev/test: ma’lumotlar papkasini almashtiradi. Paketlangan ilovada e’tiborga olinmaydi    |
+| `MARIUS_GEMINI_BASE_URL` | Faqat dev/test: Gemini API o‘rniga soxta server (E2E). Paketlangan ilovada e’tiborga olinmaydi |
 
 ### Tuzilma
 

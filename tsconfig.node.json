@@ -8,6 +8,7 @@
     "electron.vite.config.mts",
     "vitest.config.mts",
     "src/main/**/*",
+    "src/modules/**/*",
     "src/preload/**/*",
     "src/shared/**/*",
     "tests/unit/**/*"

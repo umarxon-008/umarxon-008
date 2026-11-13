@@ -1,4 +1,19 @@
-import type { AppInfo, IpcResult, Settings, SettingsPatch, SystemMetrics } from '../shared/ipc';
+import type {
+  AiSettings,
+  AiSettingsPatch,
+  AppInfo,
+  ChatEvent,
+  ChatMessage,
+  ChatSendResult,
+  ConnectionTest,
+  Conversation,
+  ConversationSummary,
+  IpcResult,
+  ProviderId,
+  Settings,
+  SettingsPatch,
+  SystemMetrics,
+} from '../shared/ipc';
 
 /** Renderer'ga ochilgan yagona API. Boshqa hech qanday OS kirish yo'li yo'q. */
 export interface MariusApi {
@@ -14,6 +29,27 @@ export interface MariusApi {
   };
   logs: {
     openFolder(): Promise<IpcResult<void>>;
+  };
+  ai: {
+    getSettings(): Promise<IpcResult<AiSettings>>;
+    updateSettings(patch: AiSettingsPatch): Promise<IpcResult<AiSettings>>;
+    /** Kalit faqat main process'ga yuboriladi va u yerda shifrlanadi. Qaytarib o'qib bo'lmaydi. */
+    setGeminiKey(key: string): Promise<IpcResult<AiSettings>>;
+    deleteGeminiKey(): Promise<IpcResult<AiSettings>>;
+    testConnection(provider: ProviderId): Promise<IpcResult<ConnectionTest>>;
+  };
+  chat: {
+    listConversations(): Promise<IpcResult<ConversationSummary[]>>;
+    getConversation(id: string): Promise<IpcResult<Conversation>>;
+    send(conversationId: string | null, text: string): Promise<IpcResult<ChatSendResult>>;
+    regenerate(
+      conversationId: string,
+    ): Promise<IpcResult<{ requestId: string; assistantMessage: ChatMessage }>>;
+    cancel(requestId: string): Promise<IpcResult<boolean>>;
+    deleteConversation(id: string): Promise<IpcResult<void>>;
+    clearAll(): Promise<IpcResult<void>>;
+    /** Javob oqimi hodisalari. Obunani bekor qiluvchi funksiya qaytaradi. */
+    onEvent(listener: (event: ChatEvent) => void): () => void;
   };
 }
 

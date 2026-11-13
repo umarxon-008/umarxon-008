@@ -22,7 +22,7 @@ PROJECT_AUDIT, ARCHITECTURE, ROADMAP, RISK_REGISTER.
 
 **Qabul mezonlari:** Windows'da ishga tushadi, navigatsiya ishlaydi, renderer'dan `require` va `process` yo'qligi testda tekshirilgan, CI yashil.
 
-## PHASE 2 — Chat (~2 sessiya)
+## PHASE 2 — Chat ✅ (kod va testlar tayyor; Windows'da foydalanuvchi sinovi kutilmoqda, `PHASE_2_REPORT.md`)
 - `AIProvider` interfeysi va foydalanuvchi tanlagan birinchi adapter.
 - Streaming, cancel, timeout, retry; xatoliklar o'zbekcha matnlarga map qilingan.
 - `conversations` / `messages`; yangi suhbat; tarixni tozalash.

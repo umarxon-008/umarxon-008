@@ -1,12 +1,17 @@
 import { join } from 'node:path';
-import { app, BrowserWindow, ipcMain, nativeTheme, net, shell } from 'electron';
-import { IPC_CHANNELS, type AppInfo } from '@shared/ipc';
+import { app, BrowserWindow, ipcMain, nativeTheme, net, safeStorage, shell } from 'electron';
+import { CHAT_EVENT_CHANNEL, IPC_CHANNELS, type AppInfo, type ChatEvent } from '@shared/ipc';
 import { createLogger, type Logger } from './logging/logger';
 import { openDatabase, type Database } from './database/database';
 import { SettingsRepository } from './database/settings-repository';
 import { createSenderGuard, dispatchIpc, type IpcHandlers } from './ipc/router';
 import { hardenWindow, lockDownPermissions, secureWebPreferences } from './security/window';
 import { createSystemMetricsService } from './services/system-metrics';
+import { SecretStore, type Encryptor } from './database/secret-store';
+import { ProviderSettingsRepository } from './database/provider-settings-repository';
+import { MemoryConversationStore, SqliteConversationStore } from './database/conversation-store';
+import { AiService } from './services/ai-service';
+import { ChatService } from './services/chat-service';
 
 const APP_ID = 'uz.marius.app';
 
@@ -21,6 +26,9 @@ app.setAppUserModelId(APP_ID);
 // Faqat development/test uchun: E2E testlar haqiqiy foydalanuvchi ma'lumotlariga tegmasligi kerak.
 const testDataDir = process.env['MARIUS_USER_DATA_DIR'];
 if (testDataDir && !app.isPackaged) app.setPath('userData', testDataDir);
+
+// Faqat development/test uchun: E2E testda Gemini o'rniga lokal soxta server ishlatiladi.
+const geminiBaseUrl = !app.isPackaged ? process.env['MARIUS_GEMINI_BASE_URL'] || undefined : undefined;
 
 const devServerUrl = !app.isPackaged ? process.env['ELECTRON_RENDERER_URL'] : undefined;
 const rendererFile = join(__dirname, '../renderer/index.html');
@@ -64,8 +72,37 @@ function createMainWindow(settings: SettingsRepository): BrowserWindow {
   return win;
 }
 
-function registerIpc(settings: SettingsRepository): void {
+/** Windows'da DPAPI orqali shifrlash. Mavjud bo'lmasa, kalit saqlanmaydi. */
+const electronEncryptor: Encryptor = {
+  isAvailable: () => safeStorage.isAsyncEncryptionAvailable(),
+  encrypt: (plain) => safeStorage.encryptStringAsync(plain),
+  decrypt: async (cipher) => (await safeStorage.decryptStringAsync(cipher)).result,
+};
+
+function emitChatEvent(event: ChatEvent): void {
+  const wc = mainWindow?.webContents;
+  if (wc && !wc.isDestroyed()) wc.send(CHAT_EVENT_CHANNEL, event);
+}
+
+function registerIpc(settings: SettingsRepository, database: Database): void {
   const metrics = createSystemMetricsService({ isOnline: () => net.isOnline() });
+  const ai = new AiService(
+    new ProviderSettingsRepository(database),
+    new SecretStore(database, electronEncryptor),
+    {
+      ...(geminiBaseUrl ? { geminiBaseUrl } : {}),
+    },
+  );
+  const persistentStore = new SqliteConversationStore(database);
+  const recovered = persistentStore.recoverInterrupted();
+  if (recovered > 0) logger.warn('chat.recovered_interrupted', { count: recovered });
+  const chat = new ChatService({
+    stores: { persistent: persistentStore, memory: new MemoryConversationStore() },
+    saveHistory: () => settings.getAll().saveHistory,
+    resolveProvider: () => ai.resolve(),
+    emit: emitChatEvent,
+    logger,
+  });
 
   const handlers: IpcHandlers = {
     'app:getInfo': (): AppInfo => ({
@@ -85,6 +122,20 @@ function registerIpc(settings: SettingsRepository): void {
     'logs:openFolder': async () => {
       await shell.openPath(paths().logDirectory);
     },
+
+    'ai:getSettings': () => ai.getSettings(),
+    'ai:updateSettings': (patch) => ai.update(patch),
+    'ai:setGeminiKey': ({ key }) => ai.setGeminiKey(key),
+    'ai:deleteGeminiKey': () => ai.deleteGeminiKey(),
+    'ai:testConnection': ({ provider }) => ai.testConnection(provider),
+
+    'chat:listConversations': () => chat.listConversations(),
+    'chat:getConversation': ({ id }) => chat.getConversation(id),
+    'chat:send': ({ conversationId, text }) => chat.send(conversationId, text),
+    'chat:regenerate': ({ conversationId }) => chat.regenerate(conversationId),
+    'chat:cancel': ({ requestId }) => chat.cancel(requestId),
+    'chat:deleteConversation': ({ id }) => chat.deleteConversation(id),
+    'chat:clearAll': () => chat.clearAll(),
   };
 
   const isTrusted = createSenderGuard({ devServerUrl, rendererFile });
@@ -120,7 +171,7 @@ if (!app.requestSingleInstanceLock()) {
     const settings = new SettingsRepository(db);
     nativeTheme.themeSource = settings.getAll().theme;
     lockDownPermissions(logger, createSenderGuard({ devServerUrl, rendererFile }));
-    registerIpc(settings);
+    registerIpc(settings, db);
     mainWindow = createMainWindow(settings);
     mainWindow.on('closed', () => {
       mainWindow = null;
