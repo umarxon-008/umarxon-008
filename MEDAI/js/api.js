@@ -59,6 +59,7 @@ let enginePromise = null;
 export function detectEngine() {
   if (!enginePromise) {
     enginePromise = (async () => {
+      if (location.protocol === 'file:') return 'browser'; // fayl sifatida ochilgan — server bo'lishi mumkin emas
       try {
         const controller = new AbortController();
         const t = setTimeout(() => controller.abort(), 4000);

@@ -164,11 +164,11 @@ MEDAI/
 
 ```bash
 npm test             # 20 ta unit va API test (Node test runner)
-npm run test:e2e     # 33 ta brauzer testi (Playwright kerak: npm i -D playwright && npx playwright install chromium)
+npm run test:e2e     # 34 ta brauzer testi (Playwright kerak: npm i -D playwright && npx playwright install chromium)
 npm run fixtures     # sintetik namuna fayllarni qayta yaratish
 ```
 
-**Oxirgi natija:** unit/API — 20/20 ✔, E2E — 33/33 ✔ (serversiz statik rejim testi ham shu jumladan). Barcha testlarda faqat sintetik maʼlumotlar ishlatilgan.
+**Oxirgi natija:** unit/API — 20/20 ✔, E2E — 34/34 ✔ (serversiz statik rejim va file:// testlari ham shu jumladan). Barcha testlarda faqat sintetik maʼlumotlar ishlatilgan.
 
 | Promptdagi test | Holat |
 |---|---|

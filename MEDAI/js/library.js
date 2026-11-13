@@ -9,9 +9,12 @@ let cache = null;
 
 export async function loadLibrary() {
   if (cache) return cache;
-  const res = await fetch('data/medical-terms.json');
-  if (!res.ok) throw new Error('library');
-  const data = await res.json();
+  let data = window.MEDAI_TERMS; // yig'ilgan versiyada sahifaga joylangan (file:// uchun)
+  if (!data) {
+    const res = await fetch('data/medical-terms.json');
+    if (!res.ok) throw new Error('library');
+    data = await res.json();
+  }
   cache = {
     meta: data.meta,
     terms: data.terms.map((t) => ({

@@ -445,6 +445,29 @@ await check('Statik rejim (serversiz): chat, PDF tahlil (pdf.js) va dori brauzer
   }
 });
 
+await check('dist/index.html ni fayl sifatida ochish (file://): ikonlar, chat, PDF va namunalar', async () => {
+  const fp = await browser.newPage({ viewport: { width: 1280, height: 860 } });
+  const errs = [];
+  fp.on('pageerror', (e) => errs.push(e.message));
+  fp.on('console', (m) => m.type() === 'error' && errs.push(m.text()));
+  await fp.goto(`file://${path.resolve(here, '../../dist/index.html')}`);
+  await fp.waitForFunction(() => document.querySelector('#statusText').textContent === 'Demo rejim');
+  assert(await fp.locator('i[data-lucide]').count() === 0 && await fp.locator('svg.lucide').count() > 40, 'ikonlar chizilmadi');
+  const msg = await ask(fp, 'Kreatinin nima?');
+  assert((await msg.innerText()).includes('Kreatinin'), 'chat ishlamadi');
+  await fp.click('.nav__item[data-route="analysis"]');
+  await fp.click('#labSampleBtn');
+  await fp.waitForSelector('#labFileChip:not([hidden])');
+  await fp.click('#labAnalyzeBtn');
+  await fp.waitForSelector('#confirmRows tr', { timeout: 20000 });
+  assert((await fp.locator('#confirmRows tr').count()) === 8, 'file:// da PDF oʻqilmadi');
+  await fp.click('.nav__item[data-route="medicine"]');
+  await fp.click('#medSampleBtn');
+  await fp.waitForSelector('#medicineResult .med-section');
+  assert(errs.length === 0, errs.join(' | '));
+  await fp.close();
+});
+
 await check('Brauzer konsolida xatolar yoʻq', async () => {
   const real = consoleErrors.filter((e) => !e.includes('net::ERR_FAILED') && !e.includes('Failed to load resource'));
   assert(real.length === 0, real.join(' | '));

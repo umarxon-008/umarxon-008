@@ -3,7 +3,7 @@
  * Oqim: 1) yuklash  ->  2) aniqlangan qiymatlarni foydalanuvchi tasdiqlaydi  ->  3) natija.
  * MAXFIYLIK: fayl va natijalar faqat sahifa xotirasida turadi — localStorage ga yozilmaydi.
  */
-import { $, el, icon, icons, formatBytes, renderMarkdown, copyText } from './utils.js';
+import { $, el, icon, icons, formatBytes, renderMarkdown, copyText, loadSampleBlob } from './utils.js';
 import { api } from './api.js';
 import { toast } from './ui.js';
 import { bindDropzone, validateFile } from './dropzone.js';
@@ -145,9 +145,7 @@ export async function loadSample() {
   if (s.controller) return;
   setStage(1);
   try {
-    const res = await fetch('assets/samples/namuna-qon-tahlili.pdf');
-    if (!res.ok) throw new Error();
-    const blob = await res.blob();
+    const blob = await loadSampleBlob('assets/samples/namuna-qon-tahlili.pdf', 'application/pdf');
     setFile(new File([blob], 'namuna-qon-tahlili.pdf', { type: 'application/pdf' }));
     toast('Namuna hujjat yuklandi. Bu soxta (sintetik) maʼlumot — haqiqiy bemorga tegishli emas.', 'info', { timeout: 6000 });
   } catch {

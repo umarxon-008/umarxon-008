@@ -38,7 +38,9 @@ export function createApp() {
     app.use(`/${dir}`, express.static(path.join(ROOT_DIR, dir), staticOpts));
   }
   app.get('/vendor/lucide.min.js', (_req, res) => res.sendFile(path.join(NODE_MODULES, 'lucide/dist/umd/lucide.min.js')));
-  app.use('/vendor/pdfjs', express.static(path.join(NODE_MODULES, 'pdfjs-dist/build'), { maxAge: '7d', index: false }));
+  for (const f of ['pdf.min.js', 'pdf.worker.min.js']) {
+    app.get(`/vendor/pdfjs/${f}`, (_req, res) => res.sendFile(path.join(NODE_MODULES, 'pdfjs-dist/build', f)));
+  }
   app.use('/vendor/fonts', express.static(path.join(NODE_MODULES, '@fontsource-variable/inter/files'), { maxAge: '7d' }));
   app.get('/', (_req, res) => res.sendFile(path.join(ROOT_DIR, 'index.html')));
   app.use((_req, res) => res.status(404).sendFile(path.join(ROOT_DIR, 'index.html')));

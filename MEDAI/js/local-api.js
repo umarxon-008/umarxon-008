@@ -15,6 +15,8 @@ const NAME_RE = /^[\p{L}\p{N}][\p{L}\p{N}\s\-+.,()'ʻʼ’]{1,79}$/u;
 
 let libPromise = null;
 const getLib = () => {
+  // file:// da fetch ishlamaydi — yig'ilgan versiyada ma'lumot sahifaga oldindan joylanadi (window.MEDAI_TERMS)
+  if (!libPromise && window.MEDAI_TERMS) libPromise = Promise.resolve(prepareLibrary(window.MEDAI_TERMS));
   if (!libPromise) {
     libPromise = fetch('data/medical-terms.json')
       .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
@@ -53,15 +55,37 @@ async function detectType(file, allowed) {
 
 const formatOf = (type) => ({ 'application/pdf': 'PDF', 'image/png': 'PNG', 'image/jpeg': 'JPG', 'text/plain': 'TXT' }[type]);
 
+/** Oddiy (klassik) skriptni yuklash — file:// da ham ishlaydi (modul va Worker'dan farqli). */
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.append(s);
+  });
+}
+
+let pdfjsPromise = null;
+/**
+ * pdf.js (v3, UMD) ni yuklaydi. Worker fayli ham oddiy skript sifatida yuklanadi (window.pdfjsWorker),
+ * shunda pdf.js alohida Worker yaratmasdan asosiy oqimda ishlaydi — file:// da ham.
+ * Xavfsizlik: isEvalSupported: false (CVE-2024-4367 dan himoya).
+ */
+function getPdfjs() {
+  if (!pdfjsPromise) {
+    pdfjsPromise = (async () => {
+      if (!window.pdfjsLib) await loadScript('vendor/pdfjs/pdf.min.js');
+      if (!window.pdfjsWorker) await loadScript('vendor/pdfjs/pdf.worker.min.js');
+      return window.pdfjsLib;
+    })().catch(() => { pdfjsPromise = null; throw new ApiError('PDF oʻquvchi modulni yuklab boʻlmadi.', { kind: 'pdfjs' }); });
+  }
+  return pdfjsPromise;
+}
+
 /** PDF matnini brauzerda ajratish (pdf.js). Matn qatorlari y-koordinata bo'yicha tiklanadi. */
 async function pdfText(file) {
-  let pdfjs;
-  try {
-    pdfjs = await import('../vendor/pdfjs/pdf.min.mjs');
-    pdfjs.GlobalWorkerOptions.workerSrc = new URL('../vendor/pdfjs/pdf.worker.min.mjs', import.meta.url).href;
-  } catch {
-    throw new ApiError('PDF oʻquvchi modulni yuklab boʻlmadi.', { kind: 'pdfjs' });
-  }
+  const pdfjs = await getPdfjs();
   try {
     const doc = await pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()), isEvalSupported: false }).promise;
     const lines = [];

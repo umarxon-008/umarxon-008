@@ -881,3 +881,7 @@ input[type='search']::-webkit-search-cancel-button { display: none; }
 .about-phase--next { border-color: #c6e4ee; background: linear-gradient(180deg, #f3fafc, var(--surface)); }
 .about-cta { flex-direction: row; align-items: center; justify-content: space-between; gap: 20px; background: var(--surface-2); }
 .about-cta h3 { font-size: 18px; }
+
+/* Manba fayl sifatida ochilganda ko'rsatiladigan ogohlantirish (js/boot-check.js) */
+.boot-warning { position: fixed; inset: 0 0 auto; z-index: 300; padding: 14px 20px; background: var(--danger); color: #fff; font-size: 15px; line-height: 1.5; text-align: center; }
+.boot-warning code { background: rgba(255, 255, 255, 0.18); padding: 1px 6px; border-radius: 5px; }

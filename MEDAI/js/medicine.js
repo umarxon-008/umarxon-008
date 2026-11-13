@@ -2,7 +2,7 @@
  * Dori qo'llanmasi (Medicine Guide): dori nomi, yo'riqnoma fayli yoki matni bo'yicha tushuntirish.
  * MEDAI dozani, davolash kursini yoki dorini almashtirishni tavsiya qilmaydi.
  */
-import { $, $$, el, icon, icons, formatBytes } from './utils.js';
+import { $, $$, el, icon, icons, formatBytes, loadSampleBlob } from './utils.js';
 import { api } from './api.js';
 import { toast, errorState, skeleton } from './ui.js';
 import { bindDropzone, validateFile } from './dropzone.js';
@@ -71,9 +71,8 @@ export function initMedicine() {
 
   $('#medSampleBtn').addEventListener('click', async () => {
     try {
-      const res = await fetch('assets/samples/namuna-yoriqnoma.txt');
-      if (!res.ok) throw new Error();
-      const sample = new File([await res.blob()], 'namuna-yoriqnoma.txt', { type: 'text/plain' });
+      const blob = await loadSampleBlob('assets/samples/namuna-yoriqnoma.txt', 'text/plain');
+      const sample = new File([blob], 'namuna-yoriqnoma.txt', { type: 'text/plain' });
       selectTab('tab-file');
       setFile(sample);
       toast('Namuna yoʻriqnoma yuklandi. Bu sintetik matn — haqiqiy dori emas.', 'info', { timeout: 5000 });

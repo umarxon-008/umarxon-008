@@ -206,3 +206,20 @@ export async function copyText(text) {
 
 export const prefersReducedMotion = () =>
   document.documentElement.classList.contains('reduce-motion') || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/**
+ * Namuna faylni olish. Yig'ilgan versiyada namunalar sahifaga base64 ko'rinishida joylanadi
+ * (window.MEDAI_SAMPLES) — file:// da fetch ishlamagani uchun. Aks holda serverdan yuklanadi.
+ */
+export async function loadSampleBlob(path, type) {
+  const b64 = window.MEDAI_SAMPLES?.[path];
+  if (b64) {
+    const bin = atob(b64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i += 1) bytes[i] = bin.charCodeAt(i);
+    return new Blob([bytes], { type });
+  }
+  const res = await fetch(path);
+  if (!res.ok) throw new Error('sample');
+  return res.blob();
+}
