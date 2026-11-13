@@ -73,3 +73,30 @@ test('sanitizeMessages: bo\'sh, uzun va noto\'g\'ri formatni rad etadi', () => {
   const ok = sanitizeMessages([{ role: 'assistant', content: 'salom' }, { role: 'user', content: 'a' }, { role: 'user', content: 'b' }]);
   assert.deepEqual(ok, [{ role: 'user', content: 'a\n\nb' }]);
 });
+
+test('demo: salomlashish, imkoniyatlar, minnatdorchilik va tayyorgarlik mavzusi', () => {
+  assert.equal(demoReply('Salom').kind, 'greeting');
+  assert.equal(demoReply('Assalomu alaykum!').kind, 'greeting');
+  assert.equal(demoReply('Nima qila olasan?').kind, 'capabilities');
+  assert.equal(demoReply('Rahmat!').kind, 'thanks');
+  assert.equal(demoReply('Tahlilga qanday tayyorlanish kerak?').kind, 'topic');
+  assert.equal(demoReply('Salom, kreatinin nima?').kind, 'library');
+});
+
+test('demo: savoldagi qiymatni foydalanuvchi yozgan oraliq bilan solishtiradi', () => {
+  const low = demoReply('Gemoglobinim 112 g/L, meʼyor 120–160');
+  assert.equal(low.kind, 'value');
+  assert.match(low.reply, /\*\*past\*\*/);
+  assert.match(low.reply, /112 g\/L/);
+  assert.match(demoReply('ALT 64 U/L, meʼyor 0-40').reply, /\*\*yuqori\*\*/);
+  assert.match(demoReply('CRP 3 mg/L, meʼyor < 5').reply, /\*\*ichida\*\*/);
+  const noRange = demoReply('Hb 120 nima degani?');
+  assert.equal(noRange.kind, 'value');
+  assert.match(noRange.reply, /oʻzidan qoʻymaydi/);
+});
+
+test('kutubxona: yangi atamalar va qisqa aliaslar to\'g\'ri moslanadi', () => {
+  assert.equal(demoReply('TTG nima?').sources[0].term, 'TTG (TSH)');
+  assert.equal(demoReply('HbA1c nima?').sources[0].term, 'Glikirlangan gemoglobin (HbA1c)');
+  assert.equal(demoReply('Futbol qoidalari qanday?').kind, 'no_source');
+});

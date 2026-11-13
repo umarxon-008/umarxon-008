@@ -8,6 +8,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
+import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 process.env.MEDAI_FORCE_DEMO = 'true';
@@ -297,7 +298,7 @@ await check('Dori qoʻllanmasi: nom boʻyicha (demo — ochiq «mavjud emas» ho
 await check('Tibbiy kutubxona: qidiruv, boʻsh natija va batafsil oyna', async () => {
   await page.goto(`${BASE}/#/library`);
   await page.waitForSelector('.term-card');
-  assert((await page.locator('.term-card').count()) === 10, '10 ta atama boʻlishi kerak');
+  assert((await page.locator('.term-card').count()) === 26, '26 ta atama boʻlishi kerak');
   await page.fill('#librarySearch', 'crp');
   await page.waitForFunction(() => document.querySelectorAll('.term-card').length === 1);
   await page.fill('#librarySearch', 'zzzz');
@@ -311,7 +312,7 @@ await check('Tibbiy kutubxona: qidiruv, boʻsh natija va batafsil oyna', async (
 });
 
 await check('13. Navigatsiyadagi barcha tugmalar', async () => {
-  const routes = { chat: 'AI yordamchi', analysis: 'Tibbiy tahlil', medicine: 'Dori qoʻllanmasi', library: 'Tibbiy kutubxona', history: 'Suhbatlar tarixi' };
+  const routes = { chat: 'AI yordamchi', analysis: 'Tibbiy tahlil', medicine: 'Dori qoʻllanmasi', library: 'Tibbiy kutubxona', history: 'Suhbatlar tarixi', about: 'Loyiha haqida' };
   for (const [route, title] of Object.entries(routes)) {
     await page.click(`.nav__item[data-route="${route}"]`);
     await page.waitForFunction((t) => document.querySelector('#pageTitle').textContent === t, title);
@@ -327,6 +328,32 @@ await check('13. Navigatsiyadagi barcha tugmalar', async () => {
   await page.keyboard.press('Escape');
   await page.selectOption('#langSelect', 'ru');
   assert((await page.inputValue('#langSelect')) === 'uz', 'til oʻzbekchaga qaytmadi');
+});
+
+await check('«Sinab koʻring»: savoldagi qiymatni oraliq bilan solishtirish', async () => {
+  await page.click('#newChatBtn');
+  await page.waitForSelector('#welcome:not([hidden])');
+  const before = await page.locator('.msg--ai').count();
+  await page.locator('.try-chip').first().click();
+  await page.waitForFunction((n) => document.querySelectorAll('.msg--ai:not(.msg--typing)').length > n, before);
+  const text = await page.locator('.msg--ai').last().innerText();
+  assert(text.includes('natijangiz haqida') && text.includes('past'), 'qiymat solishtirilmadi');
+});
+
+await check('Dori qoʻllanmasi: «Namuna yoʻriqnoma» tugmasi', async () => {
+  await page.goto(`${BASE}/#/medicine`);
+  await page.click('#medSampleBtn');
+  await page.waitForFunction(() => document.querySelector('#medicineResult .card__title')?.textContent === 'Namuna-dori 500');
+});
+
+await check('Loyiha haqida: taqdimot sahifasi va tugmalari', async () => {
+  await page.goto(`${BASE}/#/about`);
+  await page.waitForSelector('#view-about:not([hidden]) .about-hero');
+  assert((await page.locator('.about-card').count()) >= 9, 'imkoniyat kartalari yetarli emas');
+  await page.screenshot({ path: `${SHOTS}/desktop-12-about.png` });
+  await page.locator('[data-about-action="sample"]').click();
+  await page.waitForSelector('#view-analysis:not([hidden]) #labFileChip:not([hidden])');
+  await page.click('#labRemoveBtn');
 });
 
 await check('Sozlamalar: ism validatsiyasi va saqlash', async () => {
@@ -382,6 +409,39 @@ await check('Laptop va planshet oʻlchamlari', async () => {
     await mobile.screenshot({ path: `${SHOTS}/${name}-library.png` });
     const overflow = await mobile.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
     assert(!overflow, `${name}: gorizontal scroll`);
+  }
+});
+
+// ---------- Serversiz (statik) rejim: dist/ API'siz beriladi ----------
+await check('Statik rejim (serversiz): chat, PDF tahlil (pdf.js) va dori brauzerda ishlaydi', async () => {
+  execSync('node scripts/build.mjs', { cwd: path.resolve(here, '../..'), stdio: 'ignore' });
+  const express = require('express');
+  const staticApp = express();
+  staticApp.use((req, res, next) => { res.set('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'"); next(); });
+  staticApp.use(express.static(path.resolve(here, '../../dist')));
+  const st = staticApp.listen(0, '127.0.0.1');
+  await new Promise((r) => st.once('listening', r));
+  const SBASE = `http://127.0.0.1:${st.address().port}`;
+  try {
+    const sp = await browser.newPage({ viewport: { width: 1280, height: 860 } });
+    const errs = [];
+    sp.on('pageerror', (e) => errs.push(e.message));
+    await sp.goto(SBASE, { waitUntil: 'networkidle' });
+    await sp.waitForFunction(() => document.querySelector('#statusText').textContent === 'Demo rejim');
+    const msg = await ask(sp, 'Gemoglobinim 112 g/L, meʼyor 120–160');
+    assert((await msg.innerText()).includes('natijangiz haqida'), 'statik chat ishlamadi');
+    await sp.goto(`${SBASE}/#/analysis`);
+    await sp.setInputFiles('#labFileInput', path.join(fixtures, 'namuna-qon-tahlili.pdf'));
+    await sp.click('#labAnalyzeBtn');
+    await sp.waitForSelector('#confirmRows tr', { timeout: 20000 });
+    assert((await sp.locator('#confirmRows tr').count()) === 8, 'brauzerdagi PDF oʻqish 8 qator bermadi');
+    await sp.goto(`${SBASE}/#/medicine`);
+    await sp.click('#medSampleBtn');
+    await sp.waitForSelector('#medicineResult .med-section');
+    assert(errs.length === 0, errs.join(' | '));
+    await sp.close();
+  } finally {
+    st.close();
   }
 });
 

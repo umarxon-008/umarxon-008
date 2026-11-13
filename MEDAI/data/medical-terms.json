@@ -11,163 +11,812 @@
       "id": "gemoglobin",
       "term": "Gemoglobin",
       "category": "Qon tahlili",
-      "aliases": ["gemoglobin", "hemoglobin", "haemoglobin", "hgb", "hb", "гемоглобин"],
+      "aliases": [
+        "gemoglobin",
+        "hemoglobin",
+        "haemoglobin",
+        "hgb",
+        "hb",
+        "гемоглобин"
+      ],
       "simple": "Qizil qon tanachalari (eritrotsitlar) ichidagi oqsil. U oʻpkadan kislorodni tananing barcha aʼzolariga tashiydi.",
       "medical": "Gemoglobin — temir saqlovchi oqsil va umumiy qon tahlilining asosiy koʻrsatkichlaridan biri. Odatda g/L yoki g/dL birligida oʻlchanadi. Meʼyoriy oraliq yosh, jins, homiladorlik va laboratoriya uslubiga qarab farq qiladi, shuning uchun natija oʻsha laboratoriya koʻrsatgan reference range bilan solishtiriladi.",
-      "related": ["Eritrotsitlar", "Temir almashinuvi", "Kislorod tashish", "Kamqonlik (anemiya) tekshiruvlari"],
+      "related": [
+        "Eritrotsitlar",
+        "Temir almashinuvi",
+        "Kislorod tashish",
+        "Kamqonlik (anemiya) tekshiruvlari"
+      ],
       "doctorQuestions": [
         "Bu natija mening yoshim va jinsim uchun qanday baholanadi?",
         "Qoʻshimcha tekshiruv (masalan, temir koʻrsatkichlari) kerakmi?"
       ],
       "sources": [
-        { "title": "Hemoglobin Test", "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)", "url": "https://medlineplus.gov/lab-tests/hemoglobin-test/" }
+        {
+          "title": "Hemoglobin Test",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/lab-tests/hemoglobin-test/"
+        }
       ]
     },
     {
       "id": "leykotsit",
       "term": "Leykotsitlar",
       "category": "Qon tahlili",
-      "aliases": ["leykotsit", "leykotsitlar", "leykositlar", "leukocyte", "leukocytes", "white blood cells", "wbc", "лейкоциты", "лейкоцит", "oq qon tanachalari"],
+      "aliases": [
+        "leykotsit",
+        "leykotsitlar",
+        "leykositlar",
+        "leukocyte",
+        "leukocytes",
+        "white blood cells",
+        "wbc",
+        "лейкоциты",
+        "лейкоцит",
+        "oq qon tanachalari"
+      ],
       "simple": "Tanani infeksiyalar va boshqa begona omillardan himoya qiluvchi oq qon tanachalari.",
       "medical": "Leykotsitlar — immun tizimi hujayralari: neytrofillar, limfotsitlar, monotsitlar, eozinofillar va bazofillar. Umumiy qon tahlilida ularning umumiy soni (odatda ×10⁹/L) va baʼzan turlari boʻyicha ulushi koʻrsatiladi. Koʻrsatkich infeksiya, yalligʻlanish, stress, jismoniy zoʻriqish, ayrim dorilar va boshqa omillar taʼsirida oʻzgarishi mumkin, shuning uchun bitta natija asosida xulosa chiqarilmaydi.",
-      "related": ["Immun tizimi", "Infeksiya", "Yalligʻlanish", "Leykotsitar formula"],
+      "related": [
+        "Immun tizimi",
+        "Infeksiya",
+        "Yalligʻlanish",
+        "Leykotsitar formula"
+      ],
       "doctorQuestions": [
         "Leykotsitar formulani (turlari boʻyicha) ham koʻrib chiqish kerakmi?",
         "Tahlilni qayta topshirish kerakmi va qachon?"
       ],
       "sources": [
-        { "title": "White Blood Count (WBC)", "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)", "url": "https://medlineplus.gov/lab-tests/white-blood-count-wbc/" }
+        {
+          "title": "White Blood Count (WBC)",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/lab-tests/white-blood-count-wbc/"
+        }
       ]
     },
     {
       "id": "trombotsit",
       "term": "Trombotsitlar",
       "category": "Qon tahlili",
-      "aliases": ["trombotsit", "trombotsitlar", "trombositlar", "platelet", "platelets", "plt", "тромбоциты", "тромбоцит"],
+      "aliases": [
+        "trombotsit",
+        "trombotsitlar",
+        "trombositlar",
+        "platelet",
+        "platelets",
+        "plt",
+        "тромбоциты",
+        "тромбоцит"
+      ],
       "simple": "Qon ivishida qatnashadigan mayda qon tanachalari — jarohatda qon toʻxtashiga yordam beradi.",
       "medical": "Trombotsitlar suyak koʻmigida hosil boʻladi va qon ivish jarayonining dastlabki bosqichida ishtirok etadi. Umumiy qon tahlilida ularning soni odatda ×10⁹/L birligida beriladi. Natijaga namunaning olinishi va saqlanishi ham taʼsir qilishi mumkin, shuning uchun gʻayrioddiy natija koʻpincha qayta tekshiriladi.",
-      "related": ["Qon ivishi", "Suyak koʻmigi", "Qon ketishi"],
+      "related": [
+        "Qon ivishi",
+        "Suyak koʻmigi",
+        "Qon ketishi"
+      ],
       "doctorQuestions": [
         "Bu natija qayta tekshirishni talab qiladimi?",
         "Qabul qilayotgan dorilarim bu koʻrsatkichga taʼsir qilishi mumkinmi?"
       ],
       "sources": [
-        { "title": "Platelet Tests", "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)", "url": "https://medlineplus.gov/lab-tests/platelet-tests/" }
+        {
+          "title": "Platelet Tests",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/lab-tests/platelet-tests/"
+        }
       ]
     },
     {
       "id": "glyukoza",
       "term": "Glyukoza",
       "category": "Biokimyo",
-      "aliases": ["glyukoza", "glukoza", "glucose", "glu", "qand", "qondagi qand", "глюкоза", "сахар крови"],
+      "aliases": [
+        "glyukoza",
+        "glukoza",
+        "glucose",
+        "glu",
+        "qand",
+        "qondagi qand",
+        "глюкоза",
+        "сахар крови"
+      ],
       "simple": "Qondagi qand miqdori. Glyukoza — tananing asosiy energiya manbai.",
       "medical": "Qondagi glyukoza darajasi ovqatlanish vaqti, tahlil och qoringa topshirilgan-topshirilmagani, stress va dorilarga bogʻliq. Odatda mmol/L yoki mg/dL birligida oʻlchanadi. Natijani baholashda tahlil sharoiti muhim; yakuniy xulosani shifokor qoʻshimcha tekshiruvlar bilan birga beradi.",
-      "related": ["Insulin", "Uglevod almashinuvi", "HbA1c (glikirlangan gemoglobin)"],
+      "related": [
+        "Insulin",
+        "Uglevod almashinuvi",
+        "HbA1c (glikirlangan gemoglobin)"
+      ],
       "doctorQuestions": [
         "Tahlil och qoringa topshirilgani natijani baholashga qanday taʼsir qiladi?",
         "HbA1c kabi qoʻshimcha tekshiruv kerakmi?"
       ],
       "sources": [
-        { "title": "Blood Glucose Test", "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)", "url": "https://medlineplus.gov/lab-tests/blood-glucose-test/" }
+        {
+          "title": "Blood Glucose Test",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/lab-tests/blood-glucose-test/"
+        }
       ]
     },
     {
       "id": "xolesterin",
       "term": "Xolesterin",
       "category": "Biokimyo",
-      "aliases": ["xolesterin", "xolesterol", "cholesterol", "chol", "холестерин", "ldl", "hdl", "lpnp", "lpvp"],
+      "aliases": [
+        "xolesterin",
+        "xolesterol",
+        "cholesterol",
+        "chol",
+        "холестерин",
+        "ldl",
+        "hdl",
+        "lpnp",
+        "lpvp"
+      ],
       "simple": "Qondagi yogʻsimon modda. Tana uni hujayra devorlari va baʼzi gormonlar uchun ishlatadi.",
       "medical": "Lipid profilida umumiy xolesterin, LDL (koʻpincha «yomon» deb ataladi), HDL (koʻpincha «yaxshi» deb ataladi) va triglitseridlar koʻrsatiladi. Natija odatda mmol/L yoki mg/dL birligida beriladi. Qaysi daraja maqsadli ekanini shifokor yurak-qon tomir xavf omillarini hisobga olib belgilaydi.",
-      "related": ["Lipid profili", "LDL va HDL", "Triglitseridlar", "Yurak-qon tomir salomatligi"],
+      "related": [
+        "Lipid profili",
+        "LDL va HDL",
+        "Triglitseridlar",
+        "Yurak-qon tomir salomatligi"
+      ],
       "doctorQuestions": [
         "Mening holatimda qaysi xolesterin darajasi maqsadli hisoblanadi?",
         "Toʻliq lipid profilini tekshirish kerakmi?"
       ],
       "sources": [
-        { "title": "Cholesterol", "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)", "url": "https://medlineplus.gov/cholesterol.html" }
+        {
+          "title": "Cholesterol",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/cholesterol.html"
+        }
       ]
     },
     {
       "id": "kreatinin",
       "term": "Kreatinin",
       "category": "Biokimyo",
-      "aliases": ["kreatinin", "creatinine", "crea", "креатинин"],
+      "aliases": [
+        "kreatinin",
+        "creatinine",
+        "crea",
+        "креатинин"
+      ],
       "simple": "Mushaklar ishlashi natijasida hosil boʻladigan va buyraklar orqali chiqariladigan modda.",
       "medical": "Qondagi kreatinin darajasi buyrak faoliyatini baholashda ishlatiladigan koʻrsatkichlardan biri. Uning darajasi mushak massasi, yosh, jins, suyuqlik ichish va baʼzi dorilarga bogʻliq. Koʻpincha u asosida glomerulyar filtratsiya tezligi (eGFR) hisoblanadi; baholashni shifokor bajaradi.",
-      "related": ["Buyrak faoliyati", "eGFR", "Mochevina"],
+      "related": [
+        "Buyrak faoliyati",
+        "eGFR",
+        "Mochevina"
+      ],
       "doctorQuestions": [
         "eGFR koʻrsatkichi ham hisoblanganmi?",
         "Qabul qilayotgan dorilarim bu natijaga taʼsir qilishi mumkinmi?"
       ],
       "sources": [
-        { "title": "Creatinine Test", "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)", "url": "https://medlineplus.gov/lab-tests/creatinine-test/" }
+        {
+          "title": "Creatinine Test",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/lab-tests/creatinine-test/"
+        }
       ]
     },
     {
       "id": "vitamin-d",
       "term": "Vitamin D",
       "category": "Biokimyo",
-      "aliases": ["vitamin d", "d vitamini", "vitamin d3", "25(oh)d", "25-oh", "25-oh vitamin d", "kalsidiol", "витамин d", "витамин д"],
+      "aliases": [
+        "vitamin d",
+        "d vitamini",
+        "vitamin d3",
+        "25(oh)d",
+        "25-oh",
+        "25-oh vitamin d",
+        "kalsidiol",
+        "витамин d",
+        "витамин д"
+      ],
       "simple": "Suyak va tishlar uchun zarur boʻlgan kaltsiyni oʻzlashtirishga yordam beruvchi vitamin. Teri quyosh nuri taʼsirida uni hosil qiladi.",
       "medical": "Laboratoriyada odatda 25-gidroksivitamin D (25(OH)D) oʻlchanadi. Birligi ng/mL yoki nmol/L boʻlishi mumkin — birliklar orasidagi farqga eʼtibor bering. Yetishmovchilik va ortiqchalik chegaralari turli tashkilotlar tavsiyalarida farq qiladi. Qoʻshimcha qabul qilish zarurati va miqdorini faqat shifokor belgilaydi.",
-      "related": ["Kaltsiy", "Suyak salomatligi", "Quyosh nuri"],
+      "related": [
+        "Kaltsiy",
+        "Suyak salomatligi",
+        "Quyosh nuri"
+      ],
       "doctorQuestions": [
         "Bu natija qaysi birlikda va qaysi meʼyorga nisbatan baholangan?",
         "Qayta tekshirish qachon maqsadga muvofiq?"
       ],
       "sources": [
-        { "title": "Vitamin D Test", "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)", "url": "https://medlineplus.gov/lab-tests/vitamin-d-test/" }
+        {
+          "title": "Vitamin D Test",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/lab-tests/vitamin-d-test/"
+        }
       ]
     },
     {
       "id": "qon-bosimi",
       "term": "Qon bosimi",
       "category": "Umumiy",
-      "aliases": ["qon bosimi", "arterial bosim", "blood pressure", "давление", "артериальное давление", "gipertoniya", "gipertenziya", "hypertension"],
+      "aliases": [
+        "qon bosimi",
+        "arterial bosim",
+        "blood pressure",
+        "давление",
+        "артериальное давление",
+        "gipertoniya",
+        "gipertenziya",
+        "hypertension"
+      ],
       "simple": "Yurak qonni haydaganda qon tomir devorlariga beradigan bosim kuchi. Ikki raqam bilan yoziladi, masalan 120/80.",
       "medical": "Yuqori (sistolik) raqam yurak qisqarganidagi, pastki (diastolik) raqam yurak boʻshashganidagi bosimni bildiradi; birligi mm sim. ust. (mmHg). Bosim kun davomida, jismoniy faollik, stress va oʻlchash usuliga qarab oʻzgaradi, shuning uchun bir martalik oʻlchov asosida xulosa qilinmaydi.",
-      "related": ["Yurak-qon tomir tizimi", "Gipertenziya", "Uy sharoitida bosim oʻlchash"],
+      "related": [
+        "Yurak-qon tomir tizimi",
+        "Gipertenziya",
+        "Uy sharoitida bosim oʻlchash"
+      ],
       "warning": "Juda yuqori bosim bilan birga kuchli bosh ogʻrigʻi, koʻkrak ogʻrigʻi, nutq yoki koʻrish buzilishi boʻlsa — darhol 103 ga qoʻngʻiroq qiling.",
       "doctorQuestions": [
         "Bosimni uyda qanday toʻgʻri oʻlchash kerak?",
         "Qaysi koʻrsatkichlarda shifokorga murojaat qilishim kerak?"
       ],
       "sources": [
-        { "title": "High Blood Pressure", "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)", "url": "https://medlineplus.gov/highbloodpressure.html" },
-        { "title": "Hypertension — fact sheet", "org": "Jahon sogʻliqni saqlash tashkiloti (WHO)", "url": "https://www.who.int/news-room/fact-sheets/detail/hypertension" }
+        {
+          "title": "High Blood Pressure",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/highbloodpressure.html"
+        },
+        {
+          "title": "Hypertension — fact sheet",
+          "org": "Jahon sogʻliqni saqlash tashkiloti (WHO)",
+          "url": "https://www.who.int/news-room/fact-sheets/detail/hypertension"
+        }
       ]
     },
     {
       "id": "allergiya",
       "term": "Allergiya",
       "category": "Umumiy",
-      "aliases": ["allergiya", "allergy", "allergen", "аллергия"],
+      "aliases": [
+        "allergiya",
+        "allergy",
+        "allergen",
+        "аллергия"
+      ],
       "simple": "Immun tizimining odatda zararsiz moddalarga (chang, gul changi, baʼzi ovqatlar yoki dorilar) haddan tashqari javob berishi.",
       "medical": "Allergik reaksiya teri toshmasi, qichishish, aksirish, burun bitishi, koʻz yoshlanishi kabi belgilar bilan namoyon boʻlishi mumkin. Ogʻir holatda — anafilaksiyada — nafas qisilishi, tomoq yoki yuz shishishi, bosim tushishi kuzatiladi va bu shoshilinch tibbiy yordam talab qiladi. Allergenni aniqlash uchun maxsus tekshiruvlar mavjud.",
-      "related": ["Immun tizimi", "Anafilaksiya", "Allergen testlari", "Dori allergiyasi"],
+      "related": [
+        "Immun tizimi",
+        "Anafilaksiya",
+        "Allergen testlari",
+        "Dori allergiyasi"
+      ],
       "warning": "Nafas qisilishi, tomoq yoki yuz shishishi boʻlsa — darhol 103 ga qoʻngʻiroq qiling.",
       "doctorQuestions": [
         "Allergenni aniqlash uchun qaysi tekshiruvlar mavjud?",
         "Dori allergiyasi haqida tibbiy kartaga qayd qilish kerakmi?"
       ],
       "sources": [
-        { "title": "Allergy", "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)", "url": "https://medlineplus.gov/allergy.html" }
+        {
+          "title": "Allergy",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/allergy.html"
+        }
       ]
     },
     {
       "id": "yalliglanish",
       "term": "Yalligʻlanish",
       "category": "Umumiy",
-      "aliases": ["yalligʻlanish", "yallig'lanish", "yalliglanish", "inflammation", "воспаление", "crp", "c-reaktiv oqsil", "s-reaktiv oqsil", "срб", "echt", "esr", "соэ"],
+      "aliases": [
+        "yalligʻlanish",
+        "yallig'lanish",
+        "yalliglanish",
+        "inflammation",
+        "воспаление"
+      ],
       "simple": "Tananing jarohat yoki infeksiyaga qarshi tabiiy himoya reaksiyasi. Qizarish, shish, ogʻriq va issiqlik bilan namoyon boʻlishi mumkin.",
       "medical": "Yalligʻlanish oʻtkir (qisqa muddatli) yoki surunkali boʻlishi mumkin. Laboratoriyada uni bilvosita koʻrsatuvchi markerlar bor: masalan, C-reaktiv oqsil (CRP) va eritrotsitlar choʻkish tezligi (EChT/ESR). Bu markerlar oʻziga xos emas — ular yalligʻlanish borligini koʻrsatishi mumkin, lekin sababini aniqlamaydi.",
-      "related": ["CRP", "EChT (ESR)", "Immun javob", "Infeksiya"],
+      "related": [
+        "C-reaktiv oqsil (CRP)",
+        "EChT (ESR)",
+        "Immun javob",
+        "Infeksiya"
+      ],
       "doctorQuestions": [
         "Bu marker natijasi qanday qoʻshimcha tekshiruvni talab qiladi?",
         "Tahlilni qachon qayta topshirish kerak?"
       ],
       "sources": [
-        { "title": "C-Reactive Protein (CRP) Test", "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)", "url": "https://medlineplus.gov/lab-tests/c-reactive-protein-crp-test/" }
+        {
+          "title": "C-Reactive Protein (CRP) Test",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/lab-tests/c-reactive-protein-crp-test/"
+        }
+      ]
+    },
+    {
+      "id": "eritrotsit",
+      "term": "Eritrotsitlar",
+      "category": "Qon tahlili",
+      "aliases": [
+        "eritrotsit",
+        "eritrotsitlar",
+        "qizil qon tanachalari",
+        "rbc",
+        "red blood cells",
+        "эритроциты",
+        "эритроцит"
+      ],
+      "simple": "Qonga qizil rang beruvchi va kislorod tashuvchi qon hujayralari.",
+      "medical": "Eritrotsitlar suyak koʻmigida hosil boʻladi va ichida gemoglobin saqlaydi. Umumiy qon tahlilida ularning soni odatda ×10¹²/L birligida beriladi. Natija suyuqlik muvozanati, yashash balandligi, yosh, jins va boshqa omillarga bogʻliq; uni gemoglobin va gematokrit bilan birga baholash odatiy hol.",
+      "related": [
+        "Gemoglobin",
+        "Gematokrit",
+        "Kislorod tashish"
+      ],
+      "doctorQuestions": [
+        "Eritrotsitlar soni gemoglobin va gematokrit bilan birga qanday baholanadi?",
+        "Qoʻshimcha tekshiruv kerakmi?"
+      ],
+      "sources": [
+        {
+          "title": "Red Blood Cell (RBC) Count",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/lab-tests/red-blood-cell-rbc-count/"
+        }
+      ]
+    },
+    {
+      "id": "gematokrit",
+      "term": "Gematokrit",
+      "category": "Qon tahlili",
+      "aliases": [
+        "gematokrit",
+        "hematokrit",
+        "hematocrit",
+        "hct",
+        "гематокрит"
+      ],
+      "simple": "Qon hajmining qancha qismini qizil qon tanachalari tashkil qilishini koʻrsatadi.",
+      "medical": "Gematokrit odatda foizda (%) yoki ulush sifatida beriladi. U eritrotsitlar soni va hajmiga, shuningdek qon plazmasi miqdoriga bogʻliq — masalan, suvsizlanish natijani oʻzgartirishi mumkin. Odatda gemoglobin bilan birga baholanadi.",
+      "related": [
+        "Eritrotsitlar",
+        "Gemoglobin",
+        "Suvsizlanish"
+      ],
+      "doctorQuestions": [
+        "Natijaga suyuqlik ichish miqdori taʼsir qilgan boʻlishi mumkinmi?"
+      ],
+      "sources": [
+        {
+          "title": "Hematocrit Test",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/lab-tests/hematocrit-test/"
+        }
+      ]
+    },
+    {
+      "id": "echt",
+      "term": "EChT (ESR)",
+      "category": "Qon tahlili",
+      "aliases": [
+        "echt",
+        "esr",
+        "soe",
+        "соэ",
+        "eritrotsitlar choʻkish tezligi",
+        "eritrotsitlar cho'kish tezligi"
+      ],
+      "simple": "Eritrotsitlarning probirka tubiga qanchalik tez choʻkishini koʻrsatuvchi tahlil.",
+      "medical": "EChT (eritrotsitlar choʻkish tezligi) odatda mm/soat birligida beriladi. U yalligʻlanishni bilvosita koʻrsatuvchi, oʻziga xos boʻlmagan marker: koʻtarilishi koʻplab holatlarda kuzatilishi mumkin va sababini oʻzi aniqlamaydi. Natija yosh va jinsga ham bogʻliq.",
+      "related": [
+        "Yalligʻlanish",
+        "C-reaktiv oqsil (CRP)",
+        "Umumiy qon tahlili"
+      ],
+      "doctorQuestions": [
+        "EChT natijasini boshqa qaysi tekshiruvlar bilan birga koʻrish kerak?"
+      ],
+      "sources": [
+        {
+          "title": "Erythrocyte Sedimentation Rate (ESR)",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/lab-tests/erythrocyte-sedimentation-rate-esr/"
+        }
+      ]
+    },
+    {
+      "id": "crp",
+      "term": "C-reaktiv oqsil (CRP)",
+      "category": "Biokimyo",
+      "aliases": [
+        "crp",
+        "c-reaktiv oqsil",
+        "s-reaktiv oqsil",
+        "c reaktiv oqsil",
+        "срб",
+        "с-реактивный белок",
+        "c-reactive protein"
+      ],
+      "simple": "Tanada yalligʻlanish boʻlganda jigar koʻproq ishlab chiqaradigan oqsil.",
+      "medical": "CRP odatda mg/L birligida oʻlchanadi. U yalligʻlanish markeri boʻlib, infeksiya, jarohat yoki boshqa yalligʻlanishli holatlarda oshishi mumkin, lekin sababini koʻrsatmaydi. Yuqori sezgir CRP (hs-CRP) deb ataladigan alohida tahlil ham mavjud.",
+      "related": [
+        "Yalligʻlanish",
+        "EChT (ESR)",
+        "Infeksiya"
+      ],
+      "doctorQuestions": [
+        "Bu natija qanday qoʻshimcha tekshiruvni talab qiladi?",
+        "Tahlilni qachon qayta topshirish kerak?"
+      ],
+      "sources": [
+        {
+          "title": "C-Reactive Protein (CRP) Test",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/lab-tests/c-reactive-protein-crp-test/"
+        }
+      ]
+    },
+    {
+      "id": "hba1c",
+      "term": "Glikirlangan gemoglobin (HbA1c)",
+      "category": "Biokimyo",
+      "aliases": [
+        "hba1c",
+        "glikirlangan gemoglobin",
+        "glikozillangan gemoglobin",
+        "gliklangan gemoglobin",
+        "a1c",
+        "гликированный гемоглобин"
+      ],
+      "simple": "Oxirgi taxminan 2–3 oy davomidagi oʻrtacha qand darajasini aks ettiruvchi tahlil.",
+      "medical": "HbA1c qizil qon tanachalaridagi gemoglobinning qancha qismi glyukoza bilan bogʻlanganini koʻrsatadi va odatda foizda (%) beriladi. U bir martalik glyukoza oʻlchovidan farqli ravishda uzoqroq davrni aks ettiradi. Baʼzi holatlar (masalan, kamqonlik turlari) natijaga taʼsir qilishi mumkin; baholashni shifokor bajaradi.",
+      "related": [
+        "Glyukoza",
+        "Insulin",
+        "Gemoglobin"
+      ],
+      "doctorQuestions": [
+        "Mening holatimda HbA1c qanday baholanadi?",
+        "Uni qanchalik tez-tez tekshirish kerak?"
+      ],
+      "sources": [
+        {
+          "title": "Hemoglobin A1C (HbA1c) Test",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/lab-tests/hemoglobin-a1c-hba1c-test/"
+        }
+      ]
+    },
+    {
+      "id": "alt",
+      "term": "ALT (alaninaminotransferaza)",
+      "category": "Biokimyo",
+      "aliases": [
+        "alt",
+        "alat",
+        "alaninaminotransferaza",
+        "alanin aminotransferaza",
+        "алт",
+        "алат",
+        "sgpt"
+      ],
+      "simple": "Asosan jigar hujayralarida boʻladigan ferment. Qondagi miqdori jigar holati haqida maʼlumot beradi.",
+      "medical": "ALT odatda U/L (birlik/litr) bilan oʻlchanadi va jigar funksiyasi tahlillari tarkibiga kiradi. Uning darajasi turli sabablarga koʻra oʻzgarishi mumkin, jumladan baʼzi dorilar va jismoniy zoʻriqish. Natija odatda AST, bilirubin va boshqa koʻrsatkichlar bilan birga baholanadi.",
+      "related": [
+        "AST",
+        "Bilirubin",
+        "Jigar funksiyasi tahlillari"
+      ],
+      "doctorQuestions": [
+        "ALT natijasini boshqa jigar koʻrsatkichlari bilan birga qanday baholaysiz?",
+        "Qabul qilayotgan dorilarim taʼsir qilishi mumkinmi?"
+      ],
+      "sources": [
+        {
+          "title": "ALT Blood Test",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/lab-tests/alt-blood-test/"
+        }
+      ]
+    },
+    {
+      "id": "ast",
+      "term": "AST (aspartataminotransferaza)",
+      "category": "Biokimyo",
+      "aliases": [
+        "ast",
+        "asat",
+        "aspartataminotransferaza",
+        "aspartat aminotransferaza",
+        "аст",
+        "асат",
+        "sgot"
+      ],
+      "simple": "Jigar, yurak va mushak hujayralarida boʻladigan ferment.",
+      "medical": "AST odatda U/L birligida oʻlchanadi. U faqat jigarga xos emas, shuning uchun koʻpincha ALT bilan birga baholanadi. Jismoniy zoʻriqish va baʼzi dorilar ham natijaga taʼsir qilishi mumkin.",
+      "related": [
+        "ALT",
+        "Jigar funksiyasi tahlillari"
+      ],
+      "doctorQuestions": [
+        "AST va ALT nisbati mening holatimda nimani bildiradi?"
+      ],
+      "sources": [
+        {
+          "title": "AST Test",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/lab-tests/ast-test/"
+        }
+      ]
+    },
+    {
+      "id": "bilirubin",
+      "term": "Bilirubin",
+      "category": "Biokimyo",
+      "aliases": [
+        "bilirubin",
+        "umumiy bilirubin",
+        "toʻgʻri bilirubin",
+        "to'g'ri bilirubin",
+        "билирубин"
+      ],
+      "simple": "Eski qizil qon tanachalari parchalanganda hosil boʻladigan sariq rangli modda. Uni jigar qayta ishlaydi.",
+      "medical": "Tahlilda umumiy, toʻgʻri (bogʻlangan) va bilvosita bilirubin koʻrsatilishi mumkin; birligi odatda µmol/L yoki mg/dL. Teri yoki koʻz oqining sargʻayishi bilirubin bilan bogʻliq boʻlishi mumkin — bunday holatda shifokorga murojaat qilish kerak.",
+      "related": [
+        "Jigar funksiyasi tahlillari",
+        "ALT",
+        "Eritrotsitlar"
+      ],
+      "doctorQuestions": [
+        "Bilirubinning qaysi turi (toʻgʻri yoki bilvosita) oʻzgargan?"
+      ],
+      "sources": [
+        {
+          "title": "Bilirubin Blood Test",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/lab-tests/bilirubin-blood-test/"
+        }
+      ]
+    },
+    {
+      "id": "mochevina",
+      "term": "Mochevina",
+      "category": "Biokimyo",
+      "aliases": [
+        "mochevina",
+        "urea",
+        "bun",
+        "мочевина"
+      ],
+      "simple": "Oqsil almashinuvi natijasida hosil boʻladigan va buyraklar orqali chiqariladigan modda.",
+      "medical": "Qondagi mochevina darajasi buyrak faoliyati, oqsil isteʼmoli va suyuqlik muvozanatiga bogʻliq. Odatda mmol/L yoki mg/dL birligida beriladi va koʻpincha kreatinin bilan birga baholanadi.",
+      "related": [
+        "Kreatinin",
+        "Buyrak faoliyati"
+      ],
+      "doctorQuestions": [
+        "Mochevina va kreatinin natijalari birga qanday baholanadi?"
+      ],
+      "sources": [
+        {
+          "title": "BUN (Blood Urea Nitrogen)",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/lab-tests/bun-blood-urea-nitrogen/"
+        }
+      ]
+    },
+    {
+      "id": "triglitserid",
+      "term": "Triglitseridlar",
+      "category": "Biokimyo",
+      "aliases": [
+        "triglitserid",
+        "triglitseridlar",
+        "trigliserid",
+        "triglycerides",
+        "tg",
+        "триглицериды"
+      ],
+      "simple": "Qondagi yogʻ turi. Tana ortiqcha energiyani triglitserid koʻrinishida saqlaydi.",
+      "medical": "Triglitseridlar lipid profilining bir qismi boʻlib, odatda mmol/L yoki mg/dL birligida beriladi. Natijaga oxirgi ovqatlanish kuchli taʼsir qiladi, shuning uchun tahlil koʻpincha och qoringa topshiriladi.",
+      "related": [
+        "Xolesterin",
+        "Lipid profili"
+      ],
+      "doctorQuestions": [
+        "Tahlilni och qoringa qayta topshirish kerakmi?"
+      ],
+      "sources": [
+        {
+          "title": "Triglycerides Test",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/lab-tests/triglycerides-test/"
+        }
+      ]
+    },
+    {
+      "id": "ttg",
+      "term": "TTG (TSH)",
+      "category": "Gormonlar",
+      "aliases": [
+        "ttg",
+        "tsh",
+        "tireotrop gormon",
+        "qalqonsimon bez gormoni",
+        "ттг",
+        "тиреотропный гормон"
+      ],
+      "simple": "Gipofiz bezi ishlab chiqaradigan va qalqonsimon bez faoliyatini boshqaradigan gormon.",
+      "medical": "TTG odatda mIU/L (yoki mkME/ml) birligida oʻlchanadi va qalqonsimon bez faoliyatini baholashda birinchi navbatda tekshiriladigan koʻrsatkichlardan biri. Natija koʻpincha erkin T4 (va T3) bilan birga baholanadi; baʼzi dorilar va homiladorlik ham taʼsir qiladi.",
+      "related": [
+        "Qalqonsimon bez",
+        "Erkin T4",
+        "Gormonlar"
+      ],
+      "doctorQuestions": [
+        "Erkin T4 ni ham tekshirish kerakmi?",
+        "Natijaga dorilarim taʼsir qilishi mumkinmi?"
+      ],
+      "sources": [
+        {
+          "title": "TSH (Thyroid-Stimulating Hormone) Test",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/lab-tests/tsh-thyroid-stimulating-hormone-test/"
+        }
+      ]
+    },
+    {
+      "id": "ferritin",
+      "term": "Ferritin",
+      "category": "Biokimyo",
+      "aliases": [
+        "ferritin",
+        "ферритин"
+      ],
+      "simple": "Tanadagi temir zaxirasini aks ettiruvchi oqsil.",
+      "medical": "Ferritin odatda ng/mL yoki µg/L birligida oʻlchanadi va temir zaxirasini baholashda ishlatiladi. Yalligʻlanish holatlarida ham oshishi mumkin, shuning uchun koʻpincha boshqa temir koʻrsatkichlari bilan birga baholanadi.",
+      "related": [
+        "Gemoglobin",
+        "Temir almashinuvi",
+        "Yalligʻlanish"
+      ],
+      "doctorQuestions": [
+        "Ferritin natijasini boshqa temir koʻrsatkichlari bilan birga koʻrish kerakmi?"
+      ],
+      "sources": [
+        {
+          "title": "Ferritin Blood Test",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/lab-tests/ferritin-blood-test/"
+        }
+      ]
+    },
+    {
+      "id": "siydik-tahlili",
+      "term": "Siydikning umumiy tahlili",
+      "category": "Siydik tahlili",
+      "aliases": [
+        "siydik tahlili",
+        "siydikning umumiy tahlili",
+        "umumiy siydik tahlili",
+        "oam",
+        "urinalysis",
+        "общий анализ мочи"
+      ],
+      "simple": "Siydikning rangi, tiniqligi, kimyoviy tarkibi va undagi hujayralarni tekshiruvchi tahlil.",
+      "medical": "Tahlilda zichlik, pH, oqsil, glyukoza, leykotsitlar, eritrotsitlar va boshqa koʻrsatkichlar baholanishi mumkin. Natijaga namunani toʻplash usuli (masalan, ertalabki oʻrta porsiya) taʼsir qiladi, shuning uchun laboratoriya koʻrsatmalariga amal qilish muhim.",
+      "related": [
+        "Buyrak faoliyati",
+        "Leykotsitlar",
+        "Glyukoza"
+      ],
+      "doctorQuestions": [
+        "Namuna toʻgʻri toʻplanganmi va tahlilni qayta topshirish kerakmi?"
+      ],
+      "sources": [
+        {
+          "title": "Urinalysis",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/lab-tests/urinalysis/"
+        }
+      ]
+    },
+    {
+      "id": "harorat",
+      "term": "Tana harorati (isitma)",
+      "category": "Umumiy",
+      "aliases": [
+        "isitma",
+        "harorat",
+        "tana harorati",
+        "temperatura",
+        "fever",
+        "температура",
+        "жар"
+      ],
+      "simple": "Tananing issiqlik darajasi. Uning koʻtarilishi — isitma — koʻpincha organizmning infeksiyaga javobi.",
+      "medical": "Harorat oʻlchash joyi (qoʻltiq, ogʻiz, quloq) va kun vaqtiga qarab biroz farq qiladi. Isitma oʻzi kasallik emas, balki belgi. Chaqaloqlarda, yuqori va uzoq davom etayotgan isitmada yoki boshqa xavotirli belgilar bilan birga kelganda shifokorga murojaat qilish kerak.",
+      "related": [
+        "Infeksiya",
+        "Yalligʻlanish"
+      ],
+      "warning": "Isitma bilan birga tutqanoq, hushning chalkashishi, nafas qisilishi yoki kuchli bosh ogʻrigʻi boʻlsa — darhol 103 ga qoʻngʻiroq qiling.",
+      "doctorQuestions": [
+        "Haroratni qaysi usulda va qanchalik tez-tez oʻlchash kerak?"
+      ],
+      "sources": [
+        {
+          "title": "Fever",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/fever.html"
+        }
+      ]
+    },
+    {
+      "id": "antibiotik",
+      "term": "Antibiotik",
+      "category": "Dori atamalari",
+      "aliases": [
+        "antibiotik",
+        "antibiotiklar",
+        "antibiotic",
+        "антибиотик"
+      ],
+      "simple": "Bakteriyalar keltirib chiqaradigan infeksiyalarga qarshi ishlatiladigan dorilar guruhi.",
+      "medical": "Antibiotiklar viruslarga (masalan, oddiy shamollash yoki grippga) taʼsir qilmaydi. Ularni faqat shifokor tavsiyasi bilan qabul qilish va belgilangan kursni oʻzboshimchalik bilan oʻzgartirmaslik muhim — notoʻgʻri qoʻllash bakteriyalarning chidamliligiga olib kelishi mumkin.",
+      "related": [
+        "Bakterial infeksiya",
+        "Antibiotiklarga chidamlilik",
+        "Nojoʻya taʼsir"
+      ],
+      "doctorQuestions": [
+        "Bu infeksiya uchun antibiotik haqiqatan kerakmi?",
+        "Qanday nojoʻya taʼsirlarga eʼtibor berishim kerak?"
+      ],
+      "sources": [
+        {
+          "title": "Antibiotics",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/antibiotics.html"
+        }
+      ]
+    },
+    {
+      "id": "nojoya-tasir",
+      "term": "Nojoʻya taʼsir",
+      "category": "Dori atamalari",
+      "aliases": [
+        "nojo'ya ta'sir",
+        "nojo'ya ta'sirlar",
+        "nojoya tasir",
+        "побочный эффект",
+        "побочные действия",
+        "side effect"
+      ],
+      "simple": "Doridan kutilgan foydadan tashqari yuzaga kelishi mumkin boʻlgan istalmagan taʼsir.",
+      "medical": "Yoʻriqnomada nojoʻya taʼsirlar koʻpincha uchrash chastotasi boʻyicha guruhlanadi (masalan, «tez-tez», «kam hollarda»). Roʻyxatda borligi har kimda albatta boʻladi degani emas. Gʻayrioddiy yoki kuchli belgilar paydo boʻlsa, shifokor yoki farmatsevtga murojaat qilish kerak.",
+      "related": [
+        "Qarshi koʻrsatma",
+        "Allergiya",
+        "Dori yoʻriqnomasi"
+      ],
+      "warning": "Dori qabul qilgandan keyin nafas qisilishi, yuz yoki tomoq shishishi boʻlsa — darhol 103 ga qoʻngʻiroq qiling.",
+      "doctorQuestions": [
+        "Qaysi nojoʻya taʼsirlarda dorini qabul qilishni darhol toʻxtatib, murojaat qilishim kerak?"
+      ],
+      "sources": [
+        {
+          "title": "Drugs, Herbs and Supplements",
+          "org": "MedlinePlus (AQSH Milliy tibbiyot kutubxonasi)",
+          "url": "https://medlineplus.gov/druginformation.html"
+        }
       ]
     }
   ]

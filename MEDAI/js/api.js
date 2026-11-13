@@ -1,5 +1,8 @@
 /**
- * Server API mijozi. API kaliti brauzerda YO'Q — barcha AI so'rovlari server orqali o'tadi.
+ * API mijozi. API kaliti brauzerda YO'Q — barcha AI so'rovlari server orqali o'tadi.
+ * Ishlash tartibi:
+ *   - MEDAI serveri topilsa (npm start yoki Netlify Functions) — so'rovlar serverga yuboriladi;
+ *   - server topilmasa (statik hosting) — brauzerdagi demo dvigatel (js/local-api.js) ishlatiladi.
  * Tibbiy ma'lumotlar console ga yozilmaydi.
  */
 
@@ -49,20 +52,52 @@ async function request(path, { method = 'GET', json, formData, signal } = {}) {
   return data;
 }
 
-export const api = {
-  status: () => request('/api/status'),
-  chat: (messages, signal) => request('/api/chat', { method: 'POST', json: { messages }, signal }),
+/* ---------------- Server yoki brauzer dvigatelini aniqlash ---------------- */
+let enginePromise = null;
+
+/** 'server' | 'browser' — bir marta aniqlanadi. */
+export function detectEngine() {
+  if (!enginePromise) {
+    enginePromise = (async () => {
+      try {
+        const controller = new AbortController();
+        const t = setTimeout(() => controller.abort(), 4000);
+        const res = await fetch('api/status', { signal: controller.signal, headers: { Accept: 'application/json' } });
+        clearTimeout(t);
+        const data = res.ok ? await res.json() : null;
+        if (data && (data.mode === 'demo' || data.mode === 'ai')) return 'server';
+      } catch { /* server yo'q */ }
+      return 'browser';
+    })();
+  }
+  return enginePromise;
+}
+
+const local = () => import('./local-api.js').then((m) => m.localApi);
+
+const serverApi = {
+  status: () => request('api/status').then((d) => ({ ...d, engine: 'server' })),
+  chat: (messages, signal) => request('api/chat', { method: 'POST', json: { messages }, signal }),
   analyzeReport(file, signal) {
     const fd = new FormData();
     fd.append('file', file, file.name);
-    return request('/api/analyze-report', { method: 'POST', formData: fd, signal });
+    return request('api/analyze-report', { method: 'POST', formData: fd, signal });
   },
   explainMedicine({ name, text, file }, signal) {
     if (file) {
       const fd = new FormData();
       fd.append('file', file, file.name);
-      return request('/api/explain-medicine', { method: 'POST', formData: fd, signal });
+      return request('api/explain-medicine', { method: 'POST', formData: fd, signal });
     }
-    return request('/api/explain-medicine', { method: 'POST', json: name ? { name } : { text }, signal });
+    return request('api/explain-medicine', { method: 'POST', json: name ? { name } : { text }, signal });
   },
+};
+
+const pick = async () => ((await detectEngine()) === 'server' ? serverApi : local());
+
+export const api = {
+  status: async () => (await pick()).status(),
+  chat: async (messages, signal) => (await pick()).chat(messages, signal),
+  analyzeReport: async (file, signal) => (await pick()).analyzeReport(file, signal),
+  explainMedicine: async (payload, signal) => (await pick()).explainMedicine(payload, signal),
 };

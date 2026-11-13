@@ -133,3 +133,18 @@
 @media (max-width: 380px) {
   .tab svg { display: none; }
 }
+
+/* Loyiha haqida — moslashuvchan */
+@media (max-width: 1023px) {
+  .about-grid--3, .about-steps { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 767px) {
+  .about { gap: 28px; }
+  .about-hero { padding: 28px 20px 24px; border-radius: 18px; }
+  .about-hero__title { font-size: 26px; }
+  .about-hero__text { font-size: 15px; }
+  .about-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .about-grid--2 { grid-template-columns: minmax(0, 1fr); }
+  .about-cta { flex-direction: column; align-items: stretch; }
+  .try-row { justify-content: flex-start; }
+}

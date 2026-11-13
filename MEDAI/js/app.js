@@ -7,14 +7,14 @@ import { api } from './api.js';
 import { t, applyTranslations, setLanguage } from './i18n.js';
 import { toast, openModal, initModal, initDrawer, initMenu } from './ui.js';
 import { initChat, render as renderChat, newConversation, prefill, isChatBusy } from './chat.js';
-import { initAnalysis, acceptExternalFile } from './upload.js';
+import { initAnalysis, acceptExternalFile, loadSample } from './upload.js';
 import { setMaxFileMb } from './dropzone.js';
 import { initMedicine } from './medicine.js';
 import { initLibrary, showLibrary, loadLibrary } from './library.js';
 import { initHistory, renderHistory, renderRecent } from './history.js';
 import { initSettings, syncSettingsForm, renderSystemStatus, wipeAll } from './settings.js';
 
-const ROUTES = ['chat', 'analysis', 'medicine', 'library', 'history', 'settings'];
+const ROUTES = ['chat', 'analysis', 'medicine', 'library', 'history', 'settings', 'about'];
 let drawer;
 let serverStatus = null;
 
@@ -41,7 +41,9 @@ function navigate() {
   $('#pageTitle').textContent = t(`nav.${route}`);
   $('#pageSubtitle').textContent = t(`page.${route}.sub`);
   document.title = `${t(`nav.${route}`)} — MEDAI`;
+  const changed = document.body.dataset.route !== route;
   document.body.dataset.route = route;
+  if (changed) $('#main').scrollTop = 0; // yangi bo'lim yuqoridan ochiladi
   drawer?.close();
 
   if (route === 'chat') renderChat();
@@ -75,7 +77,7 @@ async function refreshStatus(showToast = false) {
   $('#demoBanner').hidden = state === 'ai' || dismissed;
   $('#demoBannerText').textContent = state === 'offline'
     ? 'Server bilan aloqa yoʻq: chat, tahlil va dori boʻlimlari ishlamaydi. Serverni ishga tushiring (README) va sahifani yangilang.'
-    : 'Demo rejim: AI modeli ulanmagan. Javoblar qoidaga asoslangan va faqat MEDAI kutubxonasidan olinadi — ular AI javobi emas.';
+    : 'Demo rejim: AI modeli ulanmagan. Javoblar qoidaga asoslangan va MEDAI kutubxonasidan olinadi — ular AI javobi emas.';
   $('#demoBanner').dataset.state = state;
   renderSystemStatus(serverStatus);
   if (showToast) toast(state === 'offline' ? 'Server ulanmagan.' : `Holat yangilandi: ${$('#statusText').textContent}.`, state === 'offline' ? 'error' : 'success');
@@ -95,9 +97,12 @@ function showModesInfo() {
         icon(mode === 'ai' ? 'sparkles' : mode === 'demo' ? 'cloud-off' : 'server'),
         el('p', {}, [el('strong', { text: 'Hozirgi holat: ' }), { ai: `AI ulangan (${serverStatus?.model})`, demo: 'Demo rejim — AI ulanmagan', offline: 'Server ulanmagan' }[mode]]),
       ]),
+      serverStatus?.engine === 'browser'
+        ? el('p', { class: 'muted', text: 'Server topilmadi, shuning uchun demo toʻliq brauzeringizda ishlayapti: savollar va fayllar hech qayerga yuborilmaydi.' })
+        : null,
       el('h3', { text: 'Demo rejim' }),
       el('ul', { class: 'check-list' }, [
-        el('li', { text: 'Chat javoblari qoidaga asoslangan va faqat MEDAI kutubxonasidagi 10 ta atama hamda bir nechta umumiy mavzuni qamraydi.' }),
+        el('li', { text: 'Chat javoblari qoidaga asoslangan: MEDAI kutubxonasidagi 26 ta atama, amaliy mavzular va siz yozgan natijani oraliq bilan solishtirish.' }),
         el('li', { text: 'Tibbiy tahlil: matnli PDF dan koʻrsatkichlar algoritm bilan ajratiladi; rasm va skanerlangan hujjatlar uchun qiymatlar qoʻlda kiritiladi.' }),
         el('li', { text: 'Dori qoʻllanmasi: yuklangan yoʻriqnoma matni sarlavhalar boʻyicha boʻlimlarga ajratiladi. Dori nomi boʻyicha qidiruv mavjud emas.' }),
       ]),
@@ -171,6 +176,11 @@ function init() {
     if (action === 'clear-data') wipeAll();
   });
   $('#privacyLink').addEventListener('click', showPrivacyInfo);
+  $('#view-about').addEventListener('click', (e) => {
+    const action = e.target.closest('[data-about-action]')?.dataset.aboutAction;
+    if (action === 'chat') { go('chat'); $('#chatInput').focus(); }
+    if (action === 'sample') { go('analysis'); loadSample(); }
+  });
   $('#langSelect').addEventListener('change', (e) => {
     if (!setLanguage(e.target.value)) {
       e.target.value = 'uz';

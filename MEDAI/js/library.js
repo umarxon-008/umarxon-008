@@ -9,7 +9,7 @@ let cache = null;
 
 export async function loadLibrary() {
   if (cache) return cache;
-  const res = await fetch('/data/medical-terms.json');
+  const res = await fetch('data/medical-terms.json');
   if (!res.ok) throw new Error('library');
   const data = await res.json();
   cache = {

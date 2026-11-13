@@ -69,6 +69,20 @@ export function initMedicine() {
     if (!err) run({ text });
   });
 
+  $('#medSampleBtn').addEventListener('click', async () => {
+    try {
+      const res = await fetch('assets/samples/namuna-yoriqnoma.txt');
+      if (!res.ok) throw new Error();
+      const sample = new File([await res.blob()], 'namuna-yoriqnoma.txt', { type: 'text/plain' });
+      selectTab('tab-file');
+      setFile(sample);
+      toast('Namuna yoʻriqnoma yuklandi. Bu sintetik matn — haqiqiy dori emas.', 'info', { timeout: 5000 });
+      run({ file: sample });
+    } catch {
+      toast('Namuna faylni yuklab boʻlmadi.', 'error');
+    }
+  });
+
   $('#medicineResult').addEventListener('click', (e) => {
     const btn = e.target.closest('[data-goto-tab]');
     if (btn) { selectTab(btn.dataset.gotoTab); $(`#${btn.dataset.gotoTab}`).focus(); }

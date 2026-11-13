@@ -141,9 +141,11 @@ async function analyze() {
   }
 }
 
-async function loadSample() {
+export async function loadSample() {
+  if (s.controller) return;
+  setStage(1);
   try {
-    const res = await fetch('/assets/samples/namuna-qon-tahlili.pdf');
+    const res = await fetch('assets/samples/namuna-qon-tahlili.pdf');
     if (!res.ok) throw new Error();
     const blob = await res.blob();
     setFile(new File([blob], 'namuna-qon-tahlili.pdf', { type: 'application/pdf' }));

@@ -13,9 +13,11 @@ MEDAI — tibbiy maʼlumotlarni sodda oʻzbek tilida tushuntiruvchi web-platform
 | **AI yordamchi** | Chat. Enter bilan yuborish, Shift+Enter bilan yangi qator. Xavfsiz Markdown, manbalar va sana, javobni nusxalash, «foydali boʻldimi?» bahosi, xatoda «Qayta urinish». Shoshilinch holat, tashxis va doza soʻrovlari uchun xavfsizlik qoidalari ishlaydi. |
 | **Tibbiy tahlil** | PDF, JPG yoki PNG faylni drag-and-drop bilan yuklaydi. Ish 3 bosqichda boradi: **yuklash → qiymatlarni tasdiqlash → natija**. Har bir qiymat faqat hujjatda yozilgan meʼyoriy oraliq bilan solishtiriladi. Oraliq boʻlmasa, MEDAI uni oʻzidan qoʻymaydi. Natijada maʼnosi, cheklovlar va shifokorga beriladigan savollar chiqadi. |
 | **Dori qoʻllanmasi** | Dori nomi, yoʻriqnoma fayli (PDF/TXT; rasm faqat AI rejimida) yoki joylashtirilgan matn qabul qilinadi. Natijada quyidagi boʻlimlar chiqadi: faol modda, qoʻllanish sohasi, qarshi koʻrsatmalar, nojoʻya taʼsirlar, oʻzaro taʼsirlar, saqlash shartlari, manba va sana. **Dozalash boʻlimi ataylab koʻrsatilmaydi.** |
-| **Tibbiy kutubxona** | 10 ta atama. Qidiruv, turkum boʻyicha filtr va batafsil oyna bor. Har bir atamada sodda taʼrif, tibbiy izoh, bogʻliq tushunchalar va manba beriladi. |
+| **Tibbiy kutubxona** | 26 ta atama: qon tahlili, biokimyo, gormonlar, siydik tahlili, umumiy va dori atamalari. Qidiruv, turkum boʻyicha filtr va batafsil oyna bor. Har bir atamada sodda taʼrif, tibbiy izoh, bogʻliq tushunchalar va manba beriladi. |
 | **Suhbatlar tarixi** | Suhbat nomi avtomatik yaratiladi. Qidiruv, ochish va oʻchirish (tasdiqlash dialogi bilan) mavjud, oxirgi xabar vaqti koʻrsatiladi. Tarix **faqat shu qurilmada** (localStorage) saqlanadi. |
 | **Profil va sozlamalar** | Ism (ixtiyoriy), tarixni saqlashni yoqish/oʻchirish, animatsiyalarni kamaytirish, tizim holati va barcha maʼlumotlarni oʻchirish. |
+
+Qoʻshimcha: **«Loyiha haqida»** sahifasi (taqdimot uchun: muammo, yechim, xavfsizlik, yoʻl xaritasi), bosh ekranda **«Sinab koʻring»** stsenariylari va namuna fayllar (tahlil va yoʻriqnoma).
 
 Interfeys toʻliq **oʻzbek tilida** (lotin yozuvi). Rus va ingliz tillari uchun tuzilma tayyor (`js/i18n.js`).
 
@@ -36,13 +38,23 @@ Brauzerda oching: **http://localhost:3000**
 
 Bu holatda MEDAI **bepul DEMO rejimda** ishlaydi: API kaliti kerak emas va hech qanday pullik xizmat chaqirilmaydi.
 
+### Serversiz ishlash (statik demo)
+
+Server topilmasa (masalan, sayt oddiy statik hostingda turgan boʻlsa), ilova buni avtomatik aniqlaydi va **demo toʻliq brauzerning oʻzida ishlaydi** (`js/local-api.js`). Bunda chat, PDF tahlili (pdf.js orqali), yoʻriqnoma va kutubxona ishlaydi, savol va fayllar hech qayerga yuborilmaydi. Server va brauzer bitta umumiy mantiqdan foydalanadi (`shared/`), shuning uchun natijalar bir xil.
+
+```bash
+npm install && npm run build     # dist/ papkasi tayyor boʻladi
+```
+
+`dist/` papkasini istalgan statik hostingga yuklash mumkin: Netlify Drop (sudrab tashlash), GitHub Pages yoki Vercel.
+
 ### Rejimlar
 
 | | Demo rejim (standart) | AI rejimi |
 |---|---|---|
 | Qanday yoqiladi | `.env` da `ANTHROPIC_API_KEY` boʻsh | `.env` ga API kaliti yoziladi va server qayta ishga tushiriladi |
 | Narx | Bepul | Anthropic API ishlatilgan tokenlar boʻyicha pullik |
-| Chat | Qoidaga asoslangan javoblar: kutubxonadagi 10 ta atama, 4 ta umumiy mavzu va xavfsizlik javoblari. Qolgan savollarga «manba topilmadi» deb javob beradi. | Claude modeli javob beradi |
+| Chat | Qoidaga asoslangan javoblar: kutubxonadagi 26 ta atama; amaliy mavzular (tahlilga tayyorgarlik, natijani oʻqish, shifokorga qachon murojaat qilish va boshqalar); salomlashish; foydalanuvchi yozgan natijani oraliq bilan solishtirish («Gemoglobinim 112, meʼyor 120–160»); xavfsizlik javoblari. Qolgan savollarga «manba topilmadi» deb javob beradi. | Claude modeli javob beradi |
 | Tahlil | Matnli PDF: koʻrsatkichlar algoritm bilan ajratiladi. Rasm yoki skanerlangan PDF: qiymatlar qoʻlda kiritiladi (OCR yoʻq). | PDF va rasmni AI oʻqiydi |
 | Dori | PDF/TXT/matn sarlavhalar boʻyicha boʻlimlarga ajratiladi. Nom boʻyicha qidiruv **mavjud emas**. | Nom, fayl va matn bilan ishlaydi |
 
@@ -73,7 +85,8 @@ npx netlify-cli login
 npx netlify-cli deploy --build --prod
 ```
 
-> ⚠️ **Netlify Drop (papkani sudrab tashlash) ishlatmang.** U faqat statik fayllarni joylaydi: Functions ishlamaydi, natijada chat, tahlil va dori boʻlimlari «Server ulanmagan» deydi.
+### 3-usul: Netlify Drop (eng oddiy, faqat demo)
+`npm run build` buyrugʻini bajaring, keyin `dist/` papkasini https://app.netlify.com/drop sahifasiga sudrab tashlang. Functions ishlamaydi, lekin demo toʻliq brauzerda ishlaydi. AI ulash uchun 1- yoki 2-usulni tanlang.
 
 ### Netlify'da AI ni yoqish
 **Site configuration → Environment variables** boʻlimiga `ANTHROPIC_API_KEY` (va xohlasangiz `MEDAI_MODEL`) qoʻshing, keyin qayta deploy qiling. Kalit faqat funksiyada turadi va brauzerga chiqmaydi.
@@ -101,7 +114,10 @@ MEDAI/
   js/library.js            — Tibbiy kutubxona
   js/history.js            — Suhbatlar tarixi
   js/settings.js           — Profil va sozlamalar
-  js/api.js                — server API mijozi (kalit brauzerda yoʻq)
+  js/api.js                — API mijozi: server topilsa serverga, aks holda brauzer dvigateliga
+  js/local-api.js          — brauzerdagi demo dvigatel (serversiz ishlash, pdf.js)
+  shared/                  — server va brauzer uchun umumiy mantiq: demo javoblar, xavfsizlik,
+                             tahlil va yoʻriqnoma tahlilchilari, kutubxona qidiruvi
   js/store.js              — localStorage qatlami
   js/ui.js                 — toast, modal, tasdiqlash, drawer, menyu
   js/utils.js              — xavfsiz Markdown, DOM yordamchilari
@@ -116,8 +132,8 @@ MEDAI/
   scripts/build.mjs        — statik frontendni dist/ ga yigʻish (npm run build)
   server/config.js         — .env sozlamalari
   server/routes/           — chat, analyze, medicine, status
-  server/services/         — ai.js (Claude), demo.js, safety.js, labParser.js,
-                             leafletParser.js, files.js, library.js, prompts.js
+  server/services/         — ai.js (Claude), files.js, prompts.js va shared/ ga ulanuvchi
+                             yupqa modullar (demo, safety, labParser, leafletParser, library)
   server/rag/index.js      — RAG interfeysi (hali ulanmagan)
   tests/unit/              — parser, xavfsizlik va API testlari (node:test)
   tests/e2e/run-e2e.mjs    — brauzer testlari (Playwright)
@@ -147,12 +163,12 @@ MEDAI/
 ## Testlar
 
 ```bash
-npm test             # 17 ta unit va API test (Node test runner)
-npm run test:e2e     # 29 ta brauzer testi (Playwright kerak: npm i -D playwright && npx playwright install chromium)
+npm test             # 20 ta unit va API test (Node test runner)
+npm run test:e2e     # 33 ta brauzer testi (Playwright kerak: npm i -D playwright && npx playwright install chromium)
 npm run fixtures     # sintetik namuna fayllarni qayta yaratish
 ```
 
-**Oxirgi natija:** unit/API — 17/17 ✔, E2E — 29/29 ✔. Barcha testlarda faqat sintetik maʼlumotlar ishlatilgan.
+**Oxirgi natija:** unit/API — 20/20 ✔, E2E — 33/33 ✔ (serversiz statik rejim testi ham shu jumladan). Barcha testlarda faqat sintetik maʼlumotlar ishlatilgan.
 
 | Promptdagi test | Holat |
 |---|---|
@@ -176,7 +192,7 @@ Qoʻshimcha sinalganlar: XSS, shoshilinch holat banneri, yuklashni bekor qilish,
 ## Maʼlum cheklovlar
 
 1. **RAG ulanmagan.** Ishonchli hujjatlar bazasi yoʻq, shuning uchun AI javoblari «rasmiy manba bilan tasdiqlangan» deb koʻrsatilmaydi va bu interfeysda ochiq yoziladi.
-2. **Kutubxona matnlari tibbiy ekspert tomonidan tekshirilmagan.** Manba havolalari (MedlinePlus, WHO) ishlab chiqish muhitida tarmoq cheklovi tufayli ochib tekshirilmagan.
+2. **Kutubxona matnlari (26 atama) tibbiy ekspert tomonidan tekshirilmagan.** Manba havolalari (MedlinePlus, WHO) ishlab chiqish muhitida tarmoq cheklovi tufayli ochib tekshirilmagan.
 3. **Demo rejimda OCR yoʻq.** Rasm va skanerlangan PDF uchun qiymatlar qoʻlda kiritiladi.
 4. **Laboratoriya tahlilchisi** «Nomi Qiymat Birlik Oraliq» koʻrinishidagi satrlarni oʻqiydi. Murakkab jadvalli PDF lar notoʻgʻri oʻqilishi mumkin, shu sababli tasdiqlash bosqichi majburiy.
 5. **AI rejimi haqiqiy kalit bilan sinalmagan** (yuqoriga qarang).
