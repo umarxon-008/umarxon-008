@@ -11,8 +11,8 @@ Baholar taxminiy bo'lib, "ish sessiyasi" birligida berilgan.
 ## PHASE 0 — Audit va arxitektura ✅ (shu hujjatlar)
 PROJECT_AUDIT, ARCHITECTURE, ROADMAP, RISK_REGISTER.
 
-## PHASE 1 — App foundation va design system (~2–3 sessiya)
-- pnpm + electron-vite + React + TS (strict), ESLint, Prettier, Vitest.
+## PHASE 1 — App foundation va design system 🟡 (kod tayyor; Windows'da sinov va foydalanuvchi dizayni kutilmoqda)
+- npm + electron-vite + React + TS (strict), ESLint, Prettier, Vitest.
 - Xavfsiz `BrowserWindow`, CSP, preload `window.marius` API, typed IPC + zod.
 - SQLite spike (`better-sqlite3` va `node:sqlite`), migratsiya runner, `app_settings`.
 - Design tokens (dark theme), MARIUS logo/ikon (original), sidebar: Dashboard, Assistant, Computer, Memory, Tasks, Monitoring, Settings.
@@ -78,7 +78,7 @@ PROJECT_AUDIT, ARCHITECTURE, ROADMAP, RISK_REGISTER.
 - Prompt injection fixture'lari (web, fayl, OCR) va ularga testlar.
 
 ## PHASE 10 — Hardening va release (~2 sessiya)
-- To'liq regression, `pnpm audit`, performance va memory leak tekshiruvi.
+- To'liq regression, `npm audit`, performance va memory leak tekshiruvi.
 - NSIS installer: o'rnatish papkasini tanlash, shortcut, uninstall (user data saqlansinmi yoki o'chirilsinmi tanlovi bilan), startup default o'chiq.
 - README (prerequisites, dev run, env, test, build, package, troubleshooting), `KNOWN_LIMITATIONS.md`, release checklist.
 - Clean install va uninstall testi Windows 10/11'da.

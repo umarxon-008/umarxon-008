@@ -1,6 +1,6 @@
 # MARIUS — Arxitektura
 
-**Holat:** Taklif (PHASE 0). Foydalanuvchi tasdig'ini kutmoqda.
+**Holat:** Tasdiqlangan (2026-11-13). PHASE 1 da amalga oshirilgan qarorlar §1.3 da.
 
 ---
 
@@ -26,7 +26,7 @@
 |---|---|---|
 | Build | `electron-vite` + Vite | main / preload / renderer uchun alohida bundle |
 | UI | React 19 + TypeScript (strict) | |
-| Styling | CSS Modules + CSS custom properties (design tokens) | Og'ir UI kutubxonasisiz, to'liq nazorat |
+| Styling | Oddiy CSS + CSS custom properties (design tokens: `styles/tokens.css`) | Og'ir UI kutubxonasisiz, to'liq nazorat |
 | Routing | `react-router` (hash router) | `file://` muhitida ham ishlaydi |
 | State | Zustand (UI holati), main process (haqiqiy ma'lumot) | |
 | Validatsiya | `zod` | IPC payload, tool argumentlari, AI tool chaqiriqlari |
@@ -42,6 +42,19 @@
 **SQLite izohi:** `better-sqlite3` native modul, shuning uchun Electron uchun qayta build qilinishi kerak va bu Windows CI'da qo'shimcha qadamni talab qiladi. `node:sqlite` Electron'ning Node runtime'iga kiritilgan bo'lsa, native build umuman kerak bo'lmaydi. Qaror PHASE 1 dagi spike natijasiga qarab qabul qilinadi va `ARCHITECTURE.md` da qayd etiladi.
 
 **TypeScript izohi:** TS 7 (native kompilyator) eng yangi versiya. ESLint va electron-vite bilan mosligi PHASE 1 da tekshiriladi. Muammo chiqsa, 5.x/6.x qatoridagi barqaror versiya qotiriladi.
+
+### 1.3 Qabul qilingan qarorlar (PHASE 1)
+
+| Qaror | Natija | Sabab |
+|---|---|---|
+| Desktop framework | **Electron 45** | Foydalanuvchi tasdiqladi |
+| SQLite drayveri | **`node:sqlite`** (Electron 45 ichidagi Node 24, SQLite 3.53) | Spike muvaffaqiyatli o'tdi: native modul yo'q, Windows build sodda (R-08 yopildi) |
+| TypeScript | **6.0.x** | `typescript-eslint` TS 7 ni hali qo'llamaydi (`<6.1.0`) |
+| Build | electron-vite 6 + Vite 8, `@vitejs/plugin-react` 6 | |
+| Paket menejeri | **npm** | Windows'da foydalanuvchi uchun eng sodda yo'l |
+| AI provayderlar | **Google Gemini (bepul API kalit)** + **Ollama (lokal, bepul)** | Foydalanuvchi tanlovi, ikkalasi ham. PHASE 2 da |
+| Renderer kutubxonalari | `devDependencies` da | Vite ularni bundle'ga qo'shadi; installer'da faqat `zod` qoladi |
+| CSP | Build vaqtida HTML'ga qo'yiladi (prod: inline script yo'q) | `electron.vite.config.mts` |
 
 ## 2. Jarayonlar modeli va xavfsizlik chegaralari
 

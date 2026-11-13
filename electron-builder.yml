@@ -1,0 +1,39 @@
+appId: uz.marius.app
+productName: MARIUS
+copyright: Copyright © 2026 MARIUS
+
+directories:
+  output: dist
+  buildResources: build
+
+files:
+  - out/**
+  - package.json
+  - '!**/*.map'
+
+# node:sqlite Electron ichida tayyor, native modul yo'q, shuning uchun rebuild kerak emas.
+npmRebuild: false
+asar: true
+
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  icon: build/icon.png
+  artifactName: MARIUS-Setup-${version}.${ext}
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowElevation: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: MARIUS
+  uninstallDisplayName: MARIUS
+  # Foydalanuvchi ma'lumotlari (%APPDATA%\MARIUS) uninstallda saqlanadi.
+  # O'chirish tanlovi PHASE 10 da qo'shiladi.
+  deleteAppDataOnUninstall: false
+  runAfterFinish: true
+
+publish: null
