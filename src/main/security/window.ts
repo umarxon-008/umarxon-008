@@ -1,5 +1,6 @@
 import { BrowserWindow, session, shell, type WebPreferences } from 'electron';
 import type { Logger } from '../logging/logger';
+import { isPermissionAllowed } from './permissions';
 
 /** Barcha oynalar uchun majburiy xavfsiz sozlamalar (ARCHITECTURE §2). */
 export function secureWebPreferences(preloadPath: string, options: { devTools: boolean }): WebPreferences {
@@ -54,15 +55,22 @@ export function hardenWindow(
   });
 }
 
-/**
- * Ruxsat so'rovlari (mikrofon, kamera, joylashuv, bildirishnoma va h.k.) hozircha hammasi rad etiladi.
- * Mikrofon PHASE 3 da aniq va boshqariladigan tarzda yoqiladi.
- */
-export function lockDownPermissions(logger: Logger): void {
+/** Ruxsat siyosati: `security/permissions.ts` (faqat mikrofon audio, faqat ilova sahifasi). */
+export function lockDownPermissions(logger: Logger, isTrustedUrl: (url: string) => boolean): void {
   const ses = session.defaultSession;
-  ses.setPermissionRequestHandler((_wc, permission, callback) => {
-    logger.info('permission.denied', { permission });
-    callback(false);
+
+  ses.setPermissionRequestHandler((wc, permission, callback, details) => {
+    const url = details.requestingUrl || wc.getURL();
+    const mediaTypes = 'mediaTypes' in details ? details.mediaTypes : undefined;
+    const allowed = isPermissionAllowed({ permission, url, mediaTypes: mediaTypes ?? [] }, isTrustedUrl);
+    logger.info(allowed ? 'permission.granted' : 'permission.denied', { permission, mediaTypes });
+    callback(allowed);
   });
-  ses.setPermissionCheckHandler(() => false);
+
+  ses.setPermissionCheckHandler((wc, permission, _origin, details) => {
+    const url = details.requestingUrl || wc?.getURL() || '';
+    return isPermissionAllowed({ permission, url, mediaType: details.mediaType }, isTrustedUrl);
+  });
+
+  ses.setDevicePermissionHandler(() => false);
 }

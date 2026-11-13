@@ -42,3 +42,30 @@
 1. Foydalanuvchi Windows'da `.exe` ni sinaydi.
 2. Dizayn materiallari asosida UI yangilanadi.
 3. PHASE 2: Gemini + Ollama provayderlari bilan haqiqiy chat.
+
+---
+
+## Qo'shimcha: foydalanuvchi dizayni qo'llandi (2026-11-13)
+
+### Nima o'zgardi
+- **Vizual uslub** foydalanuvchi dizayni bo'yicha: to'q teal fon, cyan aksent, shisha panellar, segmentli progress barlar, yangi "M" belgi va ikonka.
+- **Navigatsiya** dizayn bo'yicha: Bosh sahifa, Suhbat, Xotira, Vazifalar, Tarix, Kompyuter, Sozlamalar. Yuqori panelda "Tizim faol" belgisi, Sozlamalar tugmasi va profil belgisi.
+  ⚠️ Prompt §18 dan farqi: alohida "Monitoring" bo'limi yo'q, monitoring Bosh sahifadagi "Kompyuter holati" panelida. "Tarix" bo'limi qo'shildi (amallar jurnali, PHASE 4). Bu foydalanuvchi dizayniga muvofiq qilingan.
+- **Ovoz shari**: canvas'dagi zarrachali halqa (9 qatlam × 240 zarracha + nurli iplar + chang). Tinglash paytida mikrofon ovoz balandligiga qarab **kattalashadi, to'lqinlanadi va yorqinlashadi**, markazdagi chiziq esa real to'lqin shaklini ko'rsatadi. Jimlikda sekin "nafas oladi". "Harakatni kamaytirish" sozlamasida animatsiya sekinlashadi.
+- **Kompyuter holati paneli**: CPU, RAM, disk (Node `os`, `fs.statfs`), internet (`net.isOnline`), batareya (Chromium Battery API), OS nomi. **Barcha qiymatlar real manbadan olinadi.** So'rov 3 soniyada bir marta, faqat oyna ko'rinib turganda yuboriladi. Monitoringni pauza qilish mumkin. Ma'lumot hech qayerga yuborilmaydi. (PHASE 8 monitoringining bir qismi oldinroq qilindi.)
+- **Mikrofon** (PHASE 3 ning bir qismi oldinroq qilindi): faqat tugma bosilganda yoqiladi, "● yoqiq" indikatori ko'rinadi, 30 soniyadan keyin avtomatik o'chadi, sahifadan chiqilganda o'chadi. **Audio yozilmaydi va saqlanmaydi**: faqat ovoz balandligi hisoblanadi. Nutqni matnga aylantirish (STT) PHASE 3 da qo'shiladi va bu UI'da aniq yozilgan.
+- **Ruxsat siyosati** (`security/permissions.ts`): faqat mikrofon (audio) va faqat ilovaning o'z sahifasiga ruxsat beriladi. Kamera, joylashuv, bildirishnoma va boshqa barcha ruxsatlar rad etiladi.
+- Sozlamalarda **"Ma'lumotlar qayerda saqlanadi?"** bo'limi (v2.1 talabi).
+- **Obsidian va local-first**: faqat arxitektura (`ARCHITECTURE.md` §11), tasdiq kutilmoqda.
+
+### Testlar (Linux dev konteyner)
+| Tekshiruv | Natija |
+|---|---|
+| typecheck / lint / build | ✅ |
+| Unit | ✅ 37/37 (yangi: CPU hisoblash, disk yo'li, metrics sxemasi, ruxsat siyosati, ovoz darajasi) |
+| E2E (haqiqiy Electron, xvfb) | ✅ 7/7 (yangi: real ko'rsatkichlar; mikrofon yoqish → tinglash → o'chirish (Chromium sinov qurilmasi); kamera ruxsati rad etilishi; barcha bo'limlar navigatsiyasi) |
+| Vizual tekshiruv | ✅ skrinshotlar dizayn bilan solishtirildi |
+
+### Windows'da qo'lda tekshirilishi kerak
+- Haqiqiy mikrofonda shar ovozga qarab harakatlanishi; Windows mikrofon maxfiylik sozlamasi o'chiq bo'lganda xato xabari.
+- Kompyuter holatida "Windows 11/10 …" nomi, C: disk va batareya (noutbukda) to'g'ri ko'rinishi.

@@ -21,3 +21,8 @@ Ehtimollik va ta'sir: **Y** — yuqori, **O** — o'rta, **P** — past.
 | R-15 | Crash paytida yarim bajarilgan amal | P | O | Audit holati `running → unknown`; SQLite WAL; tranzaksiyalar | 4 |
 | R-16 | Dependency zaifliklari | O | O | `npm audit` CI'da; minimal dependency siyosati | 10 |
 | R-17 | `node:sqlite` Node'da hali "experimental" belgisida | O | O | Foydalanish `database.ts` bilan cheklangan; API o'zgarsa faqat shu fayl yangilanadi; Electron yangilanishida testlar tekshiradi | 1+ |
+| R-18 | Vault ichida symlink yoki junction orqali tashqi papkaga chiqish | O | Y | `realpath` + ildizni tekshirish, reparse point tekshiruvi, F-test (path traversal) | 7B |
+| R-19 | Obsidian va MARIUS bir vaqtda faylga yozishi (konflikt) | O | O | MVP'da faqat yangi fayl yaratish va oxiriga qo'shish; ustidan yozish yo'q; yozishdan oldin `mtime` tekshiriladi | 7B |
+| R-20 | Vault cloud sync (OneDrive, Obsidian Sync) orqali ma'lumot tashqariga chiqishi | O | O | MARIUS sync'ni sozlamaydi; UI'da ogohlantirish; hujjatlashtirish | 7B |
+| R-21 | DB Windows'da Roaming profilda (`%APPDATA%`), domen tarmog'ida sinxronlanishi mumkin | P | O | `%LOCALAPPDATA%` ga migratsiya taklif qilingan, foydalanuvchi qarori kutilmoqda | 2 |
+| R-22 | Mikrofon ruxsati: renderer'ga audio kirishi | O | Y | Faqat ilovaning o'z sahifasi va faqat audio; faqat tugma bosilganda; aniq indikator; 30 soniyadan keyin avtomatik to'xtaydi; audio yozilmaydi va saqlanmaydi, faqat ovoz balandligi hisoblanadi | 1 |

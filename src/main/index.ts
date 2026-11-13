@@ -1,11 +1,12 @@
 import { join } from 'node:path';
-import { app, BrowserWindow, ipcMain, nativeTheme, shell } from 'electron';
+import { app, BrowserWindow, ipcMain, nativeTheme, net, shell } from 'electron';
 import { IPC_CHANNELS, type AppInfo } from '@shared/ipc';
 import { createLogger, type Logger } from './logging/logger';
 import { openDatabase, type Database } from './database/database';
 import { SettingsRepository } from './database/settings-repository';
 import { createSenderGuard, dispatchIpc, type IpcHandlers } from './ipc/router';
 import { hardenWindow, lockDownPermissions, secureWebPreferences } from './security/window';
+import { createSystemMetricsService } from './services/system-metrics';
 
 const APP_ID = 'uz.marius.app';
 
@@ -47,7 +48,7 @@ function createMainWindow(settings: SettingsRepository): BrowserWindow {
     minHeight: 600,
     show: false,
     title: 'MARIUS',
-    backgroundColor: theme === 'dark' ? '#0b0f17' : '#f5f7fb',
+    backgroundColor: theme === 'dark' ? '#0c161b' : '#f3f7f8',
     autoHideMenuBar: true,
     webPreferences: secureWebPreferences(preloadFile, { devTools: !app.isPackaged }),
   });
@@ -64,6 +65,8 @@ function createMainWindow(settings: SettingsRepository): BrowserWindow {
 }
 
 function registerIpc(settings: SettingsRepository): void {
+  const metrics = createSystemMetricsService({ isOnline: () => net.isOnline() });
+
   const handlers: IpcHandlers = {
     'app:getInfo': (): AppInfo => ({
       name: 'MARIUS',
@@ -72,6 +75,7 @@ function registerIpc(settings: SettingsRepository): void {
       electron: process.versions.electron,
       ...paths(),
     }),
+    'system:getMetrics': () => metrics.collect(),
     'settings:getAll': () => settings.getAll(),
     'settings:update': (patch) => {
       const updated = settings.update(patch);
@@ -115,7 +119,7 @@ if (!app.requestSingleInstanceLock()) {
 
     const settings = new SettingsRepository(db);
     nativeTheme.themeSource = settings.getAll().theme;
-    lockDownPermissions(logger);
+    lockDownPermissions(logger, createSenderGuard({ devServerUrl, rendererFile }));
     registerIpc(settings);
     mainWindow = createMainWindow(settings);
     mainWindow.on('closed', () => {

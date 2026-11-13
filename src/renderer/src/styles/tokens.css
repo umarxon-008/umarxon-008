@@ -1,6 +1,6 @@
 /*
  * MARIUS design tokens: barcha rang, o'lcham, radius, shrift va soya shu yerda.
- * Vaqtinchalik qiymatlar. Foydalanuvchi dizayni kelganda shu fayl yangilanadi.
+ * Uslub: foydalanuvchi dizayni (2026-11-13). To'q teal fon, cyan aksent, shisha panellar.
  */
 :root {
   /* Typography */
@@ -12,8 +12,8 @@
   --text-md: 14px;
   --text-lg: 16px;
   --text-xl: 20px;
-  --text-2xl: 28px;
-  --text-3xl: 36px;
+  --text-2xl: 26px;
+  --text-3xl: 34px;
 
   /* Spacing (4px grid) */
   --space-1: 4px;
@@ -29,6 +29,7 @@
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
+  --radius-xl: 20px;
   --radius-full: 999px;
 
   /* Motion */
@@ -37,61 +38,74 @@
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 
   /* Layout */
-  --sidebar-width: 232px;
-  --content-max: 1080px;
+  --sidebar-width: 220px;
+  --topbar-height: 64px;
+  --content-max: 1320px;
 }
 
 /* Qorong'i mavzu (asosiy) */
 :root,
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --bg: #0b0f17;
-  --bg-elevated: #10151f;
-  --surface: #141a26;
-  --surface-2: #1a2130;
-  --surface-hover: #1f2738;
-  --border: #252e40;
-  --border-strong: #33405a;
-  --text: #e7ebf3;
-  --text-muted: #9aa5b8;
-  --text-subtle: #6c778b;
-  --accent: #4f8dfd;
-  --accent-strong: #79a8ff;
-  --accent-2: #8b7bff;
-  --accent-contrast: #ffffff;
-  --accent-soft: rgba(79, 141, 253, 0.14);
-  --success: #3fbf87;
-  --warning: #e8b04b;
-  --danger: #f06a6a;
-  --danger-soft: rgba(240, 106, 106, 0.12);
+  --bg: #0c161b;
+  --bg-glow-1: rgba(38, 156, 170, 0.22);
+  --bg-glow-2: rgba(22, 110, 130, 0.18);
+  --bg-elevated: #111d23;
+  --surface: rgba(30, 42, 49, 0.72);
+  --surface-solid: #1a262c;
+  --surface-2: rgba(40, 54, 62, 0.7);
+  --surface-hover: rgba(70, 120, 132, 0.16);
+  --border: rgba(160, 210, 220, 0.1);
+  --border-strong: rgba(160, 210, 220, 0.2);
+  --text: #e6f1f3;
+  --text-muted: #9bb0b6;
+  --text-subtle: #6d848b;
+  --accent: #2fc6d8;
+  --accent-strong: #5fe3f0;
+  --accent-2: #2aa3c7;
+  --accent-contrast: #04161b;
+  --accent-soft: rgba(47, 198, 216, 0.14);
+  --accent-glow: rgba(95, 227, 240, 0.45);
+  --orb-rgb: 95, 227, 240;
+  --success: #4fd890;
+  --warning: #f0c05a;
+  --danger: #f27b7b;
+  --danger-soft: rgba(242, 123, 123, 0.12);
   --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent-strong);
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.35);
+  --blur: blur(14px);
 }
 
 /* Yorug' mavzu */
 :root[data-theme='light'] {
   color-scheme: light;
-  --bg: #f5f7fb;
-  --bg-elevated: #ffffff;
-  --surface: #ffffff;
-  --surface-2: #f0f3f9;
-  --surface-hover: #e9eef7;
-  --border: #dde3ee;
-  --border-strong: #c3ccdc;
-  --text: #121826;
-  --text-muted: #4f5b70;
-  --text-subtle: #7a8598;
-  --accent: #2f6fe8;
-  --accent-strong: #2f6fe8;
-  --accent-2: #6b54f0;
+  --bg: #eef4f5;
+  --bg-glow-1: rgba(47, 198, 216, 0.16);
+  --bg-glow-2: rgba(42, 163, 199, 0.12);
+  --bg-elevated: #f7fbfb;
+  --surface: rgba(255, 255, 255, 0.8);
+  --surface-solid: #ffffff;
+  --surface-2: rgba(232, 241, 243, 0.9);
+  --surface-hover: rgba(47, 198, 216, 0.1);
+  --border: rgba(20, 70, 80, 0.12);
+  --border-strong: rgba(20, 70, 80, 0.22);
+  --text: #10232a;
+  --text-muted: #4b6269;
+  --text-subtle: #75898f;
+  --accent: #0e9fb2;
+  --accent-strong: #0b8798;
+  --accent-2: #1a7fa3;
   --accent-contrast: #ffffff;
-  --accent-soft: rgba(47, 111, 232, 0.1);
-  --success: #1f9d6a;
-  --warning: #b7791f;
-  --danger: #d64545;
-  --danger-soft: rgba(214, 69, 69, 0.08);
+  --accent-soft: rgba(14, 159, 178, 0.12);
+  --accent-glow: rgba(14, 159, 178, 0.35);
+  --orb-rgb: 12, 150, 170;
+  --success: #17955a;
+  --warning: #a8720f;
+  --danger: #cf3f3f;
+  --danger-soft: rgba(207, 63, 63, 0.08);
   --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
-  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
-  --shadow-md: 0 8px 24px rgba(16, 24, 40, 0.08);
+  --shadow-sm: 0 1px 2px rgba(16, 40, 48, 0.06);
+  --shadow-md: 0 12px 32px rgba(16, 40, 48, 0.1);
+  --blur: blur(14px);
 }

@@ -9,6 +9,9 @@ const api: MariusApi = {
   app: {
     getInfo: () => ipcRenderer.invoke('app:getInfo'),
   },
+  system: {
+    getMetrics: () => ipcRenderer.invoke('system:getMetrics'),
+  },
   settings: {
     getAll: () => ipcRenderer.invoke('settings:getAll'),
     update: (patch) => ipcRenderer.invoke('settings:update', patch),

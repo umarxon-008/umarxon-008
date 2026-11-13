@@ -111,10 +111,18 @@ export function SettingsPage() {
               <dd>{info.platform}</dd>
               <dt>Electron</dt>
               <dd>{info.electron}</dd>
+            </dl>
+            <h3 className="settings-subtitle">Ma’lumotlar qayerda saqlanadi?</h3>
+            <p className="muted">
+              Barcha ma’lumotlar faqat shu kompyuterda saqlanadi. Hech narsa cloud’ga yuborilmaydi.
+            </p>
+            <dl className="info-list">
               <dt>Ma’lumotlar papkasi</dt>
               <dd className="mono">{info.dataDirectory}</dd>
               <dt>Ma’lumotlar bazasi</dt>
               <dd className="mono">{info.databaseFile}</dd>
+              <dt>Loglar</dt>
+              <dd className="mono">{info.logDirectory}</dd>
             </dl>
             <button
               type="button"

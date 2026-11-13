@@ -1,38 +1,27 @@
 import { NavLink } from 'react-router';
 import {
-  Activity,
   Brain,
-  LayoutDashboard,
-  ListTodo,
-  MessageSquare,
-  Monitor,
+  ClipboardList,
+  History,
+  House,
+  Laptop,
+  MessageCircle,
   Settings,
   type LucideIcon,
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { uz } from '../i18n/uz';
 
-const items: { to: string; label: string; icon: LucideIcon }[] = [
-  { to: '/', label: uz.nav.dashboard, icon: LayoutDashboard },
-  { to: '/assistant', label: uz.nav.assistant, icon: MessageSquare },
-  { to: '/computer', label: uz.nav.computer, icon: Monitor },
+/** Navigatsiya foydalanuvchi dizayni bo'yicha. Monitoring bosh sahifadagi "Kompyuter holati" panelida. */
+export const NAV_ITEMS: { to: string; label: string; icon: LucideIcon }[] = [
+  { to: '/', label: uz.nav.dashboard, icon: House },
+  { to: '/chat', label: uz.nav.chat, icon: MessageCircle },
   { to: '/memory', label: uz.nav.memory, icon: Brain },
-  { to: '/tasks', label: uz.nav.tasks, icon: ListTodo },
-  { to: '/monitoring', label: uz.nav.monitoring, icon: Activity },
+  { to: '/tasks', label: uz.nav.tasks, icon: ClipboardList },
+  { to: '/history', label: uz.nav.history, icon: History },
+  { to: '/computer', label: uz.nav.computer, icon: Laptop },
+  { to: '/settings', label: uz.nav.settings, icon: Settings },
 ];
-
-function Item({ to, label, icon: Icon }: { to: string; label: string; icon: LucideIcon }) {
-  return (
-    <NavLink
-      to={to}
-      end={to === '/'}
-      className={({ isActive }) => `nav__item${isActive ? ' is-active' : ''}`}
-    >
-      <Icon size={18} aria-hidden="true" />
-      <span>{label}</span>
-    </NavLink>
-  );
-}
 
 export function Sidebar() {
   return (
@@ -43,12 +32,18 @@ export function Sidebar() {
       </button>
       <Logo />
       <nav className="nav" aria-label="Asosiy navigatsiya">
-        {items.map((item) => (
-          <Item key={item.to} {...item} />
+        {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end={to === '/'}
+            className={({ isActive }) => `nav__item${isActive ? ' is-active' : ''}`}
+            title={label}
+          >
+            <Icon size={18} aria-hidden="true" />
+            <span>{label}</span>
+          </NavLink>
         ))}
-      </nav>
-      <nav className="nav nav--bottom" aria-label="Sozlamalar">
-        <Item to="/settings" label={uz.nav.settings} icon={Settings} />
       </nav>
     </aside>
   );

@@ -39,10 +39,24 @@ export const AppInfoSchema = z.object({
 });
 export type AppInfo = z.infer<typeof AppInfoSchema>;
 
+const Bytes = z.number().nonnegative();
+const Percent = z.number().min(0).max(100);
+
+export const SystemMetricsSchema = z.object({
+  cpu: z.object({ percent: Percent.nullable(), cores: z.number().int().nonnegative() }),
+  memory: z.object({ totalBytes: Bytes, usedBytes: Bytes, percent: Percent }),
+  disk: z.object({ path: z.string(), totalBytes: Bytes, usedBytes: Bytes, percent: Percent }).nullable(),
+  online: z.boolean(),
+  os: z.object({ name: z.string(), release: z.string(), uptimeSeconds: z.number().nonnegative() }),
+  sampledAt: z.string(),
+});
+export type SystemMetrics = z.infer<typeof SystemMetricsSchema>;
+
 const NoInput = z.undefined();
 
 export const IPC = {
   'app:getInfo': { input: NoInput, output: AppInfoSchema },
+  'system:getMetrics': { input: NoInput, output: SystemMetricsSchema },
   'settings:getAll': { input: NoInput, output: SettingsSchema },
   'settings:update': { input: SettingsPatchSchema, output: SettingsSchema },
   'logs:openFolder': { input: NoInput, output: z.void() },

@@ -10,9 +10,15 @@ import { _electron as electron, expect, test, type ElectronApplication, type Pag
 
 const mainEntry = join(process.cwd(), 'out/main/index.js');
 
-async function launch(userDataDir: string): Promise<{ app: ElectronApplication; page: Page }> {
+/** Chromium'ning sinov mikrofoni: haqiqiy qurilmasiz audio oqimi beradi. Ruxsat siyosati baribir MARIUS'da. */
+const FAKE_MEDIA = ['--use-fake-device-for-media-stream'];
+
+async function launch(
+  userDataDir: string,
+  extraArgs: string[] = [],
+): Promise<{ app: ElectronApplication; page: Page }> {
   const app = await electron.launch({
-    args: [mainEntry, ...(process.platform === 'linux' ? ['--no-sandbox'] : [])],
+    args: [mainEntry, ...(process.platform === 'linux' ? ['--no-sandbox'] : []), ...extraArgs],
     env: { ...process.env, MARIUS_USER_DATA_DIR: userDataDir, ELECTRON_RENDERER_URL: '' },
   });
   const page = await app.firstWindow();
@@ -47,7 +53,7 @@ test('renderer’da Node yoki Electron API yo‘q, faqat window.marius bor', asy
       module: 'undefined',
       marius: 'object',
       frozen: true,
-      keys: ['app', 'logs', 'settings'],
+      keys: ['app', 'logs', 'settings', 'system'],
     });
 
     const prefs = await app.evaluate(({ BrowserWindow }) => {
@@ -90,13 +96,17 @@ test('tanishuv → bosh sahifa → sozlamalar; mavzu qayta ishga tushganda saqla
     await page.getByRole('button', { name: 'Keyingi' }).click(); // tayyor
     await page.getByRole('button', { name: 'Boshlash' }).click();
 
-    await expect(page.getByText('Bugun sizga qanday yordam bera olaman?')).toBeVisible();
-    await expect(page.getByRole('navigation', { name: 'Asosiy navigatsiya' })).toBeVisible();
+    const nav = page.getByRole('navigation', { name: 'Asosiy navigatsiya' });
+    await expect(nav).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Kompyuter holati' })).toBeVisible();
 
-    await page.getByRole('link', { name: 'Yordamchi' }).click();
-    await expect(page.getByText(/2-bosqichda qo'shiladi/)).toBeVisible();
+    for (const name of ['Suhbat', 'Xotira', 'Vazifalar', 'Tarix', 'Kompyuter']) {
+      await nav.getByRole('link', { name }).click();
+      await expect(page.getByRole('heading', { name, level: 1, exact: true })).toBeVisible();
+      await expect(page.getByText(/bosqichda qo'shiladi/)).toBeVisible();
+    }
 
-    await page.getByRole('link', { name: 'Sozlamalar' }).click();
+    await nav.getByRole('link', { name: 'Sozlamalar' }).click();
     await page.getByText('Yorug‘', { exact: true }).click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
     await expect(page.getByText('marius.db')).toBeVisible();
@@ -106,7 +116,7 @@ test('tanishuv → bosh sahifa → sozlamalar; mavzu qayta ishga tushganda saqla
 
   ({ app, page } = await launch(dataDir));
   try {
-    await expect(page.getByText('Bugun sizga qanday yordam bera olaman?')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Kompyuter holati' })).toBeVisible();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
   } finally {
     await app.close();
@@ -122,6 +132,65 @@ test('tashqi sahifaga o‘tish bloklanadi', async () => {
     });
     await page.waitForTimeout(500);
     expect(page.url()).toBe(before);
+  } finally {
+    await app.close();
+  }
+});
+
+async function finishOnboarding(page: Page): Promise<void> {
+  for (const name of ['Keyingi', 'Keyingi', 'Keyinroq', 'Keyingi', 'Boshlash']) {
+    await page.getByRole('button', { name }).click();
+  }
+}
+
+test('kompyuter holati real ko‘rsatkichlarni ko‘rsatadi', async () => {
+  const { app, page } = await launch(dataDir);
+  try {
+    await finishOnboarding(page);
+    const panel = page.getByRole('region', { name: 'Kompyuter holati' });
+    await expect(panel.getByText(/^\d{1,3}%$/).first()).toBeVisible();
+    // Main process'dagi qiymat UI'dagi bilan bir xil manbadan
+    const metrics = await page.evaluate(() => window.marius.system.getMetrics());
+    expect(metrics.ok).toBe(true);
+    if (metrics.ok) {
+      expect(metrics.data.memory.totalBytes).toBeGreaterThan(0);
+      await expect(panel.getByText(`${metrics.data.memory.percent}%`).first()).toBeVisible();
+    }
+  } finally {
+    await app.close();
+  }
+});
+
+test('mikrofon: yoqish → tinglash → o‘chirish (sinov qurilmasi)', async () => {
+  const { app, page } = await launch(dataDir, FAKE_MEDIA);
+  try {
+    await finishOnboarding(page);
+    await page.getByRole('button', { name: 'Mikrofonni yoqish' }).click();
+    const stop = page.getByRole('button', { name: 'Mikrofonni o‘chirish' });
+    await expect(stop).toBeVisible();
+    await expect(stop).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByText('Sizni eshityapman…')).toBeVisible();
+    await stop.click();
+    await expect(page.getByRole('button', { name: 'Mikrofonni yoqish' })).toBeVisible();
+    await expect(page.getByText('Gapirish uchun mikrofonni bosing')).toBeVisible();
+  } finally {
+    await app.close();
+  }
+});
+
+test('kamera ruxsati rad etiladi (faqat mikrofon audio ruxsat etilgan)', async () => {
+  const { app, page } = await launch(dataDir, FAKE_MEDIA);
+  try {
+    const result = await page.evaluate(async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        stream.getTracks().forEach((t) => t.stop());
+        return 'granted';
+      } catch (error) {
+        return (error as Error).name;
+      }
+    });
+    expect(result).toBe('NotAllowedError');
   } finally {
     await app.close();
   }

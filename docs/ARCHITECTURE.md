@@ -197,3 +197,79 @@ Crash'dan keyin: holati `running` bo'lib qolgan audit yozuvlari ilova ishga tush
 ## 10. Reminders va notifications
 
 Main process'dagi scheduler eng yaqin `dueDateTime` uchun bitta `setTimeout` qo'yadi (polling yo'q) va tizim uyqudan uyg'onganda (`powerMonitor.resume`) qayta hisoblaydi. Bildirishnoma Electron `Notification` (Windows toast) orqali chiqadi; buning uchun NSIS installer AppUserModelID'ni to'g'ri o'rnatishi kerak. Cheklov: eslatma faqat MARIUS ishlab turganda (tray'da bo'lsa ham) chiqadi.
+
+## 11. Local-first ma'lumotlar va Obsidian integratsiyasi (taklif, v2.1 qo'shimchasi)
+
+> **Holat:** faqat arxitektura. Prompt v2.1 talabiga ko'ra bu modullar foydalanuvchi tasdig'idan keyin amalga oshiriladi.
+
+### 11.1 Asosiy tamoyil
+- **SQLite** — MARIUS'ning operatsion ma'lumotlari: tezkor, strukturali va faqat ilovaga tegishli.
+- **Obsidian Vault** — foydalanuvchining o'zi o'qiydigan va tahrirlaydigan Markdown bilimlar ombori. **Ixtiyoriy**: Obsidian o'rnatilmagan bo'lsa ham MARIUS to'liq ishlaydi.
+- Hech qanday ma'lumot avtomatik cloud'ga yuborilmaydi. Obsidian Sync, OneDrive va boshqa sync xizmatlarini MARIUS o'zi sozlamaydi.
+
+### 11.2 Audit: hozirgi holat (PHASE 1)
+| Savol | Javob |
+|---|---|
+| DB qayerda? | `app.getPath('userData')/marius.db`. Windows'da: `%APPDATA%\MARIUS\marius.db`. Yo'l hardcode qilinmagan, OS API orqali olinadi. Sozlamalar sahifasida ko'rsatiladi |
+| Local user-data API to'g'ri ishlatilganmi? | Ha. ⚠️ Eslatma: Electron'ning `userData` papkasi Windows'da **Roaming** profilda. Domen tarmog'ida Roaming profil server bilan sinxronlanishi mumkin. Taklif: PHASE 2 da DB'ni `%LOCALAPPDATA%\MARIUS` ga ko'chirish, eski joydan xavfsiz migratsiya bilan. **Foydalanuvchi qarori kerak** |
+| Ma'lumot cloud'ga yuboriladimi? | Yo'q. Hozir hech qanday tarmoq so'rovi yo'q (CSP `connect-src 'self'`) |
+| Filesystem permission modeli bormi? | Hali yo'q. PHASE 5 (`allowed_folders` + path guard) bilan umumiy bo'ladi |
+| SQLite backup/migratsiya bormi? | Migratsiya bor (tranzaksiyali, testlangan). Backup hali yo'q, `backup-restore-service` sifatida rejalashtirilgan |
+
+### 11.3 Yangi modullar
+| Modul | Joylashuv (reja) | Vazifasi |
+|---|---|---|
+| `local-data-manager` | `src/main/services/local-data` | Barcha lokal yo'llarni bir joyda hisoblaydi, "Ma'lumotlar qayerda?" sahifasi uchun ma'lumot beradi, tarix va xotirani tozalash siyosatini bajaradi |
+| `backup-restore-service` | `src/main/services/backup` | SQLite `VACUUM INTO` orqali zaxira nusxa; restore oldidan ogohlantirish va avtomatik "restore oldi" nusxasi |
+| `obsidian-vault-adapter` | `src/modules/obsidian/vault-adapter` | Vault papkasini tanlash va tekshirish, Obsidian o'rnatilganligini aniqlash (ixtiyoriy), path guard (ildizdan chiqmaslik, symlink va junction tekshiruvi) |
+| `markdown-note-service` | `src/modules/obsidian/notes` | `.md` fayllarni o'qish; yangi note yaratish va oxiriga qo'shish **faqat preview + tasdiq bilan**. Ustidan yozish va o'chirish MVP'da yo'q |
+| `vault-indexer` | `src/modules/obsidian/indexer` (worker thread) | Fayl nomi va matni bo'yicha indeks (SQLite FTS5), `mtime` orqali yangilanadi, bekor qilish mumkin, faqat `.md` fayllar |
+
+Har bir Vault amali Tool registry (§6) orqali ishlaydi:
+
+| Tool | Daraja | Tasdiq | Qo'shimcha shart |
+|---|---|---|---|
+| `vault.search`, `vault.readNote` | 1 | yo'q | Integratsiya yoqilgan va "Read" ruxsati ON |
+| `vault.createNote` | 2 | `always` + preview | "Create new notes" ON (default OFF); fayl mavjud bo'lsa rad etiladi |
+| `vault.appendToNote` | 3 | `always` + diff preview | "Append" ON (default OFF) |
+| overwrite / delete | 4 | — | MVP'da mavjud emas |
+
+### 11.4 Data-flow diagrammasi
+
+```
+                    ┌────────────────────── Foydalanuvchi kompyuteri (lokal) ──────────────────────┐
+                    │                                                                              │
+ Foydalanuvchi ───► │  UI (renderer) ──IPC──► Main process                                         │
+   (matn/ovoz)      │                          │                                                   │
+                    │                          ├──► SQLite  %APPDATA%\MARIUS\marius.db             │
+                    │                          │     sozlamalar, suhbatlar, eslatmalar, ruxsatlar, │
+                    │                          │     audit, xotira metadata, vault sozlamasi, indeks│
+                    │                          │                                                   │
+                    │                          ├──► Log fayllar (secret'larsiz)                    │
+                    │                          │                                                   │
+                    │                          └──► Obsidian Vault (foydalanuvchi tanlagan papka)  │
+                    │                                faqat ruxsat berilgan amallar, .md fayllar     │
+                    └──────────────────────────┬───────────────────────────────────────────────────┘
+                                               │  faqat joriy so'rov uchun minimal kontekst
+                                               │  (cloud provayder bo'lsa, UI'da ogohlantirish)
+                                               ▼
+                         ┌───────────────────────────────┬──────────────────────────────┐
+                         │ Ollama (lokal, kompyuter ichida)│ Google Gemini (cloud, internet)│
+                         └───────────────────────────────┴──────────────────────────────┘
+```
+
+Qoidalar: SQLite yoki Vault hech qachon butunlay AI'ga yuborilmaydi. RAG natijasidan faqat kerakli kichik parcha olinadi va so'rov qaysi provayderga ketayotgani (lokal yoki cloud) UI'da ko'rsatiladi.
+
+### 11.5 Har bir ma'lumot turi: qayerda, kim kira oladi, qanday o'chiriladi
+| Ma'lumot | Saqlash joyi | Lokal/Cloud | Kim kira oladi | Backup | Qanday o'chiriladi |
+|---|---|---|---|---|---|
+| Sozlamalar | SQLite `app_settings` | Lokal | MARIUS (main process), Windows foydalanuvchisi | MARIUS backup | Sozlamalar → Tiklash / DB'ni o'chirish |
+| API kalitlar | SQLite, `safeStorage` (DPAPI) bilan shifrlangan | Lokal | Faqat shu Windows foydalanuvchisi (DPAPI) | Backup'ga **kirmaydi** (DPAPI boshqa kompyuterda ochilmaydi) | Sozlamalar → AI → Kalitni o'chirish |
+| Suhbatlar | SQLite `conversations`, `messages` | Lokal. Cloud AI ishlatilsa, joriy so'rov matni provayderga yuboriladi | MARIUS | MARIUS backup | Suhbat → O'chirish / Tarixni tozalash |
+| Eslatmalar | SQLite `reminders` | Lokal | MARIUS | MARIUS backup | Vazifalar → O'chirish |
+| Xotira | SQLite `memory_items` | Lokal | MARIUS | MARIUS backup | Xotira → O'chirish / Eksport |
+| Audit (amallar tarixi) | SQLite `action_audit` | Lokal | MARIUS | MARIUS backup | Tarix → Tozalash (siyosat bilan) |
+| Loglar | `%APPDATA%\MARIUS\logs` | Lokal | Windows foydalanuvchisi | Yo'q (rotatsiya) | Papkani o'chirish |
+| Vault sozlamasi va indeks | SQLite | Lokal | MARIUS | MARIUS backup (indeks qayta quriladi) | Disconnect Vault / Indeksni tozalash |
+| Obsidian notes | Foydalanuvchi tanlagan Vault papkasi | Lokal (foydalanuvchi o'zi sync qilmasa) | Foydalanuvchi, Obsidian, ruxsat bilan MARIUS | Foydalanuvchi o'zi (oddiy papka). **MARIUS backup'iga kirmaydi** | Foydalanuvchi o'zi (MARIUS o'chirmaydi) |
+| Mikrofon audio | Faqat xotirada (RAM), real vaqtda | Lokal | — | Saqlanmaydi | Saqlanmaydi |

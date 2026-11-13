@@ -1,21 +1,33 @@
-/** MARIUS'ning vaqtinchalik original belgisi. Foydalanuvchi dizayni kelganda almashtiriladi. */
-export function LogoMark({ size = 32 }: { size?: number }) {
+/** MARIUS belgisi: ikki qismli "M". Original dizayn, foydalanuvchi uslubiga moslangan. */
+export function LogoMark({ size = 28 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true" className="logo-mark">
       <defs>
-        <linearGradient id="marius-g" x1="0" y1="0" x2="1" y2="1">
+        <linearGradient id="marius-g1" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="var(--accent-strong)" />
           <stop offset="1" stopColor="var(--accent-2)" />
         </linearGradient>
+        <linearGradient id="marius-g2" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="var(--accent-2)" />
+          <stop offset="1" stopColor="var(--accent-strong)" />
+        </linearGradient>
       </defs>
-      <rect x="4" y="4" width="56" height="56" rx="16" fill="none" stroke="url(#marius-g)" strokeWidth="3" />
       <path
-        d="M17 44V21l15 15 15-15v23"
+        d="M8 54V12l24 26"
         fill="none"
-        stroke="url(#marius-g)"
-        strokeWidth="5"
+        stroke="url(#marius-g1)"
+        strokeWidth="9"
         strokeLinecap="round"
         strokeLinejoin="round"
+      />
+      <path
+        d="M32 38l24-26v42"
+        fill="none"
+        stroke="url(#marius-g2)"
+        strokeWidth="9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity="0.85"
       />
     </svg>
   );

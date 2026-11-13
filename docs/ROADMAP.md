@@ -11,7 +11,7 @@ Baholar taxminiy bo'lib, "ish sessiyasi" birligida berilgan.
 ## PHASE 0 — Audit va arxitektura ✅ (shu hujjatlar)
 PROJECT_AUDIT, ARCHITECTURE, ROADMAP, RISK_REGISTER.
 
-## PHASE 1 — App foundation va design system 🟡 (kod tayyor; Windows'da sinov va foydalanuvchi dizayni kutilmoqda)
+## PHASE 1 — App foundation va design system 🟡 (kod tayyor; foydalanuvchi dizayni qo'llandi; Windows'da sinov kutilmoqda)
 - npm + electron-vite + React + TS (strict), ESLint, Prettier, Vitest.
 - Xavfsiz `BrowserWindow`, CSP, preload `window.marius` API, typed IPC + zod.
 - SQLite spike (`better-sqlite3` va `node:sqlite`), migratsiya runner, `app_settings`.
@@ -66,6 +66,12 @@ PROJECT_AUDIT, ARCHITECTURE, ROADMAP, RISK_REGISTER.
 - Eslatmalar CRUD, o'zbekcha vaqt ifodalari ("ertaga", "kechqurun", "soat yettida") va noaniq vaqtni tasdiqlatish, timezone, scheduler, toast, tray.
 
 **Qabul mezonlari:** vaqt parser testlari (yarim tun, DST, timezone); eslatma restartdan keyin ham saqlanadi.
+
+## PHASE 7B — Local data va Obsidian (v2.1 qo'shimchasi, ~2–3 sessiya)
+- `local-data-manager`, "Ma'lumotlar qayerda saqlanadi?" sahifasi, `backup-restore-service`.
+- Settings → Integratsiyalar → Obsidian: default OFF, Vault tanlash, Test access, alohida Read / Create / Append ruxsatlari, Disconnect.
+- `vault-indexer` (FTS5, worker, cancel), `markdown-note-service` (preview + tasdiq).
+- Qabul testlari: Obsidian prompt v2.1 §9 A–J va §10 (Windows'da real sinov).
 
 ## PHASE 8 — Monitoring va Vision (~2 sessiya)
 - CPU, RAM, disk va batareya kartalari, pauza imkoniyati, oxirgi yangilanish vaqti.

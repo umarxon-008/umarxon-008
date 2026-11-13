@@ -1,9 +1,12 @@
-import type { AppInfo, IpcResult, Settings, SettingsPatch } from '../shared/ipc';
+import type { AppInfo, IpcResult, Settings, SettingsPatch, SystemMetrics } from '../shared/ipc';
 
 /** Renderer'ga ochilgan yagona API. Boshqa hech qanday OS kirish yo'li yo'q. */
 export interface MariusApi {
   app: {
     getInfo(): Promise<IpcResult<AppInfo>>;
+  };
+  system: {
+    getMetrics(): Promise<IpcResult<SystemMetrics>>;
   };
   settings: {
     getAll(): Promise<IpcResult<Settings>>;

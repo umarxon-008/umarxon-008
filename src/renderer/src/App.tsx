@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router';
 import { useSettings } from './store/settings';
 import { Sidebar } from './components/Sidebar';
+import { TopBar } from './components/TopBar';
 import { ErrorState, LoadingState } from './components/StateViews';
 import { Onboarding } from './features/onboarding/Onboarding';
 import { DashboardPage } from './pages/DashboardPage';
@@ -32,63 +33,66 @@ export function App() {
   return (
     <div className="shell">
       <Sidebar />
-      <main className="shell__main" id="main" tabIndex={-1}>
-        <Routes>
-          <Route path="/" element={<DashboardPage />} />
-          <Route
-            path="/assistant"
-            element={
-              <PlaceholderPage
-                title={uz.nav.assistant}
-                phase={2}
-                description="Matnli AI suhbat, ovozli kiritish va bajarilgan amallar kartalari shu yerda bo'ladi."
-              />
-            }
-          />
-          <Route
-            path="/computer"
-            element={
-              <PlaceholderPage
-                title={uz.nav.computer}
-                phase={4}
-                description="Dasturlarni ochish, ochiq oynalar va ruxsat berilgan papkalarda fayl qidirish."
-              />
-            }
-          />
-          <Route
-            path="/memory"
-            element={
-              <PlaceholderPage
-                title={uz.nav.memory}
-                phase={7}
-                description="MARIUS nimani eslab qolganini ko'rish, tahrirlash, o'chirish va eksport qilish."
-              />
-            }
-          />
-          <Route
-            path="/tasks"
-            element={
-              <PlaceholderPage
-                title={uz.nav.tasks}
-                phase={7}
-                description="Eslatmalar va vazifalar, vaqt kelganda Windows bildirishnomasi."
-              />
-            }
-          />
-          <Route
-            path="/monitoring"
-            element={
-              <PlaceholderPage
-                title={uz.nav.monitoring}
-                phase={8}
-                description="CPU, RAM, disk va batareya holati: real ko'rsatkichlar, pauza qilish mumkin."
-              />
-            }
-          />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </main>
+      <div className="shell__content">
+        <TopBar />
+        <main className="shell__main" id="main" tabIndex={-1}>
+          <Routes>
+            <Route path="/" element={<DashboardPage />} />
+            <Route
+              path="/chat"
+              element={
+                <PlaceholderPage
+                  title={uz.nav.chat}
+                  phase={2}
+                  description="Matnli AI suhbat (Gemini yoki lokal Ollama), javobni to‘xtatish, bajarilgan amallar va tasdiq kartalari."
+                />
+              }
+            />
+            <Route
+              path="/memory"
+              element={
+                <PlaceholderPage
+                  title={uz.nav.memory}
+                  phase={7}
+                  description="MARIUS nimani eslab qolganini ko‘rish, tahrirlash, o‘chirish va eksport qilish. Obsidian Vault bilan ixtiyoriy integratsiya."
+                />
+              }
+            />
+            <Route
+              path="/tasks"
+              element={
+                <PlaceholderPage
+                  title={uz.nav.tasks}
+                  phase={7}
+                  description="Eslatmalar va vazifalar: vaqt kelganda Windows bildirishnomasi chiqadi."
+                />
+              }
+            />
+            <Route
+              path="/history"
+              element={
+                <PlaceholderPage
+                  title={uz.nav.history}
+                  phase={4}
+                  description="MARIUS bajargan barcha amallar jurnali: vaqt, amal, ruxsat darajasi, tasdiq va natija."
+                />
+              }
+            />
+            <Route
+              path="/computer"
+              element={
+                <PlaceholderPage
+                  title={uz.nav.computer}
+                  phase={4}
+                  description="Dasturlarni ochish, ochiq oynalar va ruxsat berilgan papkalarda fayl qidirish."
+                />
+              }
+            />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
+      </div>
     </div>
   );
 }

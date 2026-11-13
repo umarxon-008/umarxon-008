@@ -79,8 +79,8 @@ const steps: Step[] = [
     body: (
       <ul className="checklist">
         <li>
-          <ShieldCheck size={18} aria-hidden="true" /> Mikrofon faqat siz tugmani bosib turganingizda
-          ishlaydi.
+          <ShieldCheck size={18} aria-hidden="true" /> Mikrofon faqat siz tugmani bosganingizda yoqiladi va 30
+          soniyadan keyin o‘zi o‘chadi. Ovoz yozib olinmaydi.
         </li>
         <li>
           <ShieldCheck size={18} aria-hidden="true" /> Ekran tasviri faqat sizning ruxsatingiz bilan olinadi.
