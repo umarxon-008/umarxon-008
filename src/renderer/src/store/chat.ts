@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { ChatEvent, ChatMessage, ConversationSummary } from '@shared/ipc';
+import type { ChatEvent, ChatMessage, ConversationSummary, ToolActivity } from '@shared/ipc';
 
 interface Streaming {
   requestId: string;
@@ -11,6 +11,8 @@ interface ChatState {
   conversations: ConversationSummary[];
   activeId: string | null;
   messages: ChatMessage[];
+  /** Kompyuter amallari kartalari (audit jurnalidan) */
+  activities: ToolActivity[];
   streaming: Streaming | null;
   sending: boolean;
   /** Oxirgi javob xatosi (qayta urinish tugmasi bilan) */
@@ -32,6 +34,7 @@ export const useChat = create<ChatState>((set, get) => ({
   conversations: [],
   activeId: null,
   messages: [],
+  activities: [],
   streaming: null,
   sending: false,
   failure: null,
@@ -53,6 +56,7 @@ export const useChat = create<ChatState>((set, get) => ({
     set({
       activeId: id,
       messages: r.data.messages,
+      activities: r.data.activities,
       error: null,
       failure:
         last?.role === 'assistant' && last.status === 'error'
@@ -62,7 +66,7 @@ export const useChat = create<ChatState>((set, get) => ({
   },
 
   startNew() {
-    set({ activeId: null, messages: [], failure: null, error: null });
+    set({ activeId: null, messages: [], activities: [], failure: null, error: null });
   },
 
   async send(text) {
@@ -82,6 +86,7 @@ export const useChat = create<ChatState>((set, get) => ({
         s.activeId === conversationId
           ? [...s.messages, userMessage, assistantMessage]
           : [userMessage, assistantMessage],
+      activities: s.activeId === conversationId ? s.activities : [],
       streaming: { requestId, conversationId, messageId: assistantMessage.id },
     }));
     void get().loadList();
@@ -130,6 +135,17 @@ export const useChat = create<ChatState>((set, get) => ({
     const patchMessage = (fn: (m: ChatMessage) => ChatMessage) =>
       set((s) => ({ messages: s.messages.map((m) => (m.id === e.messageId ? fn(m) : m)) }));
 
+    if (e.type === 'tool') {
+      if (get().activeId !== e.conversationId) return;
+      set((s) => {
+        const i = s.activities.findIndex((a) => a.id === e.activity.id);
+        if (i === -1) return { activities: [...s.activities, e.activity] };
+        const next = [...s.activities];
+        next[i] = e.activity;
+        return { activities: next };
+      });
+      return;
+    }
     if (e.type === 'delta') {
       patchMessage((m) => ({ ...m, content: m.content + e.text }));
       return;

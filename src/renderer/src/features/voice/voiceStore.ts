@@ -207,7 +207,7 @@ export const useVoice = create<VoiceStore>((set, get) => {
 
 // Ovozli savolga javob tugaganda: sozlama yoqilgan bo'lsa ovoz chiqarib o'qiladi.
 window.marius.chat.onEvent((e) => {
-  if (e.type === 'delta' || e.requestId !== pendingRequestId) return;
+  if (e.type === 'delta' || e.type === 'tool' || e.requestId !== pendingRequestId) return;
   pendingRequestId = null;
   const voice = useVoice.getState();
   if (voice.status !== 'thinking') return;

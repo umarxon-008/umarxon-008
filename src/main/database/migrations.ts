@@ -65,4 +65,32 @@ export const MIGRATIONS: Migration[] = [
       CREATE INDEX idx_messages_conversation ON messages(conversation_id, created_at);
     `,
   },
+  {
+    version: 3,
+    name: 'action_audit',
+    sql: `
+      -- Har bir vosita (tool) amali jurnali (prompt §20.6). Maxfiy argumentlar yozilmaydi.
+      CREATE TABLE action_audit (
+        id               TEXT PRIMARY KEY,
+        created_at       TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+        finished_at      TEXT,
+        tool_id          TEXT NOT NULL,
+        title            TEXT NOT NULL,
+        summary          TEXT NOT NULL,
+        permission_level INTEGER NOT NULL CHECK (permission_level BETWEEN 0 AND 3),
+        source           TEXT NOT NULL CHECK (source IN ('ai', 'user')),
+        confirmation     TEXT NOT NULL
+          CHECK (confirmation IN ('not_required', 'approved', 'denied', 'timeout', 'user_initiated')),
+        status           TEXT NOT NULL
+          CHECK (status IN ('running', 'awaiting_confirmation', 'success', 'unverified', 'denied', 'error', 'unknown')),
+        result_message   TEXT,
+        error_code       TEXT,
+        duration_ms      INTEGER,
+        conversation_id  TEXT,
+        message_id       TEXT
+      );
+      CREATE INDEX idx_audit_created ON action_audit(created_at DESC);
+      CREATE INDEX idx_audit_message ON action_audit(message_id);
+    `,
+  },
 ];

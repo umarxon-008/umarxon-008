@@ -129,6 +129,95 @@ export const ConnectionTestSchema = z.object({
 });
 export type ConnectionTest = z.infer<typeof ConnectionTestSchema>;
 
+/* ===================== Vositalar (tools), audit, kompyuter ===================== */
+
+/** Ruxsat darajalari (prompt §20.2). 4 = taqiqlangan: bunday vosita registry'da umuman yo'q. */
+export const PermissionLevelSchema = z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]);
+export type PermissionLevel = z.infer<typeof PermissionLevelSchema>;
+
+export const ToolActivityStatusSchema = z.enum([
+  'running',
+  'awaiting_confirmation',
+  'success',
+  'unverified',
+  'denied',
+  'error',
+  'unknown',
+]);
+export type ToolActivityStatus = z.infer<typeof ToolActivityStatusSchema>;
+
+/** Suhbatda ko'rinadigan amal kartasi */
+export const ToolActivitySchema = z.object({
+  id: z.string().uuid(),
+  messageId: z.string().uuid().nullable(),
+  toolId: z.string(),
+  title: z.string(),
+  summary: z.string(),
+  status: ToolActivityStatusSchema,
+  resultMessage: z.string().nullable(),
+  permissionLevel: PermissionLevelSchema,
+  createdAt: z.string(),
+});
+export type ToolActivity = z.infer<typeof ToolActivitySchema>;
+
+export const ConfirmationRequestSchema = z.object({
+  id: z.string().uuid(),
+  toolId: z.string(),
+  /** MARIUS nima qilmoqchi */
+  action: z.string(),
+  /** Qaysi dastur/oyna/joyga ta'sir qiladi */
+  target: z.string(),
+  /** Natijada nima o'zgaradi */
+  effect: z.string(),
+  permissionLevel: PermissionLevelSchema,
+  expiresAt: z.string(),
+});
+export type ConfirmationRequest = z.infer<typeof ConfirmationRequestSchema>;
+export const TOOL_CONFIRM_CHANNEL = 'tool:confirm';
+
+export const AuditEntrySchema = z.object({
+  id: z.string().uuid(),
+  createdAt: z.string(),
+  toolId: z.string(),
+  summary: z.string(),
+  permissionLevel: PermissionLevelSchema,
+  source: z.enum(['ai', 'user']),
+  confirmation: z.enum(['not_required', 'approved', 'denied', 'timeout', 'user_initiated']),
+  status: ToolActivityStatusSchema,
+  errorCode: z.string().nullable(),
+  durationMs: z.number().nullable(),
+});
+export type AuditEntry = z.infer<typeof AuditEntrySchema>;
+
+export const AppEntrySchema = z.object({ id: z.string(), name: z.string() });
+export type AppEntry = z.infer<typeof AppEntrySchema>;
+
+export const WindowEntrySchema = z.object({
+  pid: z.number().int().positive(),
+  app: z.string(),
+  title: z.string(),
+});
+export type WindowEntry = z.infer<typeof WindowEntrySchema>;
+
+export const ActionResultSchema = z.object({
+  ok: z.boolean(),
+  message: z.string(),
+  verified: z.boolean().nullable(),
+});
+export type ActionResult = z.infer<typeof ActionResultSchema>;
+
+export const ComputerInfoSchema = z.object({
+  supported: z.boolean(),
+  platform: z.string(),
+  osName: z.string(),
+  cpuModel: z.string(),
+  cores: z.number(),
+  memoryTotalBytes: z.number(),
+  uptimeSeconds: z.number(),
+  battery: z.object({ percent: z.number(), charging: z.boolean() }).nullable(),
+});
+export type ComputerInfo = z.infer<typeof ComputerInfoSchema>;
+
 /* ===================== Suhbat ===================== */
 
 const Id = z.string().uuid();
@@ -155,7 +244,10 @@ export const ConversationSummarySchema = z.object({
 });
 export type ConversationSummary = z.infer<typeof ConversationSummarySchema>;
 
-export const ConversationSchema = ConversationSummarySchema.extend({ messages: z.array(ChatMessageSchema) });
+export const ConversationSchema = ConversationSummarySchema.extend({
+  messages: z.array(ChatMessageSchema),
+  activities: z.array(ToolActivitySchema),
+});
 export type Conversation = z.infer<typeof ConversationSchema>;
 
 export const MAX_MESSAGE_LENGTH = 8000;
@@ -185,6 +277,7 @@ export type ChatEvent =
       messageId: string;
       status: 'complete' | 'cancelled';
     }
+  | { type: 'tool'; requestId: string; conversationId: string; messageId: string; activity: ToolActivity }
   | {
       type: 'error';
       requestId: string;
@@ -259,6 +352,38 @@ export const IPC = {
   'chat:deleteConversation': { input: IdInput, output: z.void() },
   'chat:clearAll': { input: NoInput, output: z.void() },
 
+  'tools:respond': {
+    input: z.object({ id: z.string().uuid(), approved: z.boolean() }).strict(),
+    output: z.boolean(),
+  },
+  'audit:list': {
+    input: z.object({ limit: z.number().int().min(1).max(500) }).strict(),
+    output: z.array(AuditEntrySchema),
+  },
+  'audit:clear': { input: NoInput, output: z.void() },
+  'computer:info': { input: NoInput, output: ComputerInfoSchema },
+  'computer:listApps': {
+    input: z.object({ refresh: z.boolean() }).strict(),
+    output: z.array(AppEntrySchema),
+  },
+  'computer:launchApp': {
+    input: z.object({ appId: z.string().min(1).max(500) }).strict(),
+    output: ActionResultSchema,
+  },
+  'computer:listWindows': { input: NoInput, output: z.array(WindowEntrySchema) },
+  'computer:focusWindow': {
+    input: z
+      .object({
+        pid: z
+          .number()
+          .int()
+          .positive()
+          .max(2 ** 31),
+      })
+      .strict(),
+    output: ActionResultSchema,
+  },
+
   'voice:transcribe': { input: TranscribeInputSchema, output: z.object({ text: z.string() }) },
   'voice:synthesize': {
     input: z.object({ text: z.string().trim().min(1).max(MAX_TTS_TEXT) }).strict(),
@@ -290,6 +415,8 @@ export const AiErrorMessages = {
   AI_MODEL_NOT_FOUND: 'Tanlangan model topilmadi. Sozlamalarda boshqa modelni tanlang.',
   AI_BLOCKED: 'AI bu so‘rovga javob berishni xavfsizlik sababli rad etdi.',
   AI_BAD_RESPONSE: 'AI’dan tushunarsiz javob keldi. Qayta urinib ko‘ring.',
+  AI_TOOLS_UNSUPPORTED:
+    'Tanlangan model kompyuter amallarini (function calling) qo‘llamaydi, shuning uchun faqat suhbat ishlaydi.',
 } as const;
 export type AiErrorCode = keyof typeof AiErrorMessages;
 
@@ -307,6 +434,10 @@ export const ErrorCodes = {
   VOICE_NOT_CONFIGURED:
     'Ovoz uchun Gemini kaliti va modeli kerak. Sozlamalar → Sun’iy intellekt → Gemini bo‘limida kalitni kiriting va modelni tanlang.',
   TTS_NOT_CONFIGURED: 'Gemini ovoz modeli tanlanmagan. Sozlamalar → Ovoz bo‘limida tanlang.',
+  OS_UNSUPPORTED: 'Bu amal hozircha faqat Windows’da ishlaydi.',
+  OS_COMMAND_FAILED: 'Windows buyrug‘i bajarilmadi. Batafsil ma’lumot log faylida.',
+  APP_NOT_FOUND: 'Bunday dastur topilmadi. Ro‘yxatni yangilab, qayta urinib ko‘ring.',
+  CONFIRMATION_PENDING: 'Avvalgi amal tasdiqlanishi kutilmoqda.',
   SECRET_STORAGE_UNAVAILABLE:
     'Bu kompyuterda kalitni xavfsiz (shifrlangan) saqlab bo‘lmaydi, shuning uchun u saqlanmadi.',
   UNEXPECTED: "Kutilmagan xatolik yuz berdi. Iltimos, qayta urinib ko'ring.",

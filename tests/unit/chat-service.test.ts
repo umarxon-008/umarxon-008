@@ -2,18 +2,28 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { ChatEvent, ChatMessage } from '@shared/ipc';
 import { MemoryConversationStore, SqliteConversationStore } from '../../src/main/database/conversation-store';
 import { buildContext, ChatService } from '../../src/main/services/chat-service';
-import { ProviderError, type AIProvider, type ChatRequest } from '../../src/modules/ai/types';
+import {
+  ProviderError,
+  type AIProvider,
+  type ChatRequest,
+  type StreamEvent,
+} from '../../src/modules/ai/types';
 import { AppError } from '../../src/main/ipc/router';
 import { tempDatabase } from './helpers/db';
 
 const logger = { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() };
 
-function fakeProvider(script: (req: ChatRequest, signal: AbortSignal) => AsyncIterable<string>): AIProvider {
+function fakeProvider(
+  script: (req: ChatRequest, signal: AbortSignal) => AsyncIterable<string | StreamEvent>,
+): AIProvider {
   return {
     id: 'ollama',
     getCapabilities: () => ({ streaming: true, tools: false, vision: false, cloud: false }),
     listModels: async () => ['m'],
-    streamChat: script,
+    async *streamChat(req, signal) {
+      for await (const t of script(req, signal))
+        yield typeof t === 'string' ? { type: 'text' as const, text: t } : t;
+    },
   };
 }
 
@@ -199,7 +209,7 @@ describe('buildContext', () => {
     const many = Array.from({ length: 59 }, (_, i) => msg(i % 2 === 0 ? 'user' : 'assistant', `x${i}`));
     const ctx = buildContext(many);
     expect(ctx.length).toBeLessThanOrEqual(24);
-    expect(ctx.at(-1)!.content).toBe('x58');
+    expect((ctx.at(-1) as { content: string }).content).toBe('x58');
     expect(ctx[0]!.role).toBe('user');
     const huge = buildContext([msg('user', 'y'.repeat(50_000))]);
     expect(huge).toHaveLength(1);

@@ -104,6 +104,7 @@ export class SqliteConversationStore implements ConversationStore {
       updatedAt: c.updated_at,
       persisted: true,
       messages: rows.map(toMessage),
+      activities: [],
     };
   }
 
@@ -192,6 +193,7 @@ export class MemoryConversationStore implements ConversationStore {
       updatedAt: c.updatedAt,
       persisted: false,
       messages: c.messages.map((m) => ({ ...m })),
+      activities: [],
     };
   }
 

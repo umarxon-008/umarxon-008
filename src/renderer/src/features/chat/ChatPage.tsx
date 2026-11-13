@@ -23,6 +23,8 @@ import { Markdown } from '../../components/Markdown';
 import { isAiReady, useAi } from '../../store/ai';
 import { useChat } from '../../store/chat';
 import { useVoice } from '../voice/voiceStore';
+import { ToolActivityCard } from '../tools/ToolActivityCard';
+import type { ToolActivity } from '@shared/ipc';
 import { uz } from '../../i18n/uz';
 
 function formatTime(iso: string): string {
@@ -66,7 +68,7 @@ function ReadAloud({ message }: { message: ChatMessage }) {
   );
 }
 
-function MessageView({ m }: { m: ChatMessage }) {
+function MessageView({ m, activities }: { m: ChatMessage; activities: ToolActivity[] }) {
   if (m.role === 'user') {
     return (
       <li className="chat-msg chat-msg--user">
@@ -81,6 +83,13 @@ function MessageView({ m }: { m: ChatMessage }) {
       </span>
       <div className="chat-msg__body">
         <strong className="message__author">MARIUS</strong>
+        {activities.length > 0 && (
+          <div className="tool-cards">
+            {activities.map((a) => (
+              <ToolActivityCard key={a.id} activity={a} />
+            ))}
+          </div>
+        )}
         {m.content ? (
           <Markdown text={m.content} />
         ) : m.status === 'streaming' ? (
@@ -260,7 +269,11 @@ export function ChatPage() {
           ) : (
             <ul className="chat__list" role="log" aria-live="polite" aria-label="Xabarlar">
               {chat.messages.map((m) => (
-                <MessageView key={m.id} m={m} />
+                <MessageView
+                  key={m.id}
+                  m={m}
+                  activities={chat.activities.filter((a) => a.messageId === m.id)}
+                />
               ))}
             </ul>
           )}

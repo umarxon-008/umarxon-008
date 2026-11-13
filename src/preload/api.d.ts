@@ -1,4 +1,10 @@
 import type {
+  ActionResult,
+  AppEntry,
+  AuditEntry,
+  ComputerInfo,
+  ConfirmationRequest,
+  WindowEntry,
   AiSettings,
   AiSettingsPatch,
   AppInfo,
@@ -51,6 +57,22 @@ export interface MariusApi {
     clearAll(): Promise<IpcResult<void>>;
     /** Javob oqimi hodisalari. Obunani bekor qiluvchi funksiya qaytaradi. */
     onEvent(listener: (event: ChatEvent) => void): () => void;
+  };
+  tools: {
+    /** Tasdiq kartasiga javob: faqat foydalanuvchining haqiqiy bosishi orqali */
+    respond(id: string, approved: boolean): Promise<IpcResult<boolean>>;
+    onConfirmationRequest(listener: (request: ConfirmationRequest) => void): () => void;
+  };
+  audit: {
+    list(limit: number): Promise<IpcResult<AuditEntry[]>>;
+    clear(): Promise<IpcResult<void>>;
+  };
+  computer: {
+    info(): Promise<IpcResult<ComputerInfo>>;
+    listApps(refresh: boolean): Promise<IpcResult<AppEntry[]>>;
+    launchApp(appId: string): Promise<IpcResult<ActionResult>>;
+    listWindows(): Promise<IpcResult<WindowEntry[]>>;
+    focusWindow(pid: number): Promise<IpcResult<ActionResult>>;
   };
   voice: {
     /** 16 kHz mono WAV (base64). Faqat rozilik berilgan bo'lsa Gemini'ga yuboriladi. */

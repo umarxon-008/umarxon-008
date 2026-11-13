@@ -9,6 +9,9 @@ import { DashboardPage } from './pages/DashboardPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { ChatPage } from './features/chat/ChatPage';
+import { ConfirmationDialog } from './features/tools/ConfirmationDialog';
+import { ComputerPage } from './features/tools/ComputerPage';
+import { HistoryPage } from './features/tools/HistoryPage';
 import { uz } from './i18n/uz';
 
 export function App() {
@@ -60,31 +63,14 @@ export function App() {
                 />
               }
             />
-            <Route
-              path="/history"
-              element={
-                <PlaceholderPage
-                  title={uz.nav.history}
-                  phase={4}
-                  description="MARIUS bajargan barcha amallar jurnali: vaqt, amal, ruxsat darajasi, tasdiq va natija."
-                />
-              }
-            />
-            <Route
-              path="/computer"
-              element={
-                <PlaceholderPage
-                  title={uz.nav.computer}
-                  phase={4}
-                  description="Dasturlarni ochish, ochiq oynalar va ruxsat berilgan papkalarda fayl qidirish."
-                />
-              }
-            />
+            <Route path="/history" element={<HistoryPage />} />
+            <Route path="/computer" element={<ComputerPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
       </div>
+      <ConfirmationDialog />
     </div>
   );
 }

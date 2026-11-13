@@ -3,6 +3,9 @@ import { createGeminiProvider } from '../../src/modules/ai/gemini';
 import { ProviderError } from '../../src/modules/ai/types';
 import { collect, streamOf } from './helpers/streams';
 
+const textOf = (events: { type: string; text?: string }[]) =>
+  events.map((e) => (e.type === 'text' ? e.text : '')).join('');
+
 const KEY = 'AIza-test-key-123456';
 const req = { model: 'test-model', system: 'SYS', messages: [{ role: 'user' as const, content: 'Salom' }] };
 
@@ -23,7 +26,7 @@ describe('Gemini adapter', () => {
     );
     const p = createGeminiProvider({ apiKey: async () => KEY, fetch: fetchMock as unknown as typeof fetch });
     const chunks = await collect(p.streamChat(req, new AbortController().signal));
-    expect(chunks.join('')).toBe('Salom, do‘stim!');
+    expect(textOf(chunks)).toBe('Salom, do‘stim!');
 
     const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe(

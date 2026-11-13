@@ -1,10 +1,19 @@
 import { join } from 'node:path';
 import { app, BrowserWindow, ipcMain, nativeTheme, net, safeStorage, shell } from 'electron';
-import { CHAT_EVENT_CHANNEL, IPC_CHANNELS, type AppInfo, type ChatEvent } from '@shared/ipc';
+import {
+  CHAT_EVENT_CHANNEL,
+  IPC_CHANNELS,
+  TOOL_CONFIRM_CHANNEL,
+  type AppInfo,
+  type ChatEvent,
+  type ConfirmationRequest,
+} from '@shared/ipc';
+import { randomUUID } from 'node:crypto';
+import os from 'node:os';
 import { createLogger, type Logger } from './logging/logger';
 import { openDatabase, type Database } from './database/database';
 import { SettingsRepository } from './database/settings-repository';
-import { createSenderGuard, dispatchIpc, type IpcHandlers } from './ipc/router';
+import { AppError, createSenderGuard, dispatchIpc, type IpcHandlers } from './ipc/router';
 import { hardenWindow, lockDownPermissions, secureWebPreferences } from './security/window';
 import { createSystemMetricsService } from './services/system-metrics';
 import { SecretStore, type Encryptor } from './database/secret-store';
@@ -13,6 +22,16 @@ import { MemoryConversationStore, SqliteConversationStore } from './database/con
 import { AiService } from './services/ai-service';
 import { ChatService } from './services/chat-service';
 import { VoiceService } from './services/voice-service';
+import { AuditRepository } from './database/audit-repository';
+import { ToolRegistry } from './tools/registry';
+import { ConfirmationBroker } from './tools/confirmation';
+import { ToolExecutor } from './tools/executor';
+import { AppCatalog, createComputerTools } from './tools/computer-tools';
+import type { OsAdapter } from './windows/os-adapter';
+import { createWindowsAdapter } from './windows/windows-adapter';
+import { createFakeAdapter, createUnsupportedAdapter } from './windows/fake-adapter';
+import { osDisplayName } from './services/system-metrics';
+import type { ToolRunner } from './services/chat-service';
 
 const APP_ID = 'uz.marius.app';
 
@@ -30,6 +49,9 @@ if (testDataDir && !app.isPackaged) app.setPath('userData', testDataDir);
 
 // Faqat development/test uchun: E2E testda Gemini o'rniga lokal soxta server ishlatiladi.
 const geminiBaseUrl = !app.isPackaged ? process.env['MARIUS_GEMINI_BASE_URL'] || undefined : undefined;
+
+// Faqat development/test uchun: haqiqiy dasturlarni ochmasdan sinash (paketlangan ilovada e'tiborga olinmaydi)
+const useFakeOs = !app.isPackaged && process.env['MARIUS_FAKE_OS'] === '1';
 
 const devServerUrl = !app.isPackaged ? process.env['ELECTRON_RENDERER_URL'] : undefined;
 const rendererFile = join(__dirname, '../renderer/index.html');
@@ -80,6 +102,19 @@ const electronEncryptor: Encryptor = {
   decrypt: async (cipher) => (await safeStorage.decryptStringAsync(cipher)).result,
 };
 
+function emitConfirmation(request: ConfirmationRequest): void {
+  const win = mainWindow;
+  if (!win || win.isDestroyed()) return;
+  if (win.isMinimized()) win.restore();
+  win.flashFrame(!win.isFocused());
+  win.webContents.send(TOOL_CONFIRM_CHANNEL, request);
+}
+
+function createOsAdapter(): OsAdapter {
+  if (useFakeOs) return createFakeAdapter();
+  return process.platform === 'win32' ? createWindowsAdapter() : createUnsupportedAdapter();
+}
+
 function emitChatEvent(event: ChatEvent): void {
   const wc = mainWindow?.webContents;
   if (wc && !wc.isDestroyed()) wc.send(CHAT_EVENT_CHANNEL, event);
@@ -94,6 +129,32 @@ function registerIpc(settings: SettingsRepository, database: Database): void {
       ...(geminiBaseUrl ? { geminiBaseUrl } : {}),
     },
   );
+  // ---- Vositalar (PHASE 4) ----
+  const osAdapter = createOsAdapter();
+  logger.info('os.adapter', { kind: osAdapter.kind });
+  const audit = new AuditRepository(database);
+  const interruptedActions = audit.recoverInterrupted();
+  if (interruptedActions > 0) logger.warn('audit.recovered_interrupted', { count: interruptedActions });
+  const catalog = new AppCatalog(osAdapter);
+  const registry = new ToolRegistry();
+  for (const tool of createComputerTools({ os: osAdapter, catalog, isOnline: () => net.isOnline() })) {
+    registry.register(tool);
+  }
+  const broker = new ConfirmationBroker(emitConfirmation);
+  const executor = new ToolExecutor(registry, broker, audit, logger);
+  const toolRunner: ToolRunner = {
+    declarations: () => registry.declarations(),
+    execute: (call, ctx) => executor.execute(call, { source: 'ai', ...ctx }),
+    activitiesFor: (ids) => audit.activitiesForMessages(ids),
+  };
+  const runUserAction = async (name: string, args: Record<string, unknown>) => {
+    const out = await executor.execute(
+      { id: randomUUID(), name, args },
+      { source: 'user', conversationId: null, messageId: null, signal: new AbortController().signal },
+    );
+    return { ok: out.ok, message: out.message, verified: out.verified };
+  };
+
   const persistentStore = new SqliteConversationStore(database);
   const recovered = persistentStore.recoverInterrupted();
   if (recovered > 0) logger.warn('chat.recovered_interrupted', { count: recovered });
@@ -103,6 +164,7 @@ function registerIpc(settings: SettingsRepository, database: Database): void {
     resolveProvider: () => ai.resolve(),
     emit: emitChatEvent,
     logger,
+    tools: toolRunner,
   });
   const voice = new VoiceService({
     settings: () => settings.getAll(),
@@ -144,6 +206,31 @@ function registerIpc(settings: SettingsRepository, database: Database): void {
     'chat:cancel': ({ requestId }) => chat.cancel(requestId),
     'chat:deleteConversation': ({ id }) => chat.deleteConversation(id),
     'chat:clearAll': () => chat.clearAll(),
+
+    'tools:respond': ({ id, approved }) => broker.respond(id, approved),
+    'audit:list': ({ limit }) => audit.list(limit),
+    'audit:clear': () => audit.clear(),
+    'computer:info': async () => ({
+      supported: osAdapter.supported,
+      platform: process.platform,
+      osName: osDisplayName(),
+      cpuModel: os.cpus()[0]?.model.trim() ?? '',
+      cores: os.cpus().length,
+      memoryTotalBytes: os.totalmem(),
+      uptimeSeconds: Math.round(os.uptime()),
+      battery: await osAdapter.battery().catch(() => null),
+    }),
+    'computer:listApps': ({ refresh }) => catalog.list(refresh),
+    'computer:launchApp': async ({ appId }) => {
+      // Tarixda ichki ID emas, dastur nomi ko'rinishi uchun
+      const app = await catalog.byId(appId);
+      return runUserAction('launch_app', app ? { appId, name: app.name } : { appId });
+    },
+    'computer:listWindows': () => {
+      if (!osAdapter.supported) throw new AppError('OS_UNSUPPORTED');
+      return osAdapter.listWindows();
+    },
+    'computer:focusWindow': ({ pid }) => runUserAction('focus_window', { pid }),
 
     'voice:transcribe': async ({ audio, mimeType }) => ({ text: await voice.transcribe(audio, mimeType) }),
     'voice:synthesize': ({ text }) => voice.synthesize(text),

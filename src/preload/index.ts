@@ -1,9 +1,10 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron';
-import type { ChatEvent } from '../shared/ipc';
+import type { ChatEvent, ConfirmationRequest } from '../shared/ipc';
 import type { MariusApi } from './api';
 
 // Sandbox'dagi preload faqat 'electron' modulini import qila oladi, shuning uchun kanal nomi shu yerda.
 const CHAT_EVENT_CHANNEL = 'chat:event';
+const TOOL_CONFIRM_CHANNEL = 'tool:confirm';
 
 /**
  * Preload: sandbox ichida ishlaydi. Faqat aniq nomlangan funksiyalarni ochadi.
@@ -44,6 +45,25 @@ const api: MariusApi = {
       ipcRenderer.on(CHAT_EVENT_CHANNEL, handler);
       return () => ipcRenderer.removeListener(CHAT_EVENT_CHANNEL, handler);
     },
+  },
+  tools: {
+    respond: (id, approved) => ipcRenderer.invoke('tools:respond', { id, approved }),
+    onConfirmationRequest: (listener) => {
+      const handler = (_e: IpcRendererEvent, request: ConfirmationRequest) => listener(request);
+      ipcRenderer.on(TOOL_CONFIRM_CHANNEL, handler);
+      return () => ipcRenderer.removeListener(TOOL_CONFIRM_CHANNEL, handler);
+    },
+  },
+  audit: {
+    list: (limit) => ipcRenderer.invoke('audit:list', { limit }),
+    clear: () => ipcRenderer.invoke('audit:clear'),
+  },
+  computer: {
+    info: () => ipcRenderer.invoke('computer:info'),
+    listApps: (refresh) => ipcRenderer.invoke('computer:listApps', { refresh }),
+    launchApp: (appId) => ipcRenderer.invoke('computer:launchApp', { appId }),
+    listWindows: () => ipcRenderer.invoke('computer:listWindows'),
+    focusWindow: (pid) => ipcRenderer.invoke('computer:focusWindow', { pid }),
   },
   voice: {
     transcribe: (audio) => ipcRenderer.invoke('voice:transcribe', { audio, mimeType: 'audio/wav' }),

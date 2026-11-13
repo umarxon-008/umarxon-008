@@ -1,10 +1,13 @@
+import { randomUUID } from 'node:crypto';
 import {
   createStreamGuard,
   mapFetchError,
   ProviderError,
   type AIProvider,
   type ChatRequest,
+  type ChatTurn,
   type FetchLike,
+  type ToolCallRequest,
 } from './types';
 import { sseData } from './stream-parsers';
 
@@ -15,6 +18,54 @@ import { sseData } from './stream-parsers';
  */
 export const GEMINI_DEFAULT_BASE_URL = 'https://generativelanguage.googleapis.com';
 const API_VERSION = 'v1beta';
+
+interface GeminiPart {
+  text?: string;
+  thought?: boolean;
+  thoughtSignature?: string;
+  functionCall?: { id?: string; name?: string; args?: Record<string, unknown> };
+  functionResponse?: { id?: string; name: string; response: Record<string, unknown> };
+}
+
+interface GeminiContent {
+  role: 'user' | 'model';
+  parts: GeminiPart[];
+}
+
+/**
+ * Suhbatni Gemini formatiga o'tkazadi.
+ * - assistant → role "model": asl qismlar (raw) bo'lsa o'shalar, aks holda matn + functionCall
+ * - tool natijalari → role "user", functionResponse qismlari (ketma-ketlari bitta turnga birlashtiriladi)
+ */
+export function toGeminiContents(messages: ChatTurn[]): GeminiContent[] {
+  const out: GeminiContent[] = [];
+  for (const m of messages) {
+    if (m.role === 'user') {
+      out.push({ role: 'user', parts: [{ text: m.content }] });
+    } else if (m.role === 'assistant') {
+      const raw = Array.isArray(m.raw) ? (m.raw as GeminiPart[]) : null;
+      const parts: GeminiPart[] = raw ?? [
+        ...(m.content ? [{ text: m.content }] : []),
+        ...(m.toolCalls ?? []).map((c) => ({
+          functionCall: { ...(c.providerId ? { id: c.providerId } : {}), name: c.name, args: c.args },
+        })),
+      ];
+      if (parts.length) out.push({ role: 'model', parts });
+    } else {
+      const response =
+        m.result && typeof m.result === 'object' && !Array.isArray(m.result)
+          ? (m.result as Record<string, unknown>)
+          : { result: m.result };
+      const part: GeminiPart = {
+        functionResponse: { ...(m.providerId ? { id: m.providerId } : {}), name: m.name, response },
+      };
+      const last = out.at(-1);
+      if (last?.role === 'user' && last.parts.every((p) => p.functionResponse)) last.parts.push(part);
+      else out.push({ role: 'user', parts: [part] });
+    }
+  }
+  return out;
+}
 
 interface GeminiOptions {
   apiKey: () => Promise<string | null>;
@@ -118,10 +169,20 @@ export function createGeminiProvider(options: GeminiOptions): AIProvider {
             headers: { 'content-type': 'application/json', 'x-goog-api-key': key },
             body: JSON.stringify({
               systemInstruction: { parts: [{ text: request.system }] },
-              contents: request.messages.map((m) => ({
-                role: m.role === 'assistant' ? 'model' : 'user',
-                parts: [{ text: m.content }],
-              })),
+              contents: toGeminiContents(request.messages),
+              ...(request.tools?.length
+                ? {
+                    tools: [
+                      {
+                        functionDeclarations: request.tools.map((t) => ({
+                          name: t.name,
+                          description: t.description,
+                          parametersJsonSchema: t.parameters,
+                        })),
+                      },
+                    ],
+                  }
+                : {}),
               generationConfig: { temperature: 0.7 },
             }),
             signal: guard.signal,
@@ -133,14 +194,13 @@ export function createGeminiProvider(options: GeminiOptions): AIProvider {
         if (!res.body) throw new ProviderError('AI_BAD_RESPONSE', 'empty body');
 
         let produced = false;
+        const modelParts: GeminiPart[] = [];
+        const calls: ToolCallRequest[] = [];
         try {
           for await (const data of sseData(res.body)) {
             guard.touch();
             let chunk: {
-              candidates?: {
-                content?: { parts?: { text?: string; thought?: boolean }[] };
-                finishReason?: string;
-              }[];
+              candidates?: { content?: { parts?: GeminiPart[] }; finishReason?: string }[];
               promptFeedback?: { blockReason?: string };
             };
             try {
@@ -151,19 +211,36 @@ export function createGeminiProvider(options: GeminiOptions): AIProvider {
             if (chunk.promptFeedback?.blockReason)
               throw new ProviderError('AI_BLOCKED', chunk.promptFeedback.blockReason);
             const candidate = chunk.candidates?.[0];
-            const text = (candidate?.content?.parts ?? [])
+            const parts = candidate?.content?.parts ?? [];
+            // Asl qismlar (thoughtSignature bilan) keyingi so'rovda o'zgartirmasdan qaytariladi
+            modelParts.push(...parts);
+            for (const p of parts) {
+              if (p.functionCall?.name) {
+                calls.push({
+                  id: randomUUID(),
+                  providerId: p.functionCall.id,
+                  name: p.functionCall.name,
+                  args: p.functionCall.args ?? {},
+                });
+              }
+            }
+            const text = parts
               .filter((p) => !p.thought && typeof p.text === 'string')
               .map((p) => p.text)
               .join('');
             if (text) {
               produced = true;
-              yield text;
+              yield { type: 'text' as const, text };
             }
-            if (candidate?.finishReason === 'SAFETY' && !produced)
+            if (candidate?.finishReason === 'SAFETY' && !produced && calls.length === 0)
               throw new ProviderError('AI_BLOCKED', 'SAFETY');
           }
         } catch (error) {
           throw mapFetchError(error, guard.signal, false);
+        }
+        if (calls.length > 0) {
+          yield { type: 'tool_calls' as const, calls, raw: modelParts };
+          return;
         }
         if (!produced) throw new ProviderError('AI_BAD_RESPONSE', 'no text');
       } finally {

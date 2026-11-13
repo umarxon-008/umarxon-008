@@ -39,7 +39,7 @@ PROJECT_AUDIT, ARCHITECTURE, ROADMAP, RISK_REGISTER.
 
 **Qabul mezonlari:** gapirish → transkript → yuborish → ovozli javob zanjiri ishlaydi; TTS ishlamasa ham matnli javob chiqadi; sifat haqida o'lchangan raqamlar keltirilgan.
 
-## PHASE 4 — Tool registry va Windows asoslari (~3 sessiya)
+## PHASE 4 — Tool registry va Windows asoslari ✅ (kod va testlar tayyor; Windows'da qo‘lda sinov kutilmoqda, `PHASE_4_REPORT.md`)
 - `ToolManifest`, registry, zod validatsiya, `PermissionPolicy`, noma'lum tool'ni rad etish.
 - Confirmation card (nima qilinadi, nimaga ta'sir qiladi, xavf darajasi, tasdiq/bekor), bir martalik tasdiq.
 - `action_audit` va Settings'dagi audit ko'rinishi.

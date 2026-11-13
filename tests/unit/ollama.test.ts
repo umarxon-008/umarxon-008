@@ -2,6 +2,9 @@ import { describe, expect, it, vi } from 'vitest';
 import { createOllamaProvider, isLocalUrl } from '../../src/modules/ai/ollama';
 import { collect, streamOf } from './helpers/streams';
 
+const textOf = (events: { type: string; text?: string }[]) =>
+  events.map((e) => (e.type === 'text' ? e.text : '')).join('');
+
 const req = { model: 'llama', system: 'SYS', messages: [{ role: 'user' as const, content: 'Salom' }] };
 
 describe('Ollama adapter', () => {
@@ -19,9 +22,7 @@ describe('Ollama adapter', () => {
       baseUrl: () => 'http://127.0.0.1:11434/',
       fetch: fetchMock as unknown as typeof fetch,
     });
-    expect((await collect(p.streamChat(req, new AbortController().signal))).join('')).toBe(
-      'Assalomu alaykum',
-    );
+    expect(textOf(await collect(p.streamChat(req, new AbortController().signal)))).toBe('Assalomu alaykum');
     const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe('http://127.0.0.1:11434/api/chat');
     const body = JSON.parse(String(init.body));

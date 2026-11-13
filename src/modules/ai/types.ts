@@ -1,8 +1,31 @@
 import type { AiErrorCode, ProviderId } from '@shared/ipc';
 
-export interface ChatTurn {
-  role: 'user' | 'assistant';
-  content: string;
+/** Vosita chaqiruvi (model so'ragan) */
+export interface ToolCallRequest {
+  /** Ichki id (audit va natijani bog'lash uchun) */
+  id: string;
+  name: string;
+  args: Record<string, unknown>;
+  /** Provayder bergan id (Gemini javobida bo'lsa, functionResponse'da qaytariladi) */
+  providerId?: string | undefined;
+}
+
+export type ChatTurn =
+  | { role: 'user'; content: string }
+  | {
+      role: 'assistant';
+      content: string;
+      toolCalls?: ToolCallRequest[];
+      /** Provayderning asl javob qismlari (Gemini thoughtSignature'ni o'zgartirmasdan qaytarish uchun) */
+      raw?: unknown;
+    }
+  | { role: 'tool'; callId: string; providerId?: string | undefined; name: string; result: unknown };
+
+export interface ToolDeclarationForModel {
+  name: string;
+  description: string;
+  /** JSON Schema (object) */
+  parameters: Record<string, unknown>;
 }
 
 export interface ChatRequest {
@@ -10,7 +33,12 @@ export interface ChatRequest {
   /** Tizim ko'rsatmasi (MARIUS shaxsiyati va qoidalari) */
   system: string;
   messages: ChatTurn[];
+  tools?: ToolDeclarationForModel[];
 }
+
+/** Oqim hodisasi: matn bo'lagi yoki (javob oxirida) vosita chaqiruvlari */
+export type StreamEvent =
+  { type: 'text'; text: string } | { type: 'tool_calls'; calls: ToolCallRequest[]; raw?: unknown };
 
 export interface ProviderCapabilities {
   streaming: boolean;
@@ -27,13 +55,14 @@ export interface AIProvider {
   /** Mavjud modellar (API'dan olinadi, nomlar kodga yozilmaydi) */
   listModels(signal?: AbortSignal): Promise<string[]>;
   /** Javobni bo'laklab qaytaradi. Bekor qilish `signal` orqali. */
-  streamChat(request: ChatRequest, signal: AbortSignal): AsyncIterable<string>;
+  streamChat(request: ChatRequest, signal: AbortSignal): AsyncIterable<StreamEvent>;
 }
 
 export type FetchLike = typeof fetch;
 
 export class ProviderError extends Error {
   constructor(
+    /** CANCELLED: ichki kod (foydalanuvchiga xato sifatida ko'rsatilmaydi) */
     public readonly code: AiErrorCode | 'CANCELLED',
     public readonly detail?: string,
   ) {

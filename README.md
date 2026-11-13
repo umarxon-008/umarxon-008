@@ -2,8 +2,8 @@
 
 O‘zbek tilida gaplashadigan shaxsiy AI desktop yordamchi. Windows 10/11 uchun mo‘ljallangan.
 
-> **Holat:** 3-bosqich (PHASE 3): o‘zbekcha AI suhbat (Gemini yoki lokal Ollama), ovozli savol-javob, real tizim monitoringi, ovozga javob beruvchi shar.
-> Kompyuter amallari (dastur ochish, fayllar) keyingi bosqichlarda qo‘shiladi. Reja: [`docs/ROADMAP.md`](docs/ROADMAP.md).
+> **Holat:** 4-bosqich (PHASE 4): o‘zbekcha AI suhbat (Gemini yoki lokal Ollama), ovozli savol-javob, real tizim monitoringi, ovozga javob beruvchi shar.
+> Dastur ochish va oynalar bilan ishlash (tasdiq va audit bilan) mavjud. Fayllar, eslatmalar va brauzer qidiruvi keyingi bosqichlarda. Reja: [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Windows'da sinab ko‘rish (dasturchi bo‘lmaganlar uchun)
 
@@ -45,6 +45,12 @@ Sozlamalar → **Sun’iy intellekt** bo‘limida ikkitadan birini tanlang:
 
 Yozuv kompyuterda saqlanmaydi. Mikrofon faqat tugma bosilganda yoqiladi va 30 soniyada o‘zi o‘chadi.
 
+## Kompyuter amallari
+
+MARIUS’ga “Kalkulyatorni och”, “Qaysi dasturlar ochiq?”, “Diskda qancha joy bor?” deb yozing yoki ayting.
+Dastur ochish yoki oynaga o‘tishdan oldin MARIUS **har safar ruxsat so‘raydi**. Barcha amallar **Tarix** bo‘limida ko‘rinadi.
+Fayl o‘chirish, buyruqlar oynasida buyruq bajarish va administrator amallari yo‘q.
+
 ## Dasturchilar uchun
 
 ### Talablar
@@ -85,10 +91,11 @@ Har bir push'da GitHub Actions (`.github/workflows/windows-build.yml`) Windows'd
 
 Hozircha kerak emas. API kalitlar `.env` faylida emas, ilova ichida shifrlangan holda saqlanadi (2-bosqich).
 
-| O‘zgaruvchi              | Vazifasi                                                                                       |
-| ------------------------ | ---------------------------------------------------------------------------------------------- |
-| `MARIUS_USER_DATA_DIR`   | Faqat dev/test: ma’lumotlar papkasini almashtiradi. Paketlangan ilovada e’tiborga olinmaydi    |
-| `MARIUS_GEMINI_BASE_URL` | Faqat dev/test: Gemini API o‘rniga soxta server (E2E). Paketlangan ilovada e’tiborga olinmaydi |
+| O‘zgaruvchi              | Vazifasi                                                                                                              |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| `MARIUS_USER_DATA_DIR`   | Faqat dev/test: ma’lumotlar papkasini almashtiradi. Paketlangan ilovada e’tiborga olinmaydi                           |
+| `MARIUS_FAKE_OS`         | Faqat dev/test: `1` bo‘lsa haqiqiy dasturlar o‘rniga soxta OS adapteri (E2E). Paketlangan ilovada e’tiborga olinmaydi |
+| `MARIUS_GEMINI_BASE_URL` | Faqat dev/test: Gemini API o‘rniga soxta server (E2E). Paketlangan ilovada e’tiborga olinmaydi                        |
 
 ### Tuzilma
 

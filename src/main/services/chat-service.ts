@@ -6,9 +6,16 @@ import {
   type ChatSendResult,
   type Conversation,
   type ConversationSummary,
+  type ToolActivity,
 } from '@shared/ipc';
 import { buildSystemPrompt } from '../../modules/ai/system-prompt';
-import { ProviderError, type ChatTurn } from '../../modules/ai/types';
+import {
+  ProviderError,
+  type ChatTurn,
+  type StreamEvent,
+  type ToolCallRequest,
+  type ToolDeclarationForModel,
+} from '../../modules/ai/types';
 import { makeTitle, type ConversationStore } from '../database/conversation-store';
 import { AppError } from '../ipc/router';
 import type { Logger } from '../logging/logger';
@@ -17,6 +24,7 @@ import type { ResolvedProvider } from './ai-service';
 const MAX_TURNS = 24;
 const MAX_CONTEXT_CHARS = 24_000;
 const PERSIST_EVERY_MS = 400;
+const MAX_TOOL_STEPS = 6;
 
 /**
  * Modelga yuboriladigan tarixni tayyorlaydi: faqat oxirgi qismi, belgilar limiti bilan.
@@ -47,6 +55,21 @@ interface Active {
   messageId: string;
 }
 
+/** Vositalarni bajaruvchi (ToolExecutor + ToolRegistry ustidagi yupqa qatlam) */
+export interface ToolRunner {
+  declarations(): ToolDeclarationForModel[];
+  execute(
+    call: ToolCallRequest,
+    ctx: {
+      conversationId: string;
+      messageId: string;
+      signal: AbortSignal;
+      onActivity: (activity: ToolActivity) => void;
+    },
+  ): Promise<{ ok: boolean; message: string; verified: boolean | null; data?: unknown; errorCode?: string }>;
+  activitiesFor(messageIds: string[]): ToolActivity[];
+}
+
 export interface ChatServiceDeps {
   stores: { persistent: ConversationStore; memory: ConversationStore };
   saveHistory: () => boolean;
@@ -54,6 +77,8 @@ export interface ChatServiceDeps {
   emit: (event: ChatEvent) => void;
   logger: Logger;
   now?: () => Date;
+  /** Kompyuter amallari (PHASE 4). Berilmasa, MARIUS faqat suhbatlashadi. */
+  tools?: ToolRunner;
 }
 
 /** Suhbat servisi: xabar yuborish, oqim, to'xtatish, qayta urinish (ARCHITECTURE §5). */
@@ -80,7 +105,8 @@ export class ChatService {
     const store = this.storeFor(id);
     const conv = store?.getConversation(id);
     if (!conv) throw new AppError('NOT_FOUND');
-    return conv;
+    const activities = this.deps.tools?.activitiesFor(conv.messages.map((m) => m.id)) ?? [];
+    return { ...conv, activities };
   }
 
   deleteConversation(id: string): void {
@@ -181,21 +207,92 @@ export class ChatService {
     logger.info('chat.request', { provider: provider.id, model, turns: history.length });
 
     try {
-      const stream = provider.streamChat(
-        {
-          model,
-          system: buildSystemPrompt(this.deps.now?.() ?? new Date()),
-          messages: buildContext(history),
-        },
-        signal,
-      );
-      for await (const text of stream) {
+      const decls = this.deps.tools?.declarations() ?? [];
+      let toolsEnabled = decls.length > 0;
+      const context: ChatTurn[] = buildContext(history);
+      let steps = 0;
+      const append = (text: string) => {
         content += text;
         emit({ type: 'delta', ...base, text });
         if (Date.now() - lastPersist > PERSIST_EVERY_MS) {
           store.updateMessage(messageId, { content });
           lastPersist = Date.now();
         }
+      };
+
+      // Vosita tsikli (§6.3–6.5): model → vosita chaqiruvi → bajarish (tasdiq bilan) → natija modelga → yakuniy javob
+      for (;;) {
+        let stepText = '';
+        let toolCalls: Extract<StreamEvent, { type: 'tool_calls' }> | null = null;
+        try {
+          const stream = provider.streamChat(
+            {
+              model,
+              system: buildSystemPrompt(this.deps.now?.() ?? new Date(), { toolsEnabled }),
+              messages: context,
+              ...(toolsEnabled ? { tools: decls } : {}),
+            },
+            signal,
+          );
+          for await (const ev of stream) {
+            if (ev.type === 'text') {
+              stepText += ev.text;
+              append(ev.text);
+            } else {
+              toolCalls = ev;
+            }
+          }
+        } catch (error) {
+          // Model vositalarni qo'llamasa: bir marta vositalarsiz qayta urinish (tizim ko'rsatmasi ham moslashadi)
+          if (
+            error instanceof ProviderError &&
+            error.code === 'AI_TOOLS_UNSUPPORTED' &&
+            toolsEnabled &&
+            !stepText
+          ) {
+            toolsEnabled = false;
+            logger.warn('chat.tools_unsupported', { provider: provider.id, model });
+            continue;
+          }
+          throw error;
+        }
+        if (!toolCalls || !this.deps.tools) break;
+
+        steps++;
+        if (steps > MAX_TOOL_STEPS) {
+          append('\n\n(Juda ko‘p ketma-ket amal so‘raldi, xavfsizlik uchun to‘xtatildi.)');
+          break;
+        }
+        context.push({
+          role: 'assistant',
+          content: stepText,
+          toolCalls: toolCalls.calls,
+          raw: toolCalls.raw,
+        });
+        for (const call of toolCalls.calls) {
+          if (signal.aborted) throw new ProviderError('CANCELLED');
+          const out = await this.deps.tools.execute(call, {
+            conversationId,
+            messageId,
+            signal,
+            onActivity: (activity) => emit({ type: 'tool', ...base, activity }),
+          });
+          context.push({
+            role: 'tool',
+            callId: call.id,
+            providerId: call.providerId,
+            name: call.name,
+            result: {
+              ok: out.ok,
+              message: out.message,
+              verified: out.verified,
+              ...(out.errorCode ? { errorCode: out.errorCode } : {}),
+              ...(out.data !== undefined ? { data: out.data } : {}),
+            },
+          });
+        }
+        if (signal.aborted) throw new ProviderError('CANCELLED');
+        if (stepText && !stepText.endsWith('\n')) append('\n\n');
       }
       store.updateMessage(messageId, { content, status: 'complete', errorCode: null });
       emit({ type: 'done', ...base, status: 'complete' });

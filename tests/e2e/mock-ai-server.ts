@@ -6,6 +6,7 @@ import type { AddressInfo } from 'node:net';
  * Ilova unga haqiqiy HTTP so'rovlar yuboradi, ya'ni butun zanjir (main → fetch → oqim → IPC → UI) sinaladi.
  */
 export const MOCK_GEMINI_KEY = 'AIza-E2E-TEST-KEY-0123456789';
+export const MOCK_THOUGHT_SIGNATURE = 'SIG-E2E-THOUGHT';
 export const MOCK_TRANSCRIPT = 'Salom MARIUS, qalaysan?';
 export const MOCK_REPLY = 'Assalomu alaykum! Men **MARIUS**man. O‘zbek tilida yordam beraman.';
 
@@ -57,8 +58,33 @@ export async function startMockAiServer(): Promise<MockAiServer> {
         res.end(JSON.stringify({ error: 'mock failure' }));
         return;
       }
-      const messages = (body as { messages: { content: string }[] }).messages;
-      const slow = messages.at(-1)?.content.includes('SEKIN');
+      const { messages, tools } = body as {
+        messages: { role: string; content: string }[];
+        tools?: unknown[];
+      };
+      const last = messages.at(-1);
+      // Vosita chaqiruvi: "kalkulyator" so'ralsa launch_app, natija kelgach yakuniy javob
+      if (tools?.length && last?.role === 'user' && /kalkulyator/i.test(last.content)) {
+        res.writeHead(200, { 'content-type': 'application/x-ndjson' });
+        res.end(
+          `${JSON.stringify({ message: { role: 'assistant', content: '', tool_calls: [{ function: { name: 'launch_app', arguments: { name: 'kalkulyator' } } }] }, done: true })}\n`,
+        );
+        return;
+      }
+      if (last?.role === 'tool') {
+        const result = JSON.parse(last.content) as { ok: boolean; verified: boolean | null };
+        const text = result.ok
+          ? result.verified
+            ? 'Kalkulyator ochildi.'
+            : 'Buyruq yuborildi.'
+          : 'Amal bajarilmadi.';
+        res.writeHead(200, { 'content-type': 'application/x-ndjson' });
+        res.end(
+          `${JSON.stringify({ message: { role: 'assistant', content: text }, done: false })}\n${JSON.stringify({ message: { role: 'assistant', content: '' }, done: true })}\n`,
+        );
+        return;
+      }
+      const slow = last?.content.includes('SEKIN');
       res.writeHead(200, { 'content-type': 'application/x-ndjson' });
       const parts = slow ? Array.from({ length: 200 }, (_, i) => `so‘z${i} `) : words(MOCK_REPLY);
       for (const p of parts) {
@@ -127,6 +153,30 @@ export async function startMockAiServer(): Promise<MockAiServer> {
         return;
       }
       if (url.pathname.endsWith(':streamGenerateContent') && url.searchParams.get('alt') === 'sse') {
+        const b = body as {
+          contents: {
+            role: string;
+            parts: { text?: string; functionResponse?: { response: { ok: boolean } } }[];
+          }[];
+          tools?: unknown[];
+        };
+        const lastTurn = b.contents.at(-1);
+        const userText = lastTurn?.parts.map((p) => p.text ?? '').join('') ?? '';
+        if (b.tools?.length && lastTurn?.role === 'user' && /kalkulyator/i.test(userText)) {
+          res.writeHead(200, { 'content-type': 'text/event-stream' });
+          res.end(
+            `data: ${JSON.stringify({ candidates: [{ content: { role: 'model', parts: [{ functionCall: { name: 'launch_app', args: { name: 'Calculator' } }, thoughtSignature: MOCK_THOUGHT_SIGNATURE }] } }] })}\r\n\r\n`,
+          );
+          return;
+        }
+        const fr = lastTurn?.parts.find((p) => p.functionResponse)?.functionResponse;
+        if (fr) {
+          res.writeHead(200, { 'content-type': 'text/event-stream' });
+          res.end(
+            `data: ${JSON.stringify({ candidates: [{ content: { role: 'model', parts: [{ text: fr.response.ok ? 'Kalkulyator ochildi.' : 'Amal bajarilmadi.' }] } }] })}\r\n\r\n`,
+          );
+          return;
+        }
         res.writeHead(200, { 'content-type': 'text/event-stream' });
         for (const p of words(MOCK_REPLY)) {
           res.write(
