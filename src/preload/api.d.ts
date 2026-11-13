@@ -1,5 +1,9 @@
 import type {
   ActionResult,
+  AllowedFolderInfo,
+  FileHitInfo,
+  FolderKey,
+  FolderSuggestion,
   AppEntry,
   AuditEntry,
   ComputerInfo,
@@ -73,6 +77,22 @@ export interface MariusApi {
     launchApp(appId: string): Promise<IpcResult<ActionResult>>;
     listWindows(): Promise<IpcResult<WindowEntry[]>>;
     focusWindow(pid: number): Promise<IpcResult<ActionResult>>;
+  };
+  files: {
+    listFolders(): Promise<IpcResult<AllowedFolderInfo[]>>;
+    suggestions(): Promise<IpcResult<FolderSuggestion[]>>;
+    /** Papka faqat tizim dialogi yoki standart papkalar orqali qo'shiladi */
+    addFolderFromDialog(): Promise<IpcResult<AllowedFolderInfo[]>>;
+    addSuggestedFolder(key: FolderKey): Promise<IpcResult<AllowedFolderInfo[]>>;
+    removeFolder(id: string): Promise<IpcResult<AllowedFolderInfo[]>>;
+    search(q: {
+      query?: string;
+      extension?: string;
+      folderId?: string;
+      modifiedWithinDays?: number;
+    }): Promise<IpcResult<{ results: FileHitInfo[]; scanned: number; truncated: boolean }>>;
+    open(path: string): Promise<IpcResult<ActionResult>>;
+    showInFolder(path: string): Promise<IpcResult<ActionResult>>;
   };
   voice: {
     /** 16 kHz mono WAV (base64). Faqat rozilik berilgan bo'lsa Gemini'ga yuboriladi. */

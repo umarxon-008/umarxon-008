@@ -13,6 +13,7 @@ import {
 import type { ActionResult, AppEntry, ComputerInfo, WindowEntry } from '@shared/ipc';
 import { PageHeader } from '../../components/PageHeader';
 import { formatBytes } from '../monitoring/SystemStatusPanel';
+import { FilesSection } from './FilesSection';
 
 function ResultLine({ result }: { result: ActionResult | null }) {
   if (!result) return null;
@@ -132,6 +133,8 @@ export function ComputerPage() {
           </dl>
         </section>
       )}
+
+      {info && <FilesSection onResult={setResult} />}
 
       {info?.supported && (
         <div className="grid grid--wide">

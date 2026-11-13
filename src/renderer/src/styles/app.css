@@ -2102,3 +2102,55 @@ select.input {
   gap: var(--space-2);
   align-items: center;
 }
+
+/* ===== Fayllar (PHASE 5) ===== */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.chip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px var(--space-3);
+  border-radius: var(--radius-full);
+  border: 1px dashed var(--border-strong);
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.chip-btn:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.item-list--compact li {
+  padding: 4px var(--space-1);
+}
+
+.file-search {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.search--grow {
+  flex: 1 1 240px;
+}
+
+.input--sm {
+  height: 36px;
+  width: auto;
+  min-width: 90px;
+}
+
+.item-list .row-actions {
+  flex-shrink: 0;
+}

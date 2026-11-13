@@ -1,5 +1,5 @@
 import { join } from 'node:path';
-import { app, BrowserWindow, ipcMain, nativeTheme, net, safeStorage, shell } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, nativeTheme, net, safeStorage, shell } from 'electron';
 import {
   CHAT_EVENT_CHANNEL,
   IPC_CHANNELS,
@@ -32,6 +32,12 @@ import { createWindowsAdapter } from './windows/windows-adapter';
 import { createFakeAdapter, createUnsupportedAdapter } from './windows/fake-adapter';
 import { osDisplayName } from './services/system-metrics';
 import type { ToolRunner } from './services/chat-service';
+import { FolderRepository } from './files/folder-repository';
+import { createFileTools } from './files/file-tools';
+import { searchFiles } from './files/file-search';
+import { existsSync } from 'node:fs';
+import { realpath } from 'node:fs/promises';
+import type { FolderKey } from '@shared/ipc';
 
 const APP_ID = 'uz.marius.app';
 
@@ -140,6 +146,33 @@ function registerIpc(settings: SettingsRepository, database: Database): void {
   for (const tool of createComputerTools({ os: osAdapter, catalog, isOnline: () => net.isOnline() })) {
     registry.register(tool);
   }
+  // ---- Fayllar (PHASE 5) ----
+  const folders = new FolderRepository(database);
+  for (const tool of createFileTools({
+    folders: () => folders.list(),
+    openPath: (p) => shell.openPath(p),
+    showItemInFolder: (p) => shell.showItemInFolder(p),
+  })) {
+    registry.register(tool);
+  }
+  const FOLDER_KEYS: Record<FolderKey, { label: string; electron: Parameters<typeof app.getPath>[0] }> = {
+    documents: { label: 'Hujjatlar', electron: 'documents' },
+    downloads: { label: 'Yuklamalar', electron: 'downloads' },
+    desktop: { label: 'Ish stoli', electron: 'desktop' },
+    pictures: { label: 'Rasmlar', electron: 'pictures' },
+    music: { label: 'Musiqa', electron: 'music' },
+    videos: { label: 'Videolar', electron: 'videos' },
+  };
+  const folderInfos = () => folders.list().map((f) => ({ ...f, exists: existsSync(f.path) }));
+  const addFolderPath = async (p: string, label: string) => {
+    const real = await realpath(p);
+    // Butun diskni yoki foydalanuvchi profilini to'liq ochish o'rniga aniq papka tanlash talab qilinadi
+    if (/^[a-z]:\\?$/i.test(real) || real === '/' || real === app.getPath('home')) {
+      throw new AppError('FOLDER_TOO_BROAD');
+    }
+    folders.add(real, label);
+  };
+
   const broker = new ConfirmationBroker(emitConfirmation);
   const executor = new ToolExecutor(registry, broker, audit, logger);
   const toolRunner: ToolRunner = {
@@ -231,6 +264,44 @@ function registerIpc(settings: SettingsRepository, database: Database): void {
       return osAdapter.listWindows();
     },
     'computer:focusWindow': ({ pid }) => runUserAction('focus_window', { pid }),
+
+    'files:listFolders': () => folderInfos(),
+    'files:suggestions': () => {
+      const added = new Set(folders.list().map((f) => f.path.toLowerCase()));
+      return (Object.keys(FOLDER_KEYS) as FolderKey[]).map((key) => {
+        const p = app.getPath(FOLDER_KEYS[key].electron);
+        return { key, label: FOLDER_KEYS[key].label, path: p, added: added.has(p.toLowerCase()) };
+      });
+    },
+    'files:addFolder': async (input) => {
+      if (input.source === 'suggestion') {
+        const def = FOLDER_KEYS[input.key];
+        await addFolderPath(app.getPath(def.electron), def.label);
+      } else {
+        const res = mainWindow
+          ? await dialog.showOpenDialog(mainWindow, {
+              title: 'MARIUS uchun papka tanlang',
+              properties: ['openDirectory'],
+            })
+          : { canceled: true, filePaths: [] };
+        const picked = res.filePaths[0];
+        if (!res.canceled && picked)
+          await addFolderPath(picked, picked.split(/[\\/]/).filter(Boolean).pop() ?? picked);
+      }
+      return folderInfos();
+    },
+    'files:removeFolder': ({ id }) => {
+      folders.remove(id);
+      return folderInfos();
+    },
+    'files:search': async ({ folderId, ...q }) => {
+      const all = folders.list();
+      if (all.length === 0) throw new AppError('NO_ALLOWED_FOLDERS');
+      const roots = (folderId ? all.filter((f) => f.id === folderId) : all).map((f) => f.path);
+      return searchFiles({ roots, ...q, limit: 200 });
+    },
+    'files:open': ({ path: p }) => runUserAction('open_file', { path: p }),
+    'files:showInFolder': ({ path: p }) => runUserAction('show_in_folder', { path: p }),
 
     'voice:transcribe': async ({ audio, mimeType }) => ({ text: await voice.transcribe(audio, mimeType) }),
     'voice:synthesize': ({ text }) => voice.synthesize(text),

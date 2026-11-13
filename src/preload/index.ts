@@ -65,6 +65,16 @@ const api: MariusApi = {
     listWindows: () => ipcRenderer.invoke('computer:listWindows'),
     focusWindow: (pid) => ipcRenderer.invoke('computer:focusWindow', { pid }),
   },
+  files: {
+    listFolders: () => ipcRenderer.invoke('files:listFolders'),
+    suggestions: () => ipcRenderer.invoke('files:suggestions'),
+    addFolderFromDialog: () => ipcRenderer.invoke('files:addFolder', { source: 'dialog' }),
+    addSuggestedFolder: (key) => ipcRenderer.invoke('files:addFolder', { source: 'suggestion', key }),
+    removeFolder: (id) => ipcRenderer.invoke('files:removeFolder', { id }),
+    search: (q) => ipcRenderer.invoke('files:search', q),
+    open: (path) => ipcRenderer.invoke('files:open', { path }),
+    showInFolder: (path) => ipcRenderer.invoke('files:showInFolder', { path }),
+  },
   voice: {
     transcribe: (audio) => ipcRenderer.invoke('voice:transcribe', { audio, mimeType: 'audio/wav' }),
     synthesize: (text) => ipcRenderer.invoke('voice:synthesize', { text }),

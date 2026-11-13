@@ -218,6 +218,38 @@ export const ComputerInfoSchema = z.object({
 });
 export type ComputerInfo = z.infer<typeof ComputerInfoSchema>;
 
+/* ===================== Fayllar (PHASE 5) ===================== */
+
+export const FolderKeySchema = z.enum(['documents', 'downloads', 'desktop', 'pictures', 'music', 'videos']);
+export type FolderKey = z.infer<typeof FolderKeySchema>;
+
+export const AllowedFolderSchema = z.object({
+  id: z.string(),
+  path: z.string(),
+  label: z.string(),
+  exists: z.boolean(),
+});
+export type AllowedFolderInfo = z.infer<typeof AllowedFolderSchema>;
+
+export const FolderSuggestionSchema = z.object({
+  key: FolderKeySchema,
+  label: z.string(),
+  path: z.string(),
+  added: z.boolean(),
+});
+export type FolderSuggestion = z.infer<typeof FolderSuggestionSchema>;
+
+export const FileHitSchema = z.object({
+  path: z.string(),
+  name: z.string(),
+  folder: z.string(),
+  ext: z.string(),
+  size: z.number(),
+  modifiedAt: z.string(),
+  isDirectory: z.boolean(),
+});
+export type FileHitInfo = z.infer<typeof FileHitSchema>;
+
 /* ===================== Suhbat ===================== */
 
 const Id = z.string().uuid();
@@ -384,6 +416,43 @@ export const IPC = {
     output: ActionResultSchema,
   },
 
+  'files:listFolders': { input: NoInput, output: z.array(AllowedFolderSchema) },
+  'files:suggestions': { input: NoInput, output: z.array(FolderSuggestionSchema) },
+  'files:addFolder': {
+    input: z.discriminatedUnion('source', [
+      z.object({ source: z.literal('dialog') }).strict(),
+      z.object({ source: z.literal('suggestion'), key: FolderKeySchema }).strict(),
+    ]),
+    output: z.array(AllowedFolderSchema),
+  },
+  'files:removeFolder': {
+    input: z.object({ id: z.string().uuid() }).strict(),
+    output: z.array(AllowedFolderSchema),
+  },
+  'files:search': {
+    input: z
+      .object({
+        query: z.string().max(200).optional(),
+        extension: z
+          .string()
+          .max(20)
+          .regex(/^\.?\w+$/)
+          .optional(),
+        folderId: z.string().uuid().optional(),
+        modifiedWithinDays: z.number().int().min(1).max(3650).optional(),
+      })
+      .strict(),
+    output: z.object({ results: z.array(FileHitSchema), scanned: z.number(), truncated: z.boolean() }),
+  },
+  'files:open': {
+    input: z.object({ path: z.string().min(1).max(1000) }).strict(),
+    output: ActionResultSchema,
+  },
+  'files:showInFolder': {
+    input: z.object({ path: z.string().min(1).max(1000) }).strict(),
+    output: ActionResultSchema,
+  },
+
   'voice:transcribe': { input: TranscribeInputSchema, output: z.object({ text: z.string() }) },
   'voice:synthesize': {
     input: z.object({ text: z.string().trim().min(1).max(MAX_TTS_TEXT) }).strict(),
@@ -434,6 +503,8 @@ export const ErrorCodes = {
   VOICE_NOT_CONFIGURED:
     'Ovoz uchun Gemini kaliti va modeli kerak. Sozlamalar → Sun’iy intellekt → Gemini bo‘limida kalitni kiriting va modelni tanlang.',
   TTS_NOT_CONFIGURED: 'Gemini ovoz modeli tanlanmagan. Sozlamalar → Ovoz bo‘limida tanlang.',
+  FOLDER_TOO_BROAD: 'Butun disk yoki butun profil emas, aniq papkani tanlang (masalan, Hujjatlar).',
+  NO_ALLOWED_FOLDERS: 'Hali birorta papkaga ruxsat berilmagan. Kompyuter → Fayllar bo‘limida papka qo‘shing.',
   OS_UNSUPPORTED: 'Bu amal hozircha faqat Windows’da ishlaydi.',
   OS_COMMAND_FAILED: 'Windows buyrug‘i bajarilmadi. Batafsil ma’lumot log faylida.',
   APP_NOT_FOUND: 'Bunday dastur topilmadi. Ro‘yxatni yangilab, qayta urinib ko‘ring.',

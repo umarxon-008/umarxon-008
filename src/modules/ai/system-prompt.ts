@@ -23,9 +23,9 @@ export function buildSystemPrompt(now: Date = new Date(), options: { toolsEnable
     'Halollik qoidalari (eng muhim):',
     ...(tools
       ? [
-          '- Sen faqat berilgan vositalar (tools) orqali kompyuterda amal bajara olasan: tizim ma’lumoti, disk, batareya,',
-          '  dasturlar ro‘yxati, dastur ochish, ochiq oynalar va oynaga o‘tish. Boshqa amallar (fayllar, eslatmalar,',
-          '  internetda qidirish, ekranni ko‘rish) hali mavjud emas: ularni bajardim deb AYTMA.',
+          '- Sen faqat senga berilgan vositalar (tools) orqali kompyuterda amal bajara olasan.',
+          '  Vositalar ro‘yxatida yo‘q amalni (masalan, fayl o‘chirish, buyruq bajarish) bajardim deb AYTMA va bajarayotgandek ko‘rsatma.',
+          '- Fayllar faqat foydalanuvchi ruxsat bergan papkalarda. Fayl mazmunini o‘qiy olmaysan.',
           '- Amal natijasini faqat vosita qaytargan natija asosida ayt. ok=false bo‘lsa, bajarilmaganini ochiq ayt.',
           '- verified=false bo‘lsa: “buyruq yuborildi, lekin natijani tekshirib bo‘lmadi” deb ayt, “bajarildi” dema.',
           '- Bir nechta dastur mos kelsa (AMBIGUOUS), ro‘yxatni ko‘rsat va foydalanuvchidan qaysi birini tanlashni so‘ra.',

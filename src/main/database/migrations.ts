@@ -93,4 +93,17 @@ export const MIGRATIONS: Migration[] = [
       CREATE INDEX idx_audit_message ON action_audit(message_id);
     `,
   },
+  {
+    version: 4,
+    name: 'allowed_folders',
+    sql: `
+      -- Foydalanuvchi ruxsat bergan papkalar (prompt §10.1). Fayl amallari faqat shular ichida.
+      CREATE TABLE allowed_folders (
+        id         TEXT PRIMARY KEY,
+        path       TEXT NOT NULL UNIQUE,
+        label      TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+      );
+    `,
+  },
 ];

@@ -48,7 +48,7 @@ PROJECT_AUDIT, ARCHITECTURE, ROADMAP, RISK_REGISTER.
 
 **Qabul mezonlari:** unknown tool, noto'g'ri argument va tasdiqsiz amal bo'yicha testlar; har bir amal audit qilinadi; "Kalkulyatorni och" Windows'da ishlaydi.
 
-## PHASE 5 — File manager (~2 sessiya)
+## PHASE 5 — File manager ✅ (`PHASE_5_REPORT.md`)
 - `allowed_folders` UI, path guard (traversal, symlink, junction).
 - `searchFiles` (nom, kengaytma, sana), progress va cancel, worker thread'da bajariladi.
 - `openFile`, `createFolder`, `copyFile`, `renameFile`, `moveFile` (preview va tasdiq bilan).

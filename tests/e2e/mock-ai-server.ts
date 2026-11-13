@@ -71,13 +71,26 @@ export async function startMockAiServer(): Promise<MockAiServer> {
         );
         return;
       }
+      // Umumiy test mexanizmi: xabarda TOOL:{"name":...,"arguments":{...}} bo'lsa, o'sha vosita chaqiriladi
+      const toolMatch = last?.role === 'user' ? /TOOL:(\{.*\})\s*$/s.exec(last.content) : null;
+      if (tools?.length && toolMatch) {
+        const call = JSON.parse(toolMatch[1]!) as { name: string; arguments: Record<string, unknown> };
+        res.writeHead(200, { 'content-type': 'application/x-ndjson' });
+        res.end(
+          `${JSON.stringify({ message: { role: 'assistant', content: '', tool_calls: [{ function: call }] }, done: true })}\n`,
+        );
+        return;
+      }
       if (last?.role === 'tool') {
-        const result = JSON.parse(last.content) as { ok: boolean; verified: boolean | null };
-        const text = result.ok
-          ? result.verified
-            ? 'Kalkulyator ochildi.'
-            : 'Buyruq yuborildi.'
-          : 'Amal bajarilmadi.';
+        const result = JSON.parse(last.content) as { ok: boolean; verified: boolean | null; message: string };
+        const isCalc = messages.some((m) => m.role === 'user' && /kalkulyator/i.test(m.content));
+        const text = !isCalc
+          ? `Natija: ${result.message}`
+          : result.ok
+            ? result.verified
+              ? 'Kalkulyator ochildi.'
+              : 'Buyruq yuborildi.'
+            : 'Amal bajarilmadi.';
         res.writeHead(200, { 'content-type': 'application/x-ndjson' });
         res.end(
           `${JSON.stringify({ message: { role: 'assistant', content: text }, done: false })}\n${JSON.stringify({ message: { role: 'assistant', content: '' }, done: true })}\n`,
