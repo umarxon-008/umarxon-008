@@ -1,3 +1,5 @@
+import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 import { DEFAULT_SETTINGS } from '@shared/ipc';
 import { AppError, createSenderGuard, dispatchIpc, type IpcHandlers } from '../../src/main/ipc/router';
@@ -124,10 +126,14 @@ describe('createSenderGuard', () => {
   });
 
   it('faqat ilovaning o‘z index.html fayliga ruxsat beradi', () => {
-    const guard = createSenderGuard({ rendererFile: '/app/out/renderer/index.html' });
-    expect(guard('file:///app/out/renderer/index.html')).toBe(true);
-    expect(guard('file:///app/out/renderer/index.html#/settings')).toBe(true);
-    expect(guard('file:///tmp/evil.html')).toBe(false);
+    // Yo'llar platformaga mos quriladi: Windows'da "D:\app\...", Linux'da "/app/...".
+    const rendererFile = resolve('/app/out/renderer/index.html');
+    const appUrl = pathToFileURL(rendererFile).href;
+    const guard = createSenderGuard({ rendererFile });
+    expect(guard(appUrl)).toBe(true);
+    expect(guard(`${appUrl}#/settings`)).toBe(true);
+    expect(guard(pathToFileURL(resolve('/tmp/evil.html')).href)).toBe(false);
+    expect(guard(pathToFileURL(resolve('/app/out/renderer/other.html')).href)).toBe(false);
     expect(guard('http://localhost:5173/')).toBe(false);
     expect(guard('not a url')).toBe(false);
   });
