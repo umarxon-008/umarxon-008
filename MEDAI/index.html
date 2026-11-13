@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>MEDAI — Tibbiy maʼlumot yordamchisi</title>
+  <meta name="description" content="MEDAI — tibbiy maʼlumotlar, laboratoriya natijalari va dori yoʻriqnomalarini sodda oʻzbek tilida tushuntiruvchi yordamchi.">
+  <meta name="theme-color" content="#102B46">
+  <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <script src="/vendor/lucide.min.js" defer></script>
+  <script type="module" src="/js/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Asosiy kontentga oʻtish</a>
+
+  <div class="app">
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar" id="sidebar" aria-label="Asosiy navigatsiya">
+      <div class="sidebar__brand">
+        <img src="/assets/icons/logo.svg" alt="" width="38" height="38">
+        <div class="brand">
+          <span class="brand__name">MEDAI</span>
+          <span class="brand__tagline" data-i18n="brand.tagline">Tibbiy maʼlumot yordamchisi</span>
+        </div>
+        <button type="button" class="icon-btn sidebar__close" id="sidebarClose" aria-label="Menyuni yopish"><i data-lucide="x"></i></button>
+      </div>
+
+      <button type="button" class="btn btn--primary btn--block" id="newChatBtn">
+        <i data-lucide="message-square-plus"></i><span data-i18n="action.newChat">Yangi suhbat</span>
+      </button>
+
+      <nav class="nav" aria-label="Boʻlimlar">
+        <a href="#/chat" class="nav__item" data-route="chat"><i data-lucide="message-square"></i><span data-i18n="nav.chat">AI yordamchi</span></a>
+        <a href="#/analysis" class="nav__item" data-route="analysis"><i data-lucide="flask-conical"></i><span data-i18n="nav.analysis">Tibbiy tahlil</span></a>
+        <a href="#/medicine" class="nav__item" data-route="medicine"><i data-lucide="pill"></i><span data-i18n="nav.medicine">Dori qoʻllanmasi</span></a>
+        <a href="#/library" class="nav__item" data-route="library"><i data-lucide="book-open"></i><span data-i18n="nav.library">Tibbiy kutubxona</span></a>
+        <a href="#/history" class="nav__item" data-route="history"><i data-lucide="history"></i><span data-i18n="nav.history">Suhbatlar tarixi</span></a>
+      </nav>
+
+      <div class="sidebar__recent">
+        <h2 class="sidebar__label" data-i18n="sidebar.recent">Soʻnggi suhbatlar</h2>
+        <ul class="recent-list" id="recentList"></ul>
+      </div>
+
+      <div class="sidebar__footer">
+        <a href="#/settings" class="profile-card" data-route="settings">
+          <span class="avatar" id="sidebarAvatar" aria-hidden="true">M</span>
+          <span class="profile-card__text"><strong id="sidebarName">Mehmon</strong><small data-i18n="nav.settings">Profil va sozlamalar</small></span>
+          <i data-lucide="settings"></i>
+        </a>
+      </div>
+    </aside>
+    <div class="overlay" id="overlay" hidden></div>
+
+    <!-- ============ ASOSIY QISM ============ -->
+    <div class="main">
+      <header class="topbar">
+        <button type="button" class="icon-btn topbar__menu" id="menuBtn" aria-label="Menyuni ochish" aria-controls="sidebar" aria-expanded="false"><i data-lucide="menu"></i></button>
+        <div class="topbar__title">
+          <h1 id="pageTitle">AI yordamchi</h1>
+          <p id="pageSubtitle">Tibbiy savollaringizga sodda tilda javob</p>
+        </div>
+        <div class="topbar__actions">
+          <button type="button" class="status-pill" id="statusPill" data-state="loading" data-tooltip="Ishlash rejimi haqida">
+            <span class="status-pill__dot" aria-hidden="true"></span><span id="statusText">Tekshirilmoqda…</span>
+          </button>
+          <label class="lang-select" data-tooltip="Interfeys tili">
+            <i data-lucide="languages"></i>
+            <span class="sr-only">Interfeys tili</span>
+            <select id="langSelect">
+              <option value="uz" selected>Oʻzbekcha</option>
+              <option value="ru">Русский — tez orada</option>
+              <option value="en">English — tez orada</option>
+            </select>
+          </label>
+          <div class="menu">
+            <button type="button" class="avatar-btn" id="profileBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="profileMenu" aria-label="Profil menyusi">
+              <span class="avatar" id="headerAvatar" aria-hidden="true">M</span><i data-lucide="chevron-down"></i>
+            </button>
+            <div class="menu__panel" id="profileMenu" role="menu" aria-label="Profil menyusi" hidden>
+              <div class="menu__header"><strong id="menuName">Mehmon</strong><small>Maʼlumotlar shu qurilmada saqlanadi</small></div>
+              <a role="menuitem" href="#/settings" class="menu__item"><i data-lucide="user"></i>Profil va sozlamalar</a>
+              <button type="button" role="menuitem" class="menu__item" data-action="privacy"><i data-lucide="shield-check"></i>Maxfiylik va xavfsizlik</button>
+              <button type="button" role="menuitem" class="menu__item" data-action="about-modes"><i data-lucide="server"></i>Ishlash rejimi</button>
+              <button type="button" role="menuitem" class="menu__item menu__item--danger" data-action="clear-data"><i data-lucide="trash-2"></i>Barcha maʼlumotlarni oʻchirish</button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="demo-banner" id="demoBanner" role="status" hidden>
+        <i data-lucide="cloud-off"></i>
+        <p id="demoBannerText">Demo rejim.</p>
+        <button type="button" class="btn btn--ghost btn--sm" id="demoBannerMore">Batafsil</button>
+        <button type="button" class="icon-btn icon-btn--sm" id="demoBannerClose" aria-label="Ogohlantirishni yopish"><i data-lucide="x"></i></button>
+      </div>
+
+      <main id="main" class="content" tabindex="-1">
+
+        <!-- ============ AI YORDAMCHI ============ -->
+        <section class="view view--chat" id="view-chat" aria-labelledby="pageTitle">
+          <div class="chat">
+            <div class="chat__toolbar" id="chatToolbar" hidden>
+              <div class="chat__title"><i data-lucide="message-square"></i><span id="chatTitle">Yangi suhbat</span></div>
+              <button type="button" class="btn btn--ghost btn--sm" id="clearChatBtn" data-tooltip="Joriy suhbatdagi xabarlarni oʻchirish"><i data-lucide="eraser"></i><span>Tozalash</span></button>
+            </div>
+
+            <div class="chat__scroll" id="chatScroll">
+              <div class="welcome" id="welcome">
+                <div class="welcome__logo"><img src="/assets/icons/logo.svg" alt="" width="64" height="64"></div>
+                <h2 class="welcome__title" id="welcomeGreeting">Salom! Men MEDAI</h2>
+                <p class="welcome__text">Tibbiy maʼlumotlarni tushunishingizga yordam beruvchi AI yordamchiman. Tahlil natijalari, dori yoʻriqnomalari va tibbiy atamalarni sodda tilda tushuntiraman.</p>
+
+                <div class="quick-grid" role="list" aria-label="Tezkor savollar">
+                  <button type="button" class="quick-card" role="listitem" data-question="Umumiy qon tahlilidagi koʻrsatkichlar nimani anglatadi?">
+                    <span class="quick-card__icon"><i data-lucide="droplet"></i></span>
+                    <span>Umumiy qon tahlilidagi koʻrsatkichlar nimani anglatadi?</span>
+                  </button>
+                  <button type="button" class="quick-card" role="listitem" data-question="Tibbiy atamani sodda qilib tushuntir.">
+                    <span class="quick-card__icon"><i data-lucide="book-open"></i></span>
+                    <span>Tibbiy atamani sodda qilib tushuntir.</span>
+                  </button>
+                  <button type="button" class="quick-card" role="listitem" data-question="Dori yoʻriqnomasidagi qarshi koʻrsatmalar nima?">
+                    <span class="quick-card__icon"><i data-lucide="pill"></i></span>
+                    <span>Dori yoʻriqnomasidagi qarshi koʻrsatmalar nima?</span>
+                  </button>
+                  <button type="button" class="quick-card" role="listitem" data-question="Laboratoriya natijasini qanday tushunish mumkin?">
+                    <span class="quick-card__icon"><i data-lucide="flask-conical"></i></span>
+                    <span>Laboratoriya natijasini qanday tushunish mumkin?</span>
+                  </button>
+                </div>
+
+                <div class="feature-row">
+                  <a class="feature-link" href="#/analysis"><i data-lucide="file-up"></i><span><strong>Tahlilni yuklash</strong><small>PDF, JPG yoki PNG</small></span></a>
+                  <a class="feature-link" href="#/medicine"><i data-lucide="pill"></i><span><strong>Dori yoʻriqnomasi</strong><small>Sodda tilda tushuntirish</small></span></a>
+                  <a class="feature-link" href="#/library"><i data-lucide="book-open"></i><span><strong>Atamalar kutubxonasi</strong><small>10 ta asosiy atama</small></span></a>
+                </div>
+
+                <div class="safety-card">
+                  <i data-lucide="shield-alert"></i>
+                  <p><strong>Muhim:</strong> MEDAI shifokor emas. U tashxis qoʻymaydi, davolash belgilamaydi va dori dozasini tavsiya qilmaydi. Shoshilinch holatda darhol <strong>103</strong> yoki <strong>112</strong> ga qoʻngʻiroq qiling.</p>
+                </div>
+              </div>
+
+              <ol class="messages" id="messages" aria-live="polite" aria-label="Suhbat xabarlari"></ol>
+            </div>
+
+            <form class="composer" id="composer" novalidate>
+              <div class="emergency-banner" id="emergencyBanner" role="alert" hidden>
+                <i data-lucide="siren"></i>
+                <p><strong>Shoshilinch holat belgilari?</strong> Darhol <a href="tel:103">103</a> (tez yordam) yoki <a href="tel:112">112</a> ga qoʻngʻiroq qiling.</p>
+                <button type="button" class="icon-btn icon-btn--sm" id="emergencyClose" aria-label="Ogohlantirishni yopish"><i data-lucide="x"></i></button>
+              </div>
+              <div class="composer__box">
+                <button type="button" class="icon-btn" id="attachBtn" aria-label="Tahlil faylini biriktirish" data-tooltip="Tahlil faylini biriktirish (PDF, JPG, PNG)"><i data-lucide="paperclip"></i></button>
+                <input type="file" id="chatFileInput" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" hidden>
+                <label for="chatInput" class="sr-only">Savolingiz</label>
+                <textarea id="chatInput" rows="1" maxlength="4000" placeholder="Tibbiy savolingizni yozing…" autocomplete="off"></textarea>
+                <button type="submit" class="send-btn" id="sendBtn" aria-label="Xabarni yuborish" disabled><i data-lucide="send"></i></button>
+              </div>
+              <div class="composer__meta">
+                <span class="composer__hint"><kbd>Enter</kbd> — yuborish · <kbd>Shift</kbd>+<kbd>Enter</kbd> — yangi qator</span>
+                <span id="charCount" aria-live="polite">0 / 4000</span>
+              </div>
+              <p class="composer__disclaimer">
+                <i data-lucide="shield-alert"></i>
+                <span>MEDAI tashxis qoʻymaydi va davolash belgilamaydi. Javoblar xato boʻlishi mumkin.</span>
+                <button type="button" class="link-btn" id="privacyLink">Maxfiylik</button>
+              </p>
+            </form>
+          </div>
+        </section>
+
+        <!-- ============ TIBBIY TAHLIL ============ -->
+        <section class="view" id="view-analysis" aria-labelledby="pageTitle" hidden>
+          <div class="page">
+            <ol class="stepper" id="analysisStepper" aria-label="Tahlil bosqichlari">
+              <li data-step="1" class="is-active" aria-current="step"><span>1</span>Hujjatni yuklash</li>
+              <li data-step="2"><span>2</span>Qiymatlarni tasdiqlash</li>
+              <li data-step="3"><span>3</span>Natija</li>
+            </ol>
+
+            <div id="analysisStage1" class="stage">
+              <div class="grid-main">
+                <div class="card">
+                  <div class="card__head">
+                    <div>
+                      <h2 class="card__title">Laboratoriya tahlilini yuklang</h2>
+                      <p class="muted">Natijalarni hujjatdagi meʼyoriy oraliq bilan solishtirib, sodda tilda tushuntiramiz.</p>
+                    </div>
+                  </div>
+
+                  <div class="dropzone" id="labDropzone" tabindex="0" role="button" aria-describedby="labDropHint">
+                    <span class="dropzone__icon"><i data-lucide="upload"></i></span>
+                    <strong>Faylni shu yerga tashlang</strong>
+                    <span>yoki <span class="link-text">kompyuterdan tanlang</span></span>
+                    <small id="labDropHint">PDF, JPG, JPEG, PNG · maksimal 10 MB</small>
+                    <input type="file" id="labFileInput" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" hidden>
+                  </div>
+
+                  <div class="file-chip" id="labFileChip" hidden>
+                    <span class="file-chip__thumb" id="labFileThumb"></span>
+                    <span class="file-chip__text"><strong id="labFileName"></strong><small id="labFileMeta"></small></span>
+                    <button type="button" class="icon-btn icon-btn--danger" id="labRemoveBtn" aria-label="Faylni olib tashlash" data-tooltip="Faylni olib tashlash"><i data-lucide="trash-2"></i></button>
+                  </div>
+
+                  <div class="progress-card" id="labProgress" role="status" hidden>
+                    <div class="loading-row"><span class="spinner"></span><strong>Hujjat qayta ishlanmoqda…</strong></div>
+                    <ol class="progress-steps">
+                      <li data-step>Fayl tekshirilmoqda</li>
+                      <li data-step>Matn ajratilmoqda</li>
+                      <li data-step>Koʻrsatkichlar aniqlanmoqda</li>
+                    </ol>
+                    <button type="button" class="btn btn--secondary btn--sm" id="labCancelBtn"><i data-lucide="x"></i>Bekor qilish</button>
+                  </div>
+
+                  <p class="form-error" id="labError" role="alert" hidden></p>
+
+                  <div class="btn-row">
+                    <button type="button" class="btn btn--primary" id="labAnalyzeBtn" disabled><i data-lucide="sparkles"></i>Tahlil qilish</button>
+                    <button type="button" class="btn btn--secondary" id="labManualBtn"><i data-lucide="pencil"></i>Qoʻlda kiritish</button>
+                    <button type="button" class="btn btn--ghost" id="labSampleBtn" data-tooltip="Sintetik namuna — haqiqiy bemor maʼlumoti emas"><i data-lucide="file-text"></i>Namuna bilan sinash</button>
+                  </div>
+                </div>
+
+                <aside class="card card--muted info-card">
+                  <h3 class="section-title"><i data-lucide="lock"></i>Maʼlumotlaringiz xavfsizligi</h3>
+                  <ul class="check-list check-list--success">
+                    <li>Fayl faqat tahlil uchun serverga yuboriladi va saqlanmaydi.</li>
+                    <li>Natijalar qurilmangizda ham saqlanmaydi.</li>
+                    <li>Hujjatdagi shaxsiy maʼlumotlar logga yozilmaydi.</li>
+                  </ul>
+                  <h3 class="section-title"><i data-lucide="info"></i>Bilishingiz kerak</h3>
+                  <ul class="check-list check-list--warning">
+                    <li>MEDAI tashxis qoʻymaydi.</li>
+                    <li>Meʼyoriy oraliq laboratoriya, yosh va jinsga qarab farq qiladi.</li>
+                    <li>Hujjatda oraliq boʻlmasa, MEDAI uni oʻzidan qoʻymaydi.</li>
+                    <li>Avtomatik oʻqish xato qilishi mumkin — qiymatlarni tasdiqlash soʻraladi.</li>
+                  </ul>
+                </aside>
+              </div>
+            </div>
+
+            <div id="analysisStage2" class="stage" hidden></div>
+            <div id="analysisStage3" class="stage" hidden></div>
+          </div>
+        </section>
+
+        <!-- ============ DORI QO'LLANMASI ============ -->
+        <section class="view" id="view-medicine" aria-labelledby="pageTitle" hidden>
+          <div class="page">
+            <div class="card">
+              <div class="card__head">
+                <div>
+                  <h2 class="card__title">Dori yoʻriqnomasini tushuntirish</h2>
+                  <p class="muted">Dori nomini kiriting, yoʻriqnoma faylini yuklang yoki matnini joylashtiring.</p>
+                </div>
+              </div>
+
+              <div class="tabs" id="medicineTabs" role="tablist" aria-label="Maʼlumot manbai">
+                <button type="button" role="tab" class="tab" id="tab-name" aria-controls="panel-name" aria-selected="true"><i data-lucide="search"></i>Nomi boʻyicha</button>
+                <button type="button" role="tab" class="tab" id="tab-file" aria-controls="panel-file" aria-selected="false" tabindex="-1"><i data-lucide="file-up"></i>Yoʻriqnoma fayli</button>
+                <button type="button" role="tab" class="tab" id="tab-text" aria-controls="panel-text" aria-selected="false" tabindex="-1"><i data-lucide="clipboard-list"></i>Matnni joylashtirish</button>
+              </div>
+
+              <div class="tab-panel" id="panel-name" role="tabpanel" aria-labelledby="tab-name">
+                <form id="medNameForm" class="inline-form" novalidate>
+                  <div class="field field--grow">
+                    <label for="medNameInput" class="field__label">Dori nomi</label>
+                    <div class="input-icon">
+                      <i data-lucide="pill"></i>
+                      <input type="text" id="medNameInput" class="input" maxlength="80" placeholder="Masalan: Paratsetamol" autocomplete="off" aria-describedby="medNameError medNameHint">
+                    </div>
+                    <small class="field__hint" id="medNameHint">Nomi boʻyicha maʼlumot faqat AI rejimida mavjud.</small>
+                    <p class="form-error" id="medNameError" role="alert" hidden></p>
+                  </div>
+                  <button type="submit" class="btn btn--primary"><i data-lucide="search"></i>Tushuntirish</button>
+                </form>
+              </div>
+
+              <div class="tab-panel" id="panel-file" role="tabpanel" aria-labelledby="tab-file" hidden>
+                <div class="dropzone dropzone--compact" id="medDropzone" tabindex="0" role="button" aria-describedby="medDropHint">
+                  <span class="dropzone__icon"><i data-lucide="file-up"></i></span>
+                  <strong>Yoʻriqnoma faylini tashlang yoki tanlang</strong>
+                  <small id="medDropHint">PDF yoki TXT · rasm (JPG, PNG) faqat AI rejimida · maksimal 10 MB</small>
+                  <input type="file" id="medFileInput" accept=".pdf,.txt,.jpg,.jpeg,.png,application/pdf,text/plain,image/jpeg,image/png" hidden>
+                </div>
+                <div class="file-chip" id="medFileChip" hidden>
+                  <span class="file-chip__thumb"><i data-lucide="file-text"></i></span>
+                  <span class="file-chip__text"><strong id="medFileName"></strong><small id="medFileMeta"></small></span>
+                  <button type="button" class="icon-btn icon-btn--danger" id="medRemoveBtn" aria-label="Faylni olib tashlash"><i data-lucide="trash-2"></i></button>
+                </div>
+                <div class="btn-row">
+                  <button type="button" class="btn btn--primary" id="medFileBtn" disabled><i data-lucide="sparkles"></i>Tushuntirish</button>
+                </div>
+              </div>
+
+              <div class="tab-panel" id="panel-text" role="tabpanel" aria-labelledby="tab-text" hidden>
+                <form id="medTextForm" novalidate>
+                  <div class="field">
+                    <label for="medTextInput" class="field__label">Yoʻriqnoma matni</label>
+                    <textarea id="medTextInput" class="input textarea" rows="8" maxlength="30000" placeholder="Rasmiy yoʻriqnoma matnini shu yerga joylashtiring…" aria-describedby="medTextError"></textarea>
+                    <div class="field__row"><small class="field__hint">Kamida 50 belgi</small><small id="medTextCount">0 / 30000</small></div>
+                    <p class="form-error" id="medTextError" role="alert" hidden></p>
+                  </div>
+                  <div class="btn-row"><button type="submit" class="btn btn--primary"><i data-lucide="sparkles"></i>Tushuntirish</button></div>
+                </form>
+              </div>
+            </div>
+
+            <div class="notice notice--danger">
+              <i data-lucide="shield-alert"></i>
+              <p>MEDAI dori dozasini, davolash kursini yoki boshqa doriga almashtirishni tavsiya qilmaydi. Dori sizga mosligini <strong>shifokor yoki farmatsevt</strong> aniqlaydi.</p>
+            </div>
+
+            <div id="medicineResult" class="result-area" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <!-- ============ TIBBIY KUTUBXONA ============ -->
+        <section class="view" id="view-library" aria-labelledby="pageTitle" hidden>
+          <div class="page">
+            <div class="library-head">
+              <div class="search-box">
+                <i data-lucide="search"></i>
+                <label for="librarySearch" class="sr-only">Atamalarni qidirish</label>
+                <input type="search" id="librarySearch" class="input" placeholder="Atamani qidiring: gemoglobin, glyukoza, CRP…" autocomplete="off">
+                <button type="button" class="icon-btn icon-btn--sm" id="libraryClear" aria-label="Qidiruvni tozalash" hidden><i data-lucide="x"></i></button>
+              </div>
+              <div class="chip-row" id="libraryFilters" aria-label="Turkumlar"></div>
+            </div>
+            <div class="notice notice--warning">
+              <i data-lucide="badge-info"></i>
+              <p>Kutubxona matnlari umumiy maʼlumot uchun tayyorlangan va <strong>tibbiy ekspert tomonidan hali tekshirilmagan</strong>. Ular rasmiy tibbiy fakt yoki shifokor maslahati emas.</p>
+            </div>
+            <p class="muted small" id="libraryCount" aria-live="polite"></p>
+            <div class="term-grid" id="libraryGrid"></div>
+          </div>
+        </section>
+
+        <!-- ============ SUHBATLAR TARIXI ============ -->
+        <section class="view" id="view-history" aria-labelledby="pageTitle" hidden>
+          <div class="page page--narrow">
+            <div class="notice notice--info">
+              <i data-lucide="hard-drive"></i>
+              <p>Suhbatlar faqat <strong>shu qurilmadagi brauzer xotirasida</strong> (localStorage) saqlanadi va boshqa qurilmalarda koʻrinmaydi. Laboratoriya fayllari saqlanmaydi.</p>
+            </div>
+            <div class="notice notice--warning" id="historyStorageOff" hidden>
+              <i data-lucide="triangle-alert"></i>
+              <p>Tarixni saqlash oʻchirilgan — suhbatlar sahifa yangilanganda yoʻqoladi. <a href="#/settings">Sozlamalarda yoqish</a></p>
+            </div>
+            <div class="toolbar">
+              <div class="search-box search-box--sm">
+                <i data-lucide="search"></i>
+                <label for="historySearch" class="sr-only">Suhbatlarni qidirish</label>
+                <input type="search" id="historySearch" class="input" placeholder="Suhbatlarni qidirish…" autocomplete="off">
+              </div>
+              <span class="muted small" id="historyCount"></span>
+              <span class="spacer"></span>
+              <button type="button" class="btn btn--ghost btn--danger-text" id="historyDeleteAll"><i data-lucide="trash-2"></i>Barchasini oʻchirish</button>
+              <button type="button" class="btn btn--primary" id="historyNew"><i data-lucide="plus"></i>Yangi suhbat</button>
+            </div>
+            <ul class="history-list" id="historyList"></ul>
+          </div>
+        </section>
+
+        <!-- ============ SOZLAMALAR ============ -->
+        <section class="view" id="view-settings" aria-labelledby="pageTitle" hidden>
+          <div class="page page--narrow">
+            <div class="card">
+              <h2 class="card__title"><i data-lucide="user"></i>Profil</h2>
+              <form id="profileForm" class="inline-form" novalidate>
+                <div class="field field--grow">
+                  <label for="profileName" class="field__label">Ismingiz (ixtiyoriy)</label>
+                  <input type="text" id="profileName" class="input" maxlength="40" placeholder="Masalan: Aziza" autocomplete="given-name" aria-describedby="profileNameError profileNameHint">
+                  <small class="field__hint" id="profileNameHint">Faqat salomlashish uchun ishlatiladi va shu qurilmada saqlanadi.</small>
+                  <p class="form-error" id="profileNameError" role="alert" hidden></p>
+                </div>
+                <button type="submit" class="btn btn--primary"><i data-lucide="save"></i>Saqlash</button>
+              </form>
+            </div>
+
+            <div class="card">
+              <h2 class="card__title"><i data-lucide="shield-check"></i>Maxfiylik</h2>
+              <label class="switch-row">
+                <span><strong>Suhbatlar tarixini saqlash</strong><small>Suhbatlar shu qurilmadagi brauzer xotirasida saqlanadi.</small></span>
+                <input type="checkbox" class="switch" id="saveHistoryToggle" role="switch">
+              </label>
+              <div class="info-block">
+                <h3>Maʼlumotlar qanday ishlatiladi</h3>
+                <ul class="check-list">
+                  <li>Savollaringiz faqat javob tayyorlash uchun MEDAI serveriga yuboriladi.</li>
+                  <li>Laboratoriya va dori fayllari serverda saqlanmaydi va brauzerga yozilmaydi.</li>
+                  <li>AI rejimida soʻrovlar AI xizmatiga (Anthropic) yuboriladi; API kaliti faqat serverda turadi.</li>
+                  <li>Server tibbiy maʼlumotlarni log fayllarga yozmaydi.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="card">
+              <h2 class="card__title"><i data-lucide="monitor"></i>Interfeys</h2>
+              <label class="switch-row">
+                <span><strong>Animatsiyalarni kamaytirish</strong><small>Tizim sozlamasi (prefers-reduced-motion) har doim hurmat qilinadi.</small></span>
+                <input type="checkbox" class="switch" id="reduceMotionToggle" role="switch">
+              </label>
+            </div>
+
+            <div class="card">
+              <div class="card__head">
+                <h2 class="card__title"><i data-lucide="server"></i>Tizim holati</h2>
+                <button type="button" class="btn btn--ghost btn--sm" id="refreshStatusBtn"><i data-lucide="rotate-ccw"></i>Yangilash</button>
+              </div>
+              <dl class="kv">
+                <div><dt>Server</dt><dd id="sysServer">—</dd></div>
+                <div><dt>Rejim</dt><dd id="sysMode">—</dd></div>
+                <div><dt>AI modeli</dt><dd id="sysModel">—</dd></div>
+                <div><dt>Ishonchli hujjatlar bazasi (RAG)</dt><dd id="sysRag">—</dd></div>
+              </dl>
+            </div>
+
+            <div class="card card--danger">
+              <h2 class="card__title"><i data-lucide="trash-2"></i>Maʼlumotlarni oʻchirish</h2>
+              <p class="muted">Ushbu qurilmadagi barcha suhbatlar, baholar va sozlamalarni butunlay oʻchiradi.</p>
+              <div class="btn-row"><button type="button" class="btn btn--danger" id="wipeDataBtn"><i data-lucide="trash-2"></i>Barcha maʼlumotlarni oʻchirish</button></div>
+            </div>
+
+            <p class="muted small center">MEDAI 0.1.0 (MVP) · PHARMA GUARD AI ekotizimi moduli</p>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <div class="modal" id="modal" hidden>
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <header class="modal__header">
+        <h2 id="modalTitle"></h2>
+        <button type="button" class="icon-btn modal__close" data-close aria-label="Oynani yopish"><i data-lucide="x"></i></button>
+      </header>
+      <div class="modal__body" id="modalBody"></div>
+      <footer class="modal__footer" id="modalFooter"></footer>
+    </div>
+  </div>
+</body>
+</html>

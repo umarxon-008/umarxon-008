@@ -1,0 +1,135 @@
+/* =====================================================================
+   MEDAI — moslashuvchan (responsive) uslublar
+   Desktop (≥1280) · Laptop (1024–1279) · Planshet (768–1023) · Mobil (<768)
+   ===================================================================== */
+
+/* Laptop */
+@media (max-width: 1279px) {
+  :root { --sidebar-w: 256px; }
+  .page { padding: 24px 24px 40px; }
+  .grid-main { grid-template-columns: minmax(0, 1fr) 280px; }
+}
+
+/* Planshet: sidebar drawer ko'rinishiga o'tadi */
+@media (max-width: 1023px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .sidebar {
+    position: fixed; inset: 0 auto 0 0; width: min(300px, 86vw); box-shadow: var(--shadow-lg);
+    transform: translateX(-105%); transition: transform 0.25s var(--ease); visibility: hidden;
+  }
+  .sidebar.is-open { transform: none; visibility: visible; }
+  .sidebar .sidebar__close { display: inline-grid; }
+  .nav__item.is-active::before { left: -16px; }
+  .topbar .topbar__menu { display: inline-grid; margin-left: -8px; }
+  .topbar { padding: 0 20px; }
+  .demo-banner, .chat__toolbar { padding-left: 20px; padding-right: 20px; }
+  .grid-main { grid-template-columns: minmax(0, 1fr); }
+  .info-card { position: static; }
+  .result-list, .med-grid { grid-template-columns: minmax(0, 1fr); }
+  .stat-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  body.drawer-open { overflow: hidden; }
+}
+
+/* Mobil */
+@media (max-width: 767px) {
+  :root { --topbar-h: 60px; }
+  body { font-size: 15px; }
+  .topbar { gap: 10px; padding: 0 12px; }
+  .topbar__title h1 { font-size: 16px; }
+  .topbar__title p { display: none; }
+  .topbar__actions { gap: 6px; }
+  .status-pill { height: 32px; padding: 0 10px; font-size: 12px; gap: 6px; }
+  /* Til tanlash: faqat ikon ko'rinadi, ustida shaffof select — bosilganda tizim ro'yxati ochiladi */
+  .lang-select { width: 34px; height: 32px; padding: 0; justify-content: center; }
+  .lang-select select { position: absolute; inset: 0; width: 100%; max-width: none; opacity: 0; font-size: 16px; }
+  .avatar-btn > svg { display: none; }
+  .avatar-btn .avatar { width: 32px; height: 32px; }
+  .menu__panel { position: fixed; right: 12px; left: 12px; top: calc(var(--topbar-h) + 6px); width: auto; }
+  .demo-banner { padding: 8px 12px; font-size: 12.5px; gap: 8px; align-items: flex-start; }
+  .demo-banner > svg { margin-top: 2px; }
+  .demo-banner .btn--ghost { height: 28px; padding: 0 8px; }
+
+  .page { padding: 16px 14px 32px; gap: 16px; }
+  .card { padding: 18px; border-radius: 14px; }
+  .card__head { flex-direction: column; gap: 10px; }
+  .card__title--lg { font-size: 19px; }
+  .grid-2 { grid-template-columns: minmax(0, 1fr); }
+
+  /* Chat */
+  .chat__toolbar { padding: 8px 12px; }
+  .chat__scroll { padding: 18px 12px 8px; }
+  .welcome { gap: 12px; }
+  .welcome__title { font-size: 23px; }
+  .welcome__text { font-size: 14.5px; }
+  .quick-grid { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .quick-card { padding: 12px 14px; font-size: 14px; }
+  .feature-row { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .messages { gap: 18px; }
+  .msg { gap: 8px; }
+  .msg__avatar { width: 28px; height: 28px; border-radius: 8px; }
+  .msg__avatar img { width: 28px; height: 28px; }
+  .msg--user .msg__body { max-width: 88%; }
+  .bubble--ai { padding: 14px 14px; }
+  .msg__feedback-label { display: none; }
+  .composer { padding: 6px 10px; padding-bottom: max(10px, env(safe-area-inset-bottom)); gap: 6px; }
+  .composer__box { border-radius: 16px; padding: 6px; }
+  .composer textarea { font-size: 16px; } /* iOS da avtomatik kattalashtirishning oldini oladi */
+  .composer__hint { display: none; }
+  .composer__meta { justify-content: flex-end; }
+  .composer__disclaimer { font-size: 11.5px; }
+
+  /* Tahlil */
+  .stepper { gap: 6px; }
+  .stepper li { padding: 8px; font-size: 12px; flex-direction: column; text-align: center; gap: 4px; }
+  .dropzone { padding: 28px 16px; }
+  .btn-row > .btn, .form-actions > .btn { flex: 1 1 auto; }
+  .form-actions .spacer { display: none; }
+  .stat-row { gap: 8px; }
+  .stat { padding: 10px; gap: 8px; }
+  .stat__icon { width: 30px; height: 30px; }
+  .result-card__value strong { font-size: 20px; }
+
+  /* Tahrirlanadigan jadval -> kartalar */
+  .table-wrap { border: 0; overflow: visible; }
+  .data-table--edit thead { display: none; }
+  .data-table--edit, .data-table--edit tbody, .data-table--edit tr, .data-table--edit td { display: block; width: 100% !important; }
+  .data-table--edit tr {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 12px; margin-bottom: 10px;
+    border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2); position: relative;
+  }
+  .data-table--edit td { padding: 0 !important; border: 0; }
+  .data-table--edit td:first-child { grid-column: 1 / -1; padding-right: 40px !important; }
+  .data-table--edit td[data-label]::before { content: attr(data-label); display: block; font-size: 11.5px; font-weight: 600; color: var(--text-2); margin-bottom: 4px; }
+  .data-table--edit td:nth-child(4) { grid-column: 1 / -1; }
+  .data-table--edit .cell-actions { position: absolute; top: 8px; right: 6px; width: auto !important; }
+  .data-table--edit .input--sm { height: 40px; font-size: 16px; }
+
+  /* Dori */
+  .tabs { align-self: stretch; }
+  .tab { flex: 1; justify-content: center; padding: 0 10px; font-size: 13px; }
+  .inline-form { flex-direction: column; align-items: stretch; }
+  .inline-form > .btn { margin-top: 0; }
+  .input, .search-box .input { font-size: 16px; }
+
+  /* Tarix */
+  .toolbar .search-box { max-width: none; flex-basis: 100%; }
+  .toolbar .btn { flex: 1; }
+  .toolbar .spacer { display: none; }
+  .history-item__main { padding: 8px; gap: 10px; }
+
+  /* Modal pastdan chiqadigan varaq ko'rinishida */
+  .modal { padding: 0; place-items: end stretch; }
+  .modal__dialog, .modal__dialog--sm, .modal__dialog--lg { max-width: none; max-height: 90vh; border-radius: 20px 20px 0 0; }
+  .modal__footer { padding-bottom: max(18px, env(safe-area-inset-bottom)); }
+  .modal__footer .btn { flex: 1; }
+  .toasts { right: 12px; left: 12px; bottom: 12px; width: auto; }
+}
+
+/* Kichik mobil: holat belgisi faqat rangli nuqta bilan (to'liq matn aria-label va oynada) */
+@media (max-width: 480px) {
+  .status-pill { width: 32px; padding: 0; justify-content: center; }
+  .status-pill #statusText { display: none; }
+}
+@media (max-width: 380px) {
+  .tab svg { display: none; }
+}

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="MEDAI logotipi">
+  <rect width="48" height="48" rx="13" fill="#102B46"/>
+  <path d="M20.5 11.5h7v9h9v7h-9v9h-7v-9h-9v-7h9z" fill="#FFFFFF" opacity=".14"/>
+  <path d="M9.5 25.5h7.2l3-6.5 4.6 13 3.9-9.2 2.3 2.7h8" fill="none" stroke="#39AFC4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="38.5" cy="25.5" r="2.4" fill="#39AFC4"/>
+</svg>
