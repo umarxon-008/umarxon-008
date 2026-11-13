@@ -38,6 +38,7 @@ function ModelSelect({ provider, value }: { provider: ProviderId; value: string 
       <span>Model</span>
       <select
         className="input"
+        aria-label="AI model"
         value={value ?? ''}
         onChange={(e) =>
           void update(

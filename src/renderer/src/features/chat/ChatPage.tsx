@@ -4,6 +4,12 @@ import {
   AlertTriangle,
   Cloud,
   HardDrive,
+  Loader2,
+  Mic,
+  Pause,
+  Play,
+  Volume2,
+  VolumeX,
   MessageSquarePlus,
   RotateCcw,
   Send,
@@ -16,12 +22,48 @@ import { LogoMark } from '../../components/Logo';
 import { Markdown } from '../../components/Markdown';
 import { isAiReady, useAi } from '../../store/ai';
 import { useChat } from '../../store/chat';
+import { useVoice } from '../voice/voiceStore';
+import { uz } from '../../i18n/uz';
 
 function formatTime(iso: string): string {
   const d = new Date(iso);
   return Number.isNaN(d.getTime())
     ? ''
     : d.toLocaleString('uz-UZ', { dateStyle: 'short', timeStyle: 'short' });
+}
+
+function ReadAloud({ message }: { message: ChatMessage }) {
+  const voice = useVoice();
+  const active = voice.speakingMessageId === message.id && voice.status === 'speaking';
+  if (active) {
+    return (
+      <span className="chat-msg__tools">
+        <button
+          type="button"
+          className="link-btn"
+          onClick={() => (voice.paused ? voice.resumeSpeaking() : voice.pauseSpeaking())}
+        >
+          {voice.paused ? <Play size={12} aria-hidden="true" /> : <Pause size={12} aria-hidden="true" />}
+          {voice.paused ? uz.voice.resume : uz.voice.pause}
+        </button>
+        <button type="button" className="link-btn" onClick={() => voice.cancel()}>
+          <VolumeX size={12} aria-hidden="true" /> {uz.voice.stopSpeaking}
+        </button>
+      </span>
+    );
+  }
+  return (
+    <span className="chat-msg__tools">
+      <button
+        type="button"
+        className="link-btn"
+        disabled={voice.status === 'listening' || voice.status === 'transcribing'}
+        onClick={() => void voice.speak(message.content, message.id)}
+      >
+        <Volume2 size={12} aria-hidden="true" /> {uz.voice.readAloud}
+      </button>
+    </span>
+  );
 }
 
 function MessageView({ m }: { m: ChatMessage }) {
@@ -49,6 +91,7 @@ function MessageView({ m }: { m: ChatMessage }) {
           </p>
         ) : null}
         {m.status === 'streaming' && m.content && <span className="chat-msg__cursor" aria-hidden="true" />}
+        {m.status === 'complete' && m.content && <ReadAloud message={m} />}
         {m.status === 'cancelled' && <small className="chat-msg__meta">⏹ To‘xtatildi</small>}
         {m.status === 'error' && (
           <small className="chat-msg__meta chat-msg__meta--error">
@@ -76,6 +119,23 @@ export function ChatPage() {
     void loadAi();
     void loadList();
   }, [loadAi, loadList]);
+
+  // Ovozli kiritish: transkript yozish maydoniga qo'yiladi (yuborishdan oldin tahrirlash mumkin)
+  const voiceStatus = useVoice((v) => v.status);
+  const voiceTarget = useVoice((v) => v.target);
+  const voiceMessage = useVoice((v) => v.message);
+  useEffect(
+    () =>
+      useVoice.subscribe((v) => {
+        if (v.status === 'review' && v.target === 'chat') {
+          const t = useVoice.getState().takeTranscript();
+          setText((prev) => (prev.trim() ? `${prev.trim()} ${t}` : t));
+          inputRef.current?.focus();
+        }
+      }),
+    [],
+  );
+  const dictating = voiceTarget === 'chat' && (voiceStatus === 'listening' || voiceStatus === 'transcribing');
 
   // Yangi matn kelganda pastga aylantirish
   const lastContent = chat.messages.at(-1)?.content.length ?? 0;
@@ -247,6 +307,34 @@ export function ChatPage() {
             onChange={(e) => setText(e.target.value)}
             onKeyDown={onKeyDown}
           />
+          <button
+            type="button"
+            className={`icon-btn${dictating ? ' icon-btn--live' : ''}`}
+            disabled={!ready || voiceStatus === 'transcribing' || chat.sending}
+            onClick={() =>
+              voiceStatus === 'listening'
+                ? void useVoice.getState().stopListening()
+                : void useVoice.getState().startListening('chat')
+            }
+            aria-label={
+              voiceStatus === 'listening' && voiceTarget === 'chat'
+                ? uz.voice.stopListening
+                : 'Ovoz bilan yozish'
+            }
+            title={
+              voiceStatus === 'listening' && voiceTarget === 'chat'
+                ? uz.voice.stopListening
+                : 'Ovoz bilan yozish'
+            }
+          >
+            {voiceStatus === 'transcribing' && voiceTarget === 'chat' ? (
+              <Loader2 size={18} className="spin" aria-hidden="true" />
+            ) : voiceStatus === 'listening' && voiceTarget === 'chat' ? (
+              <Square size={16} aria-hidden="true" />
+            ) : (
+              <Mic size={18} aria-hidden="true" />
+            )}
+          </button>
           {chat.streaming ? (
             <button
               type="button"
@@ -269,6 +357,16 @@ export function ChatPage() {
             </button>
           )}
         </form>
+        {voiceTarget === 'chat' && voiceMessage && (voiceStatus === 'idle' || voiceStatus === 'error') && (
+          <p className="composer__note composer__note--warn" role="status">
+            {voiceMessage}
+          </p>
+        )}
+        {dictating && (
+          <p className="composer__note" role="status">
+            {voiceStatus === 'listening' ? `🎙 ${uz.voice.hintListening}` : uz.voice.transcribing}
+          </p>
+        )}
         {s?.provider === 'gemini' && (
           <p className="composer__note">
             <Cloud size={12} aria-hidden="true" /> Gemini ishlatilmoqda: xabarlaringiz javob olish uchun

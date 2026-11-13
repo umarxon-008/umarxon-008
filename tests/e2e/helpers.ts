@@ -6,9 +6,10 @@ const mainEntry = join(process.cwd(), 'out/main/index.js');
 export async function launchApp(
   userDataDir: string,
   env: Record<string, string> = {},
+  extraArgs: string[] = [],
 ): Promise<{ app: ElectronApplication; page: Page }> {
   const app = await electron.launch({
-    args: [mainEntry, ...(process.platform === 'linux' ? ['--no-sandbox'] : [])],
+    args: [mainEntry, ...(process.platform === 'linux' ? ['--no-sandbox'] : []), ...extraArgs],
     env: { ...process.env, MARIUS_USER_DATA_DIR: userDataDir, ELECTRON_RENDERER_URL: '', ...env },
   });
   const page = await app.firstWindow();

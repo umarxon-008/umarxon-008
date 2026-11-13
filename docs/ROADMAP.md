@@ -31,7 +31,7 @@ PROJECT_AUDIT, ARCHITECTURE, ROADMAP, RISK_REGISTER.
 
 **Qabul mezonlari:** haqiqiy kalit bilan real chat ishlaydi; kalit DB'da shifrlangan (test bilan tasdiqlangan); kalit log, renderer bundle va git'da yo'q.
 
-## PHASE 3 — Voice MVP (~2–3 sessiya)
+## PHASE 3 — Voice MVP ✅ (kod va testlar tayyor; o‘zbekcha sifat Windows’da o‘lchanishi kerak, `PHASE_3_REPORT.md`)
 - Push-to-talk, mikrofon ruxsati va xatolik holatlari.
 - STT adapter, transkriptni tahrirlab yuborish; TTS adapter (play/pause/stop, tezlik).
 - Voice state machine va unit testlari.

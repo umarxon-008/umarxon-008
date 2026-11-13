@@ -2,8 +2,8 @@
 
 O‘zbek tilida gaplashadigan shaxsiy AI desktop yordamchi. Windows 10/11 uchun mo‘ljallangan.
 
-> **Holat:** 2-bosqich (PHASE 2): o‘zbekcha AI suhbat (Gemini yoki lokal Ollama), real tizim monitoringi, ovozga javob beruvchi shar.
-> Ovozni matnga aylantirish va kompyuter amallari keyingi bosqichlarda qo‘shiladi. Reja: [`docs/ROADMAP.md`](docs/ROADMAP.md).
+> **Holat:** 3-bosqich (PHASE 3): o‘zbekcha AI suhbat (Gemini yoki lokal Ollama), ovozli savol-javob, real tizim monitoringi, ovozga javob beruvchi shar.
+> Kompyuter amallari (dastur ochish, fayllar) keyingi bosqichlarda qo‘shiladi. Reja: [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Windows'da sinab ko‘rish (dasturchi bo‘lmaganlar uchun)
 
@@ -36,6 +36,14 @@ Sozlamalar → **Sun’iy intellekt** bo‘limida ikkitadan birini tanlang:
 3. MARIUS’da **Ulanishni tekshirish**ni bosing va modelni tanlang.
 
 > Kuchli kompyuter (16 GB+ RAM) tavsiya etiladi. O‘zbek tili sifati modelga bog‘liq.
+
+## Ovoz bilan ishlash
+
+1. Sozlamalar → **Ovoz**: “Gemini (internet)” va **rozilik** belgisini yoqing (ovoz matnga aylantirish uchun Google’ga yuboriladi).
+2. Bosh sahifada mikrofon tugmasini bosing, gapiring va yana bosing. Matnni tekshirib, **Yuborish**ni bosing.
+3. Javob ovoz chiqarib o‘qiladi (Windows ovozi yoki Gemini ovozi). Pauza va to‘xtatish tugmalari bor.
+
+Yozuv kompyuterda saqlanmaydi. Mikrofon faqat tugma bosilganda yoqiladi va 30 soniyada o‘zi o‘chadi.
 
 ## Dasturchilar uchun
 

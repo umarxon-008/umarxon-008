@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { smoothLevel } from './level';
-import { mic, useVoice } from './voiceStore';
+import { mic, speaker, useVoice, type VoiceStatus } from './voiceStore';
 import { useSettings } from '../../store/settings';
 import { uz } from '../../i18n/uz';
 
@@ -79,11 +79,21 @@ export function VoiceOrb() {
     const frame = (now: number) => {
       raf = requestAnimationFrame(frame);
       const t = ((now - start) / 1000) * speed;
-      const listening = statusRef.current === 'listening';
+      const state = statusRef.current;
+      const listening = state === 'listening';
+      const speaking = state === 'speaking';
+      const processing = state === 'transcribing' || state === 'thinking';
 
       // Maqsad daraja: tinglayotganda mikrofon, aks holda sekin nafas olish.
       const breathing = 0.06 + 0.04 * Math.sin(t * 1.2);
-      const target = listening ? Math.max(0.08, mic.readLevel()) : breathing;
+      // Tinglash: mikrofon; gapirish: MARIUS ovozi; ishlov berish: tez "puls"; aks holda nafas
+      const target = listening
+        ? Math.max(0.08, mic.readLevel())
+        : speaking
+          ? Math.max(0.1, speaker.level())
+          : processing
+            ? 0.16 + 0.1 * Math.max(0, Math.sin(t * 5))
+            : breathing;
       level = smoothLevel(level, prefersReduced ? target * 0.5 : target);
 
       const cx = width / 2;
@@ -168,7 +178,7 @@ export function VoiceOrb() {
       const waveWidth = R * 1.25;
       const left = cx - waveWidth / 2;
       const baseY = cy + R * 0.12;
-      const samples = listening ? mic.waveform() : null;
+      const samples = listening ? mic.waveform() : speaking ? speaker.waveform() : null;
       ctx.beginPath();
       const steps = 120;
       for (let k = 0; k <= steps; k++) {
@@ -201,13 +211,25 @@ export function VoiceOrb() {
     };
   }, [reducedMotion, theme]);
 
-  const listening = status === 'listening';
+  const active = status !== 'idle' && status !== 'review';
   return (
     <div className="orb">
       <canvas ref={canvasRef} className="orb__canvas" aria-hidden="true" />
-      <span className={`orb__label${listening ? ' is-listening' : ''}`} aria-hidden="true">
-        {listening ? uz.voice.listening : uz.voice.orbIdle}
+      <span className={`orb__label${active ? ' is-listening' : ''}`} aria-hidden="true">
+        {ORB_LABELS[status]}
       </span>
     </div>
   );
 }
+
+const ORB_LABELS: Record<VoiceStatus, string> = {
+  idle: uz.voice.orbIdle,
+  listening: uz.voice.listening,
+  transcribing: uz.voice.transcribing,
+  review: uz.voice.orbIdle,
+  thinking: uz.voice.thinking,
+  awaiting_confirmation: uz.voice.orbIdle,
+  executing: uz.voice.orbIdle,
+  speaking: uz.voice.speaking,
+  error: uz.voice.errorLabel,
+};

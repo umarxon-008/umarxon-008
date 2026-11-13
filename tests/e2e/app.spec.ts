@@ -53,7 +53,7 @@ test('renderer’da Node yoki Electron API yo‘q, faqat window.marius bor', asy
       module: 'undefined',
       marius: 'object',
       frozen: true,
-      keys: ['ai', 'app', 'chat', 'logs', 'settings', 'system'],
+      keys: ['ai', 'app', 'chat', 'logs', 'settings', 'system', 'voice'],
     });
 
     const prefs = await app.evaluate(({ BrowserWindow }) => {
@@ -164,18 +164,21 @@ test('kompyuter holati real ko‘rsatkichlarni ko‘rsatadi', async () => {
   }
 });
 
-test('mikrofon: yoqish → tinglash → o‘chirish (sinov qurilmasi)', async () => {
+test('mikrofon: yoqish → tinglash → tugatish (sinov qurilmasi, rozilik yo‘q)', async () => {
   const { app, page } = await launch(dataDir, FAKE_MEDIA);
   try {
     await finishOnboarding(page);
     await page.getByRole('button', { name: 'Mikrofonni yoqish' }).click();
-    const stop = page.getByRole('button', { name: 'Mikrofonni o‘chirish' });
+    const stop = page.getByRole('button', { name: 'Tinglashni tugatish' });
     await expect(stop).toBeVisible();
     await expect(stop).toHaveAttribute('aria-pressed', 'true');
     await expect(page.getByText('Sizni eshityapman…')).toBeVisible();
+    await expect(page.getByText('● yoqiq')).toBeVisible();
     await stop.click();
     await expect(page.getByRole('button', { name: 'Mikrofonni yoqish' })).toBeVisible();
-    await expect(page.getByText('Gapirish uchun mikrofonni bosing')).toBeVisible();
+    await expect(page.getByText('● yoqiq')).toHaveCount(0);
+    // Rozilik bo'lmagani uchun matnga aylantirilmaydi va bu aniq aytiladi
+    await expect(page.getByText(/yuborilishiga rozilik bering/)).toBeVisible();
   } finally {
     await app.close();
   }

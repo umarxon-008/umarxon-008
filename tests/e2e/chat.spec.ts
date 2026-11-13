@@ -31,7 +31,7 @@ async function configureOllamaViaUi(page: Page, url: string) {
   await page.getByRole('button', { name: 'Saqlash' }).click();
   await page.getByRole('button', { name: 'Ulanishni tekshirish' }).click();
   await expect(page.getByText('Ulanish muvaffaqiyatli. 1 ta model topildi.')).toBeVisible();
-  await page.getByRole('combobox').selectOption('mock-uz:latest');
+  await page.getByRole('combobox', { name: 'AI model' }).selectOption('mock-uz:latest');
 }
 
 test('AI sozlanmagan: suhbat sahifasi sozlashga yo‘naltiradi', async () => {
@@ -140,7 +140,7 @@ test('Gemini API kaliti: Windows’da shifrlab saqlanadi, boshqa tizimlarda ochi
       await expect(page.getByText('API kalit saqlangan')).toBeVisible();
       await expect(page.getByText('Ulanish muvaffaqiyatli. 1 ta model topildi.')).toBeVisible();
       await expect(page.getByLabel('Gemini API kalit')).toHaveValue(''); // UI'da qolmaydi
-      await page.getByRole('combobox').selectOption('mock-gemini');
+      await page.getByRole('combobox', { name: 'AI model' }).selectOption('mock-gemini');
 
       await nav(page).getByRole('link', { name: 'Suhbat' }).click();
       await expect(page.getByText(/Gemini ishlatilmoqda: xabarlaringiz/)).toBeVisible();

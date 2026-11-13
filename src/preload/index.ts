@@ -45,6 +45,10 @@ const api: MariusApi = {
       return () => ipcRenderer.removeListener(CHAT_EVENT_CHANNEL, handler);
     },
   },
+  voice: {
+    transcribe: (audio) => ipcRenderer.invoke('voice:transcribe', { audio, mimeType: 'audio/wav' }),
+    synthesize: (text) => ipcRenderer.invoke('voice:synthesize', { text }),
+  },
 };
 
 contextBridge.exposeInMainWorld('marius', Object.freeze(api));

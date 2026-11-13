@@ -6,11 +6,14 @@ import type { AddressInfo } from 'node:net';
  * Ilova unga haqiqiy HTTP so'rovlar yuboradi, ya'ni butun zanjir (main → fetch → oqim → IPC → UI) sinaladi.
  */
 export const MOCK_GEMINI_KEY = 'AIza-E2E-TEST-KEY-0123456789';
+export const MOCK_TRANSCRIPT = 'Salom MARIUS, qalaysan?';
 export const MOCK_REPLY = 'Assalomu alaykum! Men **MARIUS**man. O‘zbek tilida yordam beraman.';
 
 export interface MockAiServer {
   url: string;
   requests: { path: string; body: unknown; headers: IncomingMessage['headers'] }[];
+  /** Oxirgi transkripsiya so'rovidagi audio baytlari (WAV sarlavhasini tekshirish uchun) */
+  lastAudio: Buffer | null;
   failNext: boolean;
   close(): Promise<void>;
 }
@@ -27,7 +30,13 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const words = (text: string) => text.match(/\S+\s*/g) ?? [];
 
 export async function startMockAiServer(): Promise<MockAiServer> {
-  const state: MockAiServer = { url: '', requests: [], failNext: false, close: async () => undefined };
+  const state: MockAiServer = {
+    url: '',
+    requests: [],
+    lastAudio: null,
+    failNext: false,
+    close: async () => undefined,
+  };
 
   const handler = async (req: IncomingMessage, res: ServerResponse) => {
     const url = new URL(req.url ?? '/', 'http://x');
@@ -79,6 +88,42 @@ export async function startMockAiServer(): Promise<MockAiServer> {
             models: [{ name: 'models/mock-gemini', supportedGenerationMethods: ['generateContent'] }],
           }),
         );
+        return;
+      }
+      if (url.pathname.endsWith(':generateContent')) {
+        const b = body as {
+          contents: { parts: { text?: string; inlineData?: { mimeType: string; data: string } }[] }[];
+          generationConfig?: { responseModalities?: string[] };
+        };
+        res.writeHead(200, { 'content-type': 'application/json' });
+        if (b.generationConfig?.responseModalities?.includes('AUDIO')) {
+          // 0.6 s, 24 kHz, 16-bit PCM sinus (Gemini TTS formati)
+          const samples = 24000 * 0.6;
+          const pcm = Buffer.alloc(samples * 2);
+          for (let i = 0; i < samples; i++) pcm.writeInt16LE(Math.round(Math.sin(i / 8) * 8000), i * 2);
+          res.end(
+            JSON.stringify({
+              candidates: [
+                {
+                  content: {
+                    parts: [
+                      {
+                        inlineData: {
+                          mimeType: 'audio/L16;codec=pcm;rate=24000',
+                          data: pcm.toString('base64'),
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            }),
+          );
+          return;
+        }
+        const audio = b.contents[0]?.parts.find((p) => p.inlineData)?.inlineData;
+        state.lastAudio = audio ? Buffer.from(audio.data, 'base64') : null;
+        res.end(JSON.stringify({ candidates: [{ content: { parts: [{ text: MOCK_TRANSCRIPT }] } }] }));
         return;
       }
       if (url.pathname.endsWith(':streamGenerateContent') && url.searchParams.get('alt') === 'sse') {

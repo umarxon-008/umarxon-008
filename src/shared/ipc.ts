@@ -16,6 +16,23 @@ export const SettingsSchema = z.object({
   onboardingCompleted: z.boolean(),
   /** Suhbat tarixini lokal bazada saqlash. O'chirilsa, suhbat faqat ilova ochiq turgan paytda xotirada turadi. */
   saveHistory: z.boolean(),
+
+  /* --- Ovoz (PHASE 3) --- */
+  /** Nutqni matnga aylantirish: o'chiq yoki Gemini (cloud) */
+  sttProvider: z.enum(['off', 'gemini']),
+  /** Foydalanuvchi ovozining Google'ga yuborilishiga aniq rozilik (UI'dagi haqiqiy belgi orqali) */
+  sttCloudConsent: z.boolean(),
+  /** Matnni ovozga aylantirish: o'chiq, Windows tizim ovozi (lokal) yoki Gemini TTS (cloud, eksperimental) */
+  ttsEngine: z.enum(['off', 'system', 'gemini']),
+  ttsSystemVoice: z.string().max(200).nullable(),
+  ttsGeminiModel: z
+    .string()
+    .max(200)
+    .regex(/^[\w.:\-/]+$/)
+    .nullable(),
+  ttsRate: z.number().min(0.5).max(2),
+  /** Ovozli savolga javobni avtomatik ovoz chiqarib o'qish */
+  speakVoiceReplies: z.boolean(),
 });
 export type Settings = z.infer<typeof SettingsSchema>;
 
@@ -25,6 +42,13 @@ export const DEFAULT_SETTINGS: Settings = {
   reducedMotion: false,
   onboardingCompleted: false,
   saveHistory: true,
+  sttProvider: 'gemini',
+  sttCloudConsent: false,
+  ttsEngine: 'system',
+  ttsSystemVoice: null,
+  ttsGeminiModel: null,
+  ttsRate: 1,
+  speakVoiceReplies: true,
 };
 
 /** Faqat ma'lum kalitlar, noma'lum kalit rad etiladi. */
@@ -173,6 +197,29 @@ export type ChatEvent =
 
 export const CHAT_EVENT_CHANNEL = 'chat:event';
 
+/* ===================== Ovoz ===================== */
+
+/** 30 soniyalik 16 kHz mono WAV ≈ 1 MB, base64'da ≈ 1.3 MB. Chegara zaxira bilan. */
+export const MAX_AUDIO_BASE64 = 4 * 1024 * 1024;
+export const MAX_TTS_TEXT = 4000;
+
+export const TranscribeInputSchema = z
+  .object({
+    audio: z
+      .string()
+      .min(100)
+      .max(MAX_AUDIO_BASE64)
+      .regex(/^[A-Za-z0-9+/=]+$/, 'base64 emas'),
+    mimeType: z.literal('audio/wav'),
+  })
+  .strict();
+
+export const SynthesizeResultSchema = z.object({
+  audio: z.string(),
+  mimeType: z.string(),
+});
+export type SynthesizeResult = z.infer<typeof SynthesizeResultSchema>;
+
 /* ===================== Kanallar ===================== */
 
 const NoInput = z.undefined();
@@ -211,6 +258,12 @@ export const IPC = {
   'chat:cancel': { input: z.object({ requestId: Id }).strict(), output: z.boolean() },
   'chat:deleteConversation': { input: IdInput, output: z.void() },
   'chat:clearAll': { input: NoInput, output: z.void() },
+
+  'voice:transcribe': { input: TranscribeInputSchema, output: z.object({ text: z.string() }) },
+  'voice:synthesize': {
+    input: z.object({ text: z.string().trim().min(1).max(MAX_TTS_TEXT) }).strict(),
+    output: SynthesizeResultSchema,
+  },
 } as const;
 
 export type IpcChannel = keyof typeof IPC;
@@ -248,6 +301,12 @@ export const ErrorCodes = {
   DATABASE_ERROR: "Ma'lumotlar bazasida xatolik yuz berdi.",
   NOT_FOUND: 'So‘ralgan ma’lumot topilmadi.',
   BUSY: 'MARIUS hali oldingi javobni yozmoqda. Uni to‘xtating yoki kuting.',
+  VOICE_DISABLED: 'Ovozni matnga aylantirish o‘chirilgan. Sozlamalar → Ovoz bo‘limida yoqing.',
+  VOICE_CONSENT_REQUIRED:
+    'Ovozingizni matnga aylantirish uchun u Google serverlariga yuboriladi. Avval Sozlamalar → Ovoz bo‘limida bunga rozilik bering.',
+  VOICE_NOT_CONFIGURED:
+    'Ovoz uchun Gemini kaliti va modeli kerak. Sozlamalar → Sun’iy intellekt → Gemini bo‘limida kalitni kiriting va modelni tanlang.',
+  TTS_NOT_CONFIGURED: 'Gemini ovoz modeli tanlanmagan. Sozlamalar → Ovoz bo‘limida tanlang.',
   SECRET_STORAGE_UNAVAILABLE:
     'Bu kompyuterda kalitni xavfsiz (shifrlangan) saqlab bo‘lmaydi, shuning uchun u saqlanmadi.',
   UNEXPECTED: "Kutilmagan xatolik yuz berdi. Iltimos, qayta urinib ko'ring.",

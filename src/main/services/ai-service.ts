@@ -1,6 +1,7 @@
 import type { AiSettings, AiSettingsPatch, ConnectionTest, ProviderId } from '@shared/ipc';
 import { AiErrorMessages } from '@shared/ipc';
 import { createGeminiProvider } from '../../modules/ai/gemini';
+import { createGeminiAudio, type GeminiAudio } from '../../modules/ai/gemini-audio';
 import { createOllamaProvider, isLocalUrl } from '../../modules/ai/ollama';
 import { ProviderError, type AIProvider, type FetchLike } from '../../modules/ai/types';
 import type { SecretStore } from '../database/secret-store';
@@ -16,6 +17,7 @@ export interface ResolvedProvider {
 export class AiService {
   readonly gemini: AIProvider;
   readonly ollama: AIProvider;
+  readonly geminiAudio: GeminiAudio;
 
   constructor(
     private readonly repo: ProviderSettingsRepository,
@@ -27,10 +29,23 @@ export class AiService {
       ...(options.fetch ? { fetch: options.fetch } : {}),
       ...(options.geminiBaseUrl ? { baseUrl: options.geminiBaseUrl } : {}),
     });
+    this.geminiAudio = createGeminiAudio({
+      apiKey: () => this.secrets.get(GEMINI_SECRET),
+      ...(options.fetch ? { fetch: options.fetch } : {}),
+      ...(options.geminiBaseUrl ? { baseUrl: options.geminiBaseUrl } : {}),
+    });
     this.ollama = createOllamaProvider({
       baseUrl: () => this.repo.get().ollamaBaseUrl,
       ...(options.fetch ? { fetch: options.fetch } : {}),
     });
+  }
+
+  hasGeminiKey(): boolean {
+    return this.secrets.has(GEMINI_SECRET);
+  }
+
+  geminiModel(): string | null {
+    return this.repo.get().geminiModel;
   }
 
   providerFor(id: ProviderId): AIProvider {

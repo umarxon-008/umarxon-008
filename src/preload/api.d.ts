@@ -12,6 +12,7 @@ import type {
   ProviderId,
   Settings,
   SettingsPatch,
+  SynthesizeResult,
   SystemMetrics,
 } from '../shared/ipc';
 
@@ -50,6 +51,11 @@ export interface MariusApi {
     clearAll(): Promise<IpcResult<void>>;
     /** Javob oqimi hodisalari. Obunani bekor qiluvchi funksiya qaytaradi. */
     onEvent(listener: (event: ChatEvent) => void): () => void;
+  };
+  voice: {
+    /** 16 kHz mono WAV (base64). Faqat rozilik berilgan bo'lsa Gemini'ga yuboriladi. */
+    transcribe(audioBase64: string): Promise<IpcResult<{ text: string }>>;
+    synthesize(text: string): Promise<IpcResult<SynthesizeResult>>;
   };
 }
 

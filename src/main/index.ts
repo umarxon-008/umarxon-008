@@ -12,6 +12,7 @@ import { ProviderSettingsRepository } from './database/provider-settings-reposit
 import { MemoryConversationStore, SqliteConversationStore } from './database/conversation-store';
 import { AiService } from './services/ai-service';
 import { ChatService } from './services/chat-service';
+import { VoiceService } from './services/voice-service';
 
 const APP_ID = 'uz.marius.app';
 
@@ -103,6 +104,13 @@ function registerIpc(settings: SettingsRepository, database: Database): void {
     emit: emitChatEvent,
     logger,
   });
+  const voice = new VoiceService({
+    settings: () => settings.getAll(),
+    audio: ai.geminiAudio,
+    geminiChatModel: () => ai.geminiModel(),
+    hasGeminiKey: () => ai.hasGeminiKey(),
+    logger,
+  });
 
   const handlers: IpcHandlers = {
     'app:getInfo': (): AppInfo => ({
@@ -136,6 +144,9 @@ function registerIpc(settings: SettingsRepository, database: Database): void {
     'chat:cancel': ({ requestId }) => chat.cancel(requestId),
     'chat:deleteConversation': ({ id }) => chat.deleteConversation(id),
     'chat:clearAll': () => chat.clearAll(),
+
+    'voice:transcribe': async ({ audio, mimeType }) => ({ text: await voice.transcribe(audio, mimeType) }),
+    'voice:synthesize': ({ text }) => voice.synthesize(text),
   };
 
   const isTrusted = createSenderGuard({ devServerUrl, rendererFile });
