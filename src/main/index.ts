@@ -1,5 +1,19 @@
 import { join } from 'node:path';
-import { app, BrowserWindow, dialog, ipcMain, nativeTheme, net, safeStorage, shell } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  dialog,
+  ipcMain,
+  Menu,
+  nativeImage,
+  nativeTheme,
+  net,
+  Notification,
+  powerMonitor,
+  safeStorage,
+  shell,
+  Tray,
+} from 'electron';
 import {
   CHAT_EVENT_CHANNEL,
   IPC_CHANNELS,
@@ -37,7 +51,11 @@ import { createFileTools } from './files/file-tools';
 import { searchFiles } from './files/file-search';
 import { existsSync } from 'node:fs';
 import { realpath } from 'node:fs/promises';
-import type { FolderKey } from '@shared/ipc';
+import { REMINDER_EVENT_CHANNEL, type FolderKey, type Reminder, type ReminderEvent } from '@shared/ipc';
+import { MemoryRepository, looksSensitive } from './memory/memory-repository';
+import { ReminderRepository } from './memory/reminder-repository';
+import { ReminderScheduler } from './memory/scheduler';
+import { createMemoryTools } from './memory/memory-tools';
 import { createWebTools } from './web/web-tools';
 import { createYoutubeClient } from '../modules/ai/youtube';
 
@@ -70,6 +88,10 @@ const rendererFile = join(__dirname, '../renderer/index.html');
 const preloadFile = join(__dirname, '../preload/index.js');
 
 let mainWindow: BrowserWindow | null = null;
+let tray: Tray | null = null;
+let isQuitting = false;
+let scheduler: ReminderScheduler | null = null;
+let getSettings: (() => { minimizeToTray: boolean }) | null = null;
 let db: Database | null = null;
 let logger: Logger;
 
@@ -100,6 +122,14 @@ function createMainWindow(settings: SettingsRepository): BrowserWindow {
   hardenWindow(win, isTrusted, logger);
 
   win.once('ready-to-show', () => win.show());
+  // Tray yoqilgan bo'lsa, yopish tugmasi oynani yashiradi (eslatmalar ishlashda davom etadi)
+  win.on('close', (e) => {
+    if (!isQuitting && getSettings?.().minimizeToTray && tray) {
+      e.preventDefault();
+      win.hide();
+    }
+  });
+  win.webContents.once('did-finish-load', () => scheduler?.start());
 
   if (devServerUrl) void win.loadURL(devServerUrl);
   else void win.loadFile(rendererFile);
@@ -125,6 +155,62 @@ function emitConfirmation(request: ConfirmationRequest): void {
 function createOsAdapter(): OsAdapter {
   if (useFakeOs) return createFakeAdapter();
   return process.platform === 'win32' ? createWindowsAdapter() : createUnsupportedAdapter();
+}
+
+function emitReminderEvent(event: ReminderEvent): void {
+  const wc = mainWindow?.webContents;
+  if (wc && !wc.isDestroyed()) wc.send(REMINDER_EVENT_CHANNEL, event);
+}
+
+function showMainWindow(): void {
+  if (!mainWindow) return;
+  if (mainWindow.isMinimized()) mainWindow.restore();
+  mainWindow.show();
+  mainWindow.focus();
+}
+
+function iconPath(): string {
+  return app.isPackaged ? join(process.resourcesPath, 'icon.png') : join(__dirname, '../../build/icon.png');
+}
+
+/** Tray (ixtiyoriy, Sozlamalarda yoqiladi): oyna yopilganda MARIUS fonda qoladi va eslatmalar ishlaydi */
+function updateTray(enabled: boolean): void {
+  if (enabled && !tray) {
+    tray = new Tray(nativeImage.createFromPath(iconPath()).resize({ width: 16, height: 16 }));
+    tray.setToolTip('MARIUS');
+    tray.setContextMenu(
+      Menu.buildFromTemplate([
+        { label: 'MARIUS’ni ochish', click: () => showMainWindow() },
+        { type: 'separator' },
+        {
+          label: 'Chiqish',
+          click: () => {
+            isQuitting = true;
+            app.quit();
+          },
+        },
+      ]),
+    );
+    tray.on('click', () => showMainWindow());
+  } else if (!enabled && tray) {
+    tray.destroy();
+    tray = null;
+  }
+}
+
+/** Eslatma vaqti keldi: Windows bildirishnomasi + ilova ichidagi xabar (bildirishnomalar o'chiq bo'lsa ham ko'rinadi) */
+function notifyReminder(reminder: Reminder, missed: boolean): void {
+  logger.info('reminder.fired', { missed });
+  if (Notification.isSupported()) {
+    const n = new Notification({
+      title: missed ? 'MARIUS: o‘tkazib yuborilgan eslatma' : 'MARIUS eslatmasi',
+      body: reminder.title,
+      icon: iconPath(),
+    });
+    n.on('click', () => showMainWindow());
+    n.show();
+  }
+  emitReminderEvent({ type: 'fired', reminder, missed });
 }
 
 function emitChatEvent(event: ChatEvent): void {
@@ -194,6 +280,31 @@ function registerIpc(settings: SettingsRepository, database: Database): void {
     registry.register(tool);
   }
 
+  // ---- Xotira va eslatmalar (PHASE 7) ----
+  const memory = new MemoryRepository(database);
+  const reminders = new ReminderRepository(database);
+  scheduler = new ReminderScheduler(reminders, notifyReminder);
+  const remindersChanged = () => {
+    scheduler?.reschedule();
+    emitReminderEvent({ type: 'changed' });
+  };
+  for (const tool of createMemoryTools({
+    memory,
+    reminders,
+    memoryEnabled: () => settings.getAll().memoryEnabled,
+    onRemindersChanged: remindersChanged,
+  })) {
+    registry.register(tool);
+  }
+  powerMonitor.on('resume', () => scheduler?.reschedule());
+  getSettings = () => settings.getAll();
+  updateTray(settings.getAll().minimizeToTray);
+  const parseDue = (iso: string) => {
+    const d = new Date(iso);
+    if (d.getTime() <= Date.now()) throw new AppError('REMINDER_IN_PAST');
+    return d;
+  };
+
   const broker = new ConfirmationBroker(emitConfirmation);
   const executor = new ToolExecutor(registry, broker, audit, logger);
   const toolRunner: ToolRunner = {
@@ -219,6 +330,7 @@ function registerIpc(settings: SettingsRepository, database: Database): void {
     emit: emitChatEvent,
     logger,
     tools: toolRunner,
+    memoryForPrompt: () => (settings.getAll().memoryEnabled ? memory.forPrompt() : []),
   });
   const voice = new VoiceService({
     settings: () => settings.getAll(),
@@ -241,6 +353,7 @@ function registerIpc(settings: SettingsRepository, database: Database): void {
     'settings:update': (patch) => {
       const updated = settings.update(patch);
       nativeTheme.themeSource = updated.theme;
+      if (patch.minimizeToTray !== undefined) updateTray(updated.minimizeToTray);
       return updated;
     },
     'logs:openFolder': async () => {
@@ -352,6 +465,49 @@ function registerIpc(settings: SettingsRepository, database: Database): void {
     },
     'youtube:deleteKey': () => secrets.delete(YOUTUBE_SECRET),
 
+    'memory:list': () => memory.list(),
+    'memory:create': ({ content }) => {
+      if (looksSensitive(content)) throw new AppError('SENSITIVE_MEMORY');
+      memory.create(content, 'user');
+      return memory.list();
+    },
+    'memory:update': ({ id, content }) => {
+      if (looksSensitive(content)) throw new AppError('SENSITIVE_MEMORY');
+      memory.update(id, content);
+      return memory.list();
+    },
+    'memory:delete': ({ id }) => {
+      memory.delete(id);
+      return memory.list();
+    },
+    'memory:clear': () => memory.clear(),
+
+    'reminders:list': () => reminders.list(),
+    'reminders:create': ({ title, description, dueAt }) => {
+      reminders.create(title, parseDue(dueAt), description);
+      remindersChanged();
+      return reminders.list();
+    },
+    'reminders:update': ({ id, title, description, dueAt }) => {
+      reminders.update(id, {
+        ...(title !== undefined ? { title } : {}),
+        ...(description !== undefined ? { description } : {}),
+        ...(dueAt !== undefined ? { due: parseDue(dueAt) } : {}),
+      });
+      remindersChanged();
+      return reminders.list();
+    },
+    'reminders:setStatus': ({ id, status }) => {
+      reminders.setStatus(id, status);
+      remindersChanged();
+      return reminders.list();
+    },
+    'reminders:delete': ({ id }) => {
+      reminders.delete(id);
+      remindersChanged();
+      return reminders.list();
+    },
+
     'voice:transcribe': async ({ audio, mimeType }) => ({ text: await voice.transcribe(audio, mimeType) }),
     'voice:synthesize': ({ text }) => voice.synthesize(text),
   };
@@ -396,8 +552,13 @@ if (!app.requestSingleInstanceLock()) {
     });
   });
 
+  app.on('before-quit', () => {
+    isQuitting = true;
+    scheduler?.stop();
+  });
+
   app.on('window-all-closed', () => {
-    app.quit();
+    if (!tray) app.quit();
   });
 
   app.on('will-quit', () => {

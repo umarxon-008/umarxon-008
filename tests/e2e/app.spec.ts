@@ -61,6 +61,8 @@ test('renderer’da Node yoki Electron API yo‘q, faqat window.marius bor', asy
         'computer',
         'files',
         'logs',
+        'memory',
+        'reminders',
         'settings',
         'system',
         'tools',
@@ -124,7 +126,6 @@ test('tanishuv → bosh sahifa → sozlamalar; mavzu qayta ishga tushganda saqla
     for (const name of ['Xotira', 'Vazifalar']) {
       await nav.getByRole('link', { name }).click();
       await expect(page.getByRole('heading', { name, level: 1, exact: true })).toBeVisible();
-      await expect(page.getByText(/bosqichda qo'shiladi/)).toBeVisible();
     }
 
     await nav.getByRole('link', { name: 'Sozlamalar' }).click();

@@ -2154,3 +2154,110 @@ select.input {
 .item-list .row-actions {
   flex-shrink: 0;
 }
+
+/* ===== Xotira va eslatmalar (PHASE 7) ===== */
+.reminder-form {
+  display: grid;
+  grid-template-columns: 2fr 2fr auto auto;
+  gap: var(--space-2);
+}
+
+@media (max-width: 1000px) {
+  .reminder-form {
+    grid-template-columns: 1fr;
+  }
+}
+
+.reminder-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.reminder {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.reminder--editing .input {
+  flex: 1 1 200px;
+}
+
+.reminder__icon {
+  color: var(--accent-strong);
+  display: inline-flex;
+}
+
+.reminder--done {
+  opacity: 0.7;
+}
+
+.reminder--done .reminder__icon {
+  color: var(--success);
+}
+
+.reminder.is-overdue {
+  border-color: var(--warning);
+}
+
+.reminder__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.reminder__body small {
+  color: var(--text-muted);
+}
+
+.item-list__name--wrap {
+  white-space: normal;
+}
+
+.status--success {
+  color: var(--success);
+}
+
+.toasts {
+  position: fixed;
+  right: var(--space-5);
+  bottom: var(--space-5);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: min(420px, calc(100vw - 2 * var(--space-5)));
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--accent);
+  background: var(--surface-solid);
+  box-shadow:
+    var(--shadow-md),
+    0 0 24px var(--accent-glow);
+}
+
+.toast > svg {
+  color: var(--accent-strong);
+  flex-shrink: 0;
+}
+
+.toast > div {
+  flex: 1;
+  min-width: 0;
+}

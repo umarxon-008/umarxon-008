@@ -1,5 +1,8 @@
 import type {
   ActionResult,
+  MemoryItem,
+  Reminder,
+  ReminderEvent,
   AllowedFolderInfo,
   FileHitInfo,
   FolderKey,
@@ -99,6 +102,26 @@ export interface MariusApi {
     /** Kalit main process'da shifrlanadi va sinov qidiruvi bilan tekshiriladi */
     setKey(key: string): Promise<IpcResult<ConnectionTest>>;
     deleteKey(): Promise<IpcResult<void>>;
+  };
+  memory: {
+    list(): Promise<IpcResult<MemoryItem[]>>;
+    create(content: string): Promise<IpcResult<MemoryItem[]>>;
+    update(id: string, content: string): Promise<IpcResult<MemoryItem[]>>;
+    delete(id: string): Promise<IpcResult<MemoryItem[]>>;
+    clear(): Promise<IpcResult<void>>;
+  };
+  reminders: {
+    list(): Promise<IpcResult<Reminder[]>>;
+    create(r: { title: string; description?: string; dueAt: string }): Promise<IpcResult<Reminder[]>>;
+    update(r: {
+      id: string;
+      title?: string;
+      description?: string | null;
+      dueAt?: string;
+    }): Promise<IpcResult<Reminder[]>>;
+    setStatus(id: string, status: Reminder['status']): Promise<IpcResult<Reminder[]>>;
+    delete(id: string): Promise<IpcResult<Reminder[]>>;
+    onEvent(listener: (event: ReminderEvent) => void): () => void;
   };
   voice: {
     /** 16 kHz mono WAV (base64). Faqat rozilik berilgan bo'lsa Gemini'ga yuboriladi. */

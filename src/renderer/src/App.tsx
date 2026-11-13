@@ -7,11 +7,13 @@ import { ErrorState, LoadingState } from './components/StateViews';
 import { Onboarding } from './features/onboarding/Onboarding';
 import { DashboardPage } from './pages/DashboardPage';
 import { SettingsPage } from './pages/SettingsPage';
-import { PlaceholderPage } from './pages/PlaceholderPage';
 import { ChatPage } from './features/chat/ChatPage';
 import { ConfirmationDialog } from './features/tools/ConfirmationDialog';
 import { ComputerPage } from './features/tools/ComputerPage';
 import { HistoryPage } from './features/tools/HistoryPage';
+import { TasksPage } from './features/memory/TasksPage';
+import { MemoryPage } from './features/memory/MemoryPage';
+import { ReminderToast } from './features/memory/ReminderToast';
 import { uz } from './i18n/uz';
 
 export function App() {
@@ -43,26 +45,8 @@ export function App() {
           <Routes>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/chat" element={<ChatPage />} />
-            <Route
-              path="/memory"
-              element={
-                <PlaceholderPage
-                  title={uz.nav.memory}
-                  phase={7}
-                  description="MARIUS nimani eslab qolganini ko‘rish, tahrirlash, o‘chirish va eksport qilish. Obsidian Vault bilan ixtiyoriy integratsiya."
-                />
-              }
-            />
-            <Route
-              path="/tasks"
-              element={
-                <PlaceholderPage
-                  title={uz.nav.tasks}
-                  phase={7}
-                  description="Eslatmalar va vazifalar: vaqt kelganda Windows bildirishnomasi chiqadi."
-                />
-              }
-            />
+            <Route path="/memory" element={<MemoryPage />} />
+            <Route path="/tasks" element={<TasksPage />} />
             <Route path="/history" element={<HistoryPage />} />
             <Route path="/computer" element={<ComputerPage />} />
             <Route path="/settings" element={<SettingsPage />} />
@@ -71,6 +55,7 @@ export function App() {
         </main>
       </div>
       <ConfirmationDialog />
+      <ReminderToast />
     </div>
   );
 }

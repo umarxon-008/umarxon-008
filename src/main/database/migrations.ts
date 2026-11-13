@@ -106,4 +106,33 @@ export const MIGRATIONS: Migration[] = [
       );
     `,
   },
+  {
+    version: 5,
+    name: 'memory_and_reminders',
+    sql: `
+      -- Foydalanuvchi tasdiqlagan xotira (prompt §14 B)
+      CREATE TABLE memory_items (
+        id         TEXT PRIMARY KEY,
+        content    TEXT NOT NULL,
+        source     TEXT NOT NULL CHECK (source IN ('user', 'ai_approved')),
+        created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+        updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+      );
+      CREATE INDEX idx_memory_updated ON memory_items(updated_at DESC);
+
+      -- Eslatmalar (prompt §15). due_at UTC ISO, timezone foydalanuvchiniki
+      CREATE TABLE reminders (
+        id          TEXT PRIMARY KEY,
+        title       TEXT NOT NULL,
+        description TEXT,
+        due_at      TEXT NOT NULL,
+        timezone    TEXT NOT NULL,
+        status      TEXT NOT NULL CHECK (status IN ('pending', 'done', 'cancelled')),
+        notified_at TEXT,
+        created_at  TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+        updated_at  TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+      );
+      CREATE INDEX idx_reminders_due ON reminders(status, due_at);
+    `,
+  },
 ];

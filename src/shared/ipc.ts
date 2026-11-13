@@ -36,6 +36,12 @@ export const SettingsSchema = z.object({
 
   /* --- Internet (PHASE 6) --- */
   searchEngine: z.enum(['google', 'bing', 'duckduckgo', 'yandex']),
+
+  /* --- Xotira va eslatmalar (PHASE 7) --- */
+  /** O'chirilsa, xotira modelga yuborilmaydi va yangi yozuv qo'shilmaydi */
+  memoryEnabled: z.boolean(),
+  /** Oyna yopilganda MARIUS tray'da qoladi (eslatmalar ishlashi uchun) */
+  minimizeToTray: z.boolean(),
 });
 export type Settings = z.infer<typeof SettingsSchema>;
 
@@ -53,6 +59,8 @@ export const DEFAULT_SETTINGS: Settings = {
   ttsRate: 1,
   speakVoiceReplies: true,
   searchEngine: 'google',
+  memoryEnabled: true,
+  minimizeToTray: false,
 };
 
 /** Faqat ma'lum kalitlar, noma'lum kalit rad etiladi. */
@@ -253,6 +261,35 @@ export const FileHitSchema = z.object({
   isDirectory: z.boolean(),
 });
 export type FileHitInfo = z.infer<typeof FileHitSchema>;
+
+/* ===================== Xotira va eslatmalar (PHASE 7) ===================== */
+
+export const MemoryItemSchema = z.object({
+  id: z.string().uuid(),
+  content: z.string(),
+  source: z.enum(['user', 'ai_approved']),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+export type MemoryItem = z.infer<typeof MemoryItemSchema>;
+export const MAX_MEMORY_LENGTH = 500;
+
+export const ReminderSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string(),
+  description: z.string().nullable(),
+  dueAt: z.string(),
+  timezone: z.string(),
+  status: z.enum(['pending', 'done', 'cancelled']),
+  notifiedAt: z.string().nullable(),
+  createdAt: z.string(),
+});
+export type Reminder = z.infer<typeof ReminderSchema>;
+
+export type ReminderEvent = { type: 'changed' } | { type: 'fired'; reminder: Reminder; missed: boolean };
+export const REMINDER_EVENT_CHANNEL = 'reminders:event';
+
+const IsoDate = z.string().refine((v) => !Number.isNaN(Date.parse(v)), 'Sana noto‘g‘ri');
 
 /* ===================== Suhbat ===================== */
 
@@ -487,6 +524,51 @@ export const IPC = {
   },
   'youtube:deleteKey': { input: NoInput, output: z.void() },
 
+  'memory:list': { input: NoInput, output: z.array(MemoryItemSchema) },
+  'memory:create': {
+    input: z.object({ content: z.string().trim().min(1).max(MAX_MEMORY_LENGTH) }).strict(),
+    output: z.array(MemoryItemSchema),
+  },
+  'memory:update': {
+    input: z
+      .object({ id: z.string().uuid(), content: z.string().trim().min(1).max(MAX_MEMORY_LENGTH) })
+      .strict(),
+    output: z.array(MemoryItemSchema),
+  },
+  'memory:delete': { input: z.object({ id: z.string().uuid() }).strict(), output: z.array(MemoryItemSchema) },
+  'memory:clear': { input: NoInput, output: z.void() },
+
+  'reminders:list': { input: NoInput, output: z.array(ReminderSchema) },
+  'reminders:create': {
+    input: z
+      .object({
+        title: z.string().trim().min(1).max(200),
+        description: z.string().max(1000).optional(),
+        dueAt: IsoDate,
+      })
+      .strict(),
+    output: z.array(ReminderSchema),
+  },
+  'reminders:update': {
+    input: z
+      .object({
+        id: z.string().uuid(),
+        title: z.string().trim().min(1).max(200).optional(),
+        description: z.string().max(1000).nullable().optional(),
+        dueAt: IsoDate.optional(),
+      })
+      .strict(),
+    output: z.array(ReminderSchema),
+  },
+  'reminders:setStatus': {
+    input: z.object({ id: z.string().uuid(), status: z.enum(['pending', 'done', 'cancelled']) }).strict(),
+    output: z.array(ReminderSchema),
+  },
+  'reminders:delete': {
+    input: z.object({ id: z.string().uuid() }).strict(),
+    output: z.array(ReminderSchema),
+  },
+
   'voice:transcribe': { input: TranscribeInputSchema, output: z.object({ text: z.string() }) },
   'voice:synthesize': {
     input: z.object({ text: z.string().trim().min(1).max(MAX_TTS_TEXT) }).strict(),
@@ -538,6 +620,9 @@ export const ErrorCodes = {
     'Ovoz uchun Gemini kaliti va modeli kerak. Sozlamalar → Sun’iy intellekt → Gemini bo‘limida kalitni kiriting va modelni tanlang.',
   TTS_NOT_CONFIGURED: 'Gemini ovoz modeli tanlanmagan. Sozlamalar → Ovoz bo‘limida tanlang.',
   FOLDER_TOO_BROAD: 'Butun disk yoki butun profil emas, aniq papkani tanlang (masalan, Hujjatlar).',
+  REMINDER_IN_PAST: 'Eslatma vaqti o‘tib ketgan. Kelajakdagi vaqtni tanlang.',
+  MEMORY_DISABLED: 'Xotira o‘chirilgan. Xotira bo‘limida yoqing.',
+  SENSITIVE_MEMORY: 'Parol, karta raqami yoki shunga o‘xshash maxfiy ma’lumot xotiraga saqlanmaydi.',
   NO_ALLOWED_FOLDERS: 'Hali birorta papkaga ruxsat berilmagan. Kompyuter → Fayllar bo‘limida papka qo‘shing.',
   OS_UNSUPPORTED: 'Bu amal hozircha faqat Windows’da ishlaydi.',
   OS_COMMAND_FAILED: 'Windows buyrug‘i bajarilmadi. Batafsil ma’lumot log faylida.',

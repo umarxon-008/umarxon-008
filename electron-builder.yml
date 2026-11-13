@@ -13,6 +13,11 @@ files:
 
 # node:sqlite Electron ichida tayyor, native modul yo'q, shuning uchun rebuild kerak emas.
 npmRebuild: false
+
+# Tray va bildirishnoma ikonasi
+extraResources:
+  - from: build/icon.png
+    to: icon.png
 asar: true
 
 win:

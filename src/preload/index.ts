@@ -1,10 +1,11 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron';
-import type { ChatEvent, ConfirmationRequest } from '../shared/ipc';
+import type { ChatEvent, ConfirmationRequest, ReminderEvent } from '../shared/ipc';
 import type { MariusApi } from './api';
 
 // Sandbox'dagi preload faqat 'electron' modulini import qila oladi, shuning uchun kanal nomi shu yerda.
 const CHAT_EVENT_CHANNEL = 'chat:event';
 const TOOL_CONFIRM_CHANNEL = 'tool:confirm';
+const REMINDER_EVENT_CHANNEL = 'reminders:event';
 
 /**
  * Preload: sandbox ichida ishlaydi. Faqat aniq nomlangan funksiyalarni ochadi.
@@ -79,6 +80,25 @@ const api: MariusApi = {
     status: () => ipcRenderer.invoke('youtube:status'),
     setKey: (key) => ipcRenderer.invoke('youtube:setKey', { key }),
     deleteKey: () => ipcRenderer.invoke('youtube:deleteKey'),
+  },
+  memory: {
+    list: () => ipcRenderer.invoke('memory:list'),
+    create: (content) => ipcRenderer.invoke('memory:create', { content }),
+    update: (id, content) => ipcRenderer.invoke('memory:update', { id, content }),
+    delete: (id) => ipcRenderer.invoke('memory:delete', { id }),
+    clear: () => ipcRenderer.invoke('memory:clear'),
+  },
+  reminders: {
+    list: () => ipcRenderer.invoke('reminders:list'),
+    create: (r) => ipcRenderer.invoke('reminders:create', r),
+    update: (r) => ipcRenderer.invoke('reminders:update', r),
+    setStatus: (id, status) => ipcRenderer.invoke('reminders:setStatus', { id, status }),
+    delete: (id) => ipcRenderer.invoke('reminders:delete', { id }),
+    onEvent: (listener) => {
+      const handler = (_e: IpcRendererEvent, event: ReminderEvent) => listener(event);
+      ipcRenderer.on(REMINDER_EVENT_CHANNEL, handler);
+      return () => ipcRenderer.removeListener(REMINDER_EVENT_CHANNEL, handler);
+    },
   },
   voice: {
     transcribe: (audio) => ipcRenderer.invoke('voice:transcribe', { audio, mimeType: 'audio/wav' }),

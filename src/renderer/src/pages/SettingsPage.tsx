@@ -92,6 +92,20 @@ export function SettingsPage() {
             <small>O‘zbek tili (lotin). Boshqa tillar keyinroq qo‘shiladi.</small>
           </div>
         </div>
+        <label className="toggle">
+          <input
+            type="checkbox"
+            checked={settings.minimizeToTray}
+            onChange={(e) => void update({ minimizeToTray: e.target.checked })}
+          />
+          <span className="toggle__track" aria-hidden="true" />
+          <span>
+            <strong>Yopilganda tray’da qolish</strong>
+            <small>
+              Oynani yopsangiz MARIUS fonda qoladi va eslatmalar vaqtida chiqadi. Chiqish: tray menyusidan.
+            </small>
+          </span>
+        </label>
         <div className="row">
           <div>
             <strong>Tanishuv oynasi</strong>

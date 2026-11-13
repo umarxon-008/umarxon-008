@@ -79,6 +79,8 @@ export interface ChatServiceDeps {
   now?: () => Date;
   /** Kompyuter amallari (PHASE 4). Berilmasa, MARIUS faqat suhbatlashadi. */
   tools?: ToolRunner;
+  /** Foydalanuvchi tasdiqlagan xotira (PHASE 7): modelga minimal miqdorda */
+  memoryForPrompt?: () => string[];
 }
 
 /** Suhbat servisi: xabar yuborish, oqim, to'xtatish, qayta urinish (ARCHITECTURE §5). */
@@ -228,7 +230,10 @@ export class ChatService {
           const stream = provider.streamChat(
             {
               model,
-              system: buildSystemPrompt(this.deps.now?.() ?? new Date(), { toolsEnabled }),
+              system: buildSystemPrompt(this.deps.now?.() ?? new Date(), {
+                toolsEnabled,
+                memory: this.deps.memoryForPrompt?.() ?? [],
+              }),
               messages: context,
               ...(toolsEnabled ? { tools: decls } : {}),
             },

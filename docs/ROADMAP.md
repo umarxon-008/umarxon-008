@@ -61,7 +61,7 @@ PROJECT_AUDIT, ARCHITECTURE, ROADMAP, RISK_REGISTER.
 
 **Qabul mezonlari:** soxta natija yo'q; har bir natijada manba va havola bor.
 
-## PHASE 7 — Xotira va eslatmalar (~2–3 sessiya)
+## PHASE 7 — Xotira va eslatmalar ✅ (`PHASE_7_REPORT.md`)
 - `memory_items`: ko'rish, qidirish, tahrirlash, o'chirish, eksport, yoqish/o'chirish; faqat foydalanuvchi tasdiqlagan yozuvlar saqlanadi.
 - Eslatmalar CRUD, o'zbekcha vaqt ifodalari ("ertaga", "kechqurun", "soat yettida") va noaniq vaqtni tasdiqlatish, timezone, scheduler, toast, tray.
 
