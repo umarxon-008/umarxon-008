@@ -1,0 +1,35 @@
+# MEDAI — Netlify sozlamalari (bu papka "base directory" sifatida ishlatilganda)
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[functions]
+  node_bundler = "esbuild"
+  # pdf-parse ichki fayllarni dinamik yuklaydi, shuning uchun to'plamga qo'shilmasdan butunligicha olinadi
+  external_node_modules = ["pdf-parse"]
+
+# API so'rovlari serverless funksiyaga yo'naltiriladi
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+  force = true
+
+# Xavfsizlik sarlavhalari (Node serveridagi helmet sozlamalari bilan bir xil)
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "no-referrer"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+[[headers]]
+  for = "/vendor/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"

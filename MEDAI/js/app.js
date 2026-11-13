@@ -8,6 +8,7 @@ import { t, applyTranslations, setLanguage } from './i18n.js';
 import { toast, openModal, initModal, initDrawer, initMenu } from './ui.js';
 import { initChat, render as renderChat, newConversation, prefill, isChatBusy } from './chat.js';
 import { initAnalysis, acceptExternalFile } from './upload.js';
+import { setMaxFileMb } from './dropzone.js';
 import { initMedicine } from './medicine.js';
 import { initLibrary, showLibrary, loadLibrary } from './library.js';
 import { initHistory, renderHistory, renderRecent } from './history.js';
@@ -65,6 +66,7 @@ async function refreshStatus(showToast = false) {
   } catch {
     serverStatus = null;
   }
+  if (serverStatus?.limits?.maxFileMb) setMaxFileMb(serverStatus.limits.maxFileMb);
   const state = !serverStatus ? 'offline' : serverStatus.mode;
   pill.dataset.state = state;
   $('#statusText').textContent = { ai: 'AI ulangan', demo: 'Demo rejim', offline: 'Server ulanmagan' }[state];

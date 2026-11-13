@@ -1,10 +1,7 @@
 /** data/medical-terms.json dan atamalarni o'qiydi va qidiruv imkonini beradi. */
-import fs from 'node:fs';
-import path from 'node:path';
-import { ROOT_DIR } from '../config.js';
+// JSON to'g'ridan-to'g'ri import qilinadi — Netlify Functions to'plamiga (bundle) ham kiradi.
+import raw from '../../data/medical-terms.json' with { type: 'json' };
 import { normalize } from './text.js';
-
-const raw = JSON.parse(fs.readFileSync(path.join(ROOT_DIR, 'data', 'medical-terms.json'), 'utf8'));
 
 export const libraryMeta = raw.meta;
 export const terms = raw.terms.map((t) => ({

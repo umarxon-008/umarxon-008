@@ -2,11 +2,9 @@
  * Yuklangan fayllarni tekshirish (tur, hajm, "magic bytes") va PDF dan matn ajratish.
  * Fayllar diskka yozilmaydi — faqat xotirada qayta ishlanadi va so'rov tugagach o'chadi.
  */
-import { createRequire } from 'node:module';
-
-const require = createRequire(import.meta.url);
 // pdf-parse ning index.js fayli test rejimida namunaviy fayl o'qiydi, shuning uchun lib yo'li ishlatiladi.
-const pdfParse = require('pdf-parse/lib/pdf-parse.js');
+// (import.meta ishlatilmaydi — Netlify bundleri CJS formatida yig'adi.)
+import pdfParse from 'pdf-parse/lib/pdf-parse.js';
 
 const SIGNATURES = {
   'application/pdf': (b) => b.subarray(0, 5).toString('latin1') === '%PDF-',

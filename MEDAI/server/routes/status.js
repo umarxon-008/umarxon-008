@@ -10,7 +10,7 @@ router.get('/status', (_req, res) => {
     mode: ai ? 'ai' : 'demo',
     model: ai ? config.model : null,
     rag: ragStatus,
-    limits: { maxFileMb: config.maxFileBytes / 1024 / 1024, maxMessageChars: config.maxMessageChars },
+    limits: { maxFileMb: config.maxFileMb, maxMessageChars: config.maxMessageChars },
     version: '0.1.0',
   });
 });

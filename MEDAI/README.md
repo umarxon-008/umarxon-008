@@ -56,6 +56,35 @@ Demo javoblar interfeysda doim **«DEMO · qoidaga asoslangan javob (AI emas)»*
 
 > AI rejimidagi kod rasmiy SDK hujjatlari asosida yozilgan. U **haqiqiy kalit bilan sinalmagan**, chunki ishlab chiqish muhitida kalit boʻlmagan. Faqat «AI xizmati ishlamadi» holati sinalgan.
 
+## Netlify'ga joylash
+
+Loyiha Netlify uchun tayyor: frontend statik fayl sifatida (`dist/`), API esa **Netlify Functions** orqali ishlaydi (`netlify/functions/api.mjs`). Sozlamalar `netlify.toml` faylida turadi. Repozitoriy ildizidagi `netlify.toml` loyiha `MEDAI/` papkasida ekanini Netlify'ga bildiradi.
+
+### 1-usul: GitHub orqali (tavsiya etiladi)
+1. Kodni GitHub'ga yuklang.
+2. Netlify'da **Add new site → Import an existing project → GitHub** ni tanlang va repozitoriyni belgilang.
+3. Sozlamalar `netlify.toml` dan avtomatik olinadi: base `MEDAI`, build `npm run build`, publish `dist`. **Deploy** tugmasini bosing.
+
+### 2-usul: Netlify CLI (GitHub'siz)
+```bash
+cd MEDAI
+npm install
+npx netlify-cli login
+npx netlify-cli deploy --build --prod
+```
+
+> ⚠️ **Netlify Drop (papkani sudrab tashlash) ishlatmang.** U faqat statik fayllarni joylaydi: Functions ishlamaydi, natijada chat, tahlil va dori boʻlimlari «Server ulanmagan» deydi.
+
+### Netlify'da AI ni yoqish
+**Site configuration → Environment variables** boʻlimiga `ANTHROPIC_API_KEY` (va xohlasangiz `MEDAI_MODEL`) qoʻshing, keyin qayta deploy qiling. Kalit faqat funksiyada turadi va brauzerga chiqmaydi.
+
+### Netlify cheklovlari
+- **Fayl hajmi 4 MB gacha.** Netlify funksiyaga keladigan soʻrovni ~6 MB bilan cheklaydi. Interfeys chegarani serverdan oladi va avtomatik 4 MB koʻrsatadi (`MEDAI_MAX_FILE_MB` bilan oʻzgartirish mumkin).
+- **Funksiya vaqti cheklangan** (standart taxminan 10 soniya). Demo rejimda bu muammo emas. AI rejimida esa uzun tahlil vaqtdan oshib ketishi mumkin. Bunday holatda Netlify'da funksiya vaqtini oshiring yoki serverni Render/Railway kabi doimiy Node.js hostingga joylang (`npm start`).
+- Rate limit har bir funksiya nusxasida alohida hisoblanadi, shuning uchun u oddiy serverdagiga nisbatan yumshoqroq.
+
+**Sinov holati:** funksiya Netlify'ning oʻz bundleri (`@netlify/zip-it-and-ship-it`, esbuild) bilan yigʻildi. Yigʻilgan kod Netlify soʻrov formatida sinaldi: status, chat, PDF tahlili, yoʻriqnoma, 4 MB chegarasi va 404. `dist/` + funksiya juftligi brauzerda ham tekshirildi. Haqiqiy Netlify hisobiga deploy qilinmagan.
+
 ---
 
 ## Loyiha tuzilmasi
@@ -80,7 +109,11 @@ MEDAI/
   data/medical-terms.json  — kutubxona maʼlumotlari
   assets/icons/            — logotip
   assets/samples/          — SINTETIK namuna tahlil (PDF)
-  server/server.js         — Express: statik fayllar + API, xavfsizlik sarlavhalari
+  server/server.js         — oddiy Node.js server: statik fayllar + API (npm start)
+  server/api.js            — API ilovasi (Node server va Netlify Functions uchun umumiy)
+  netlify/functions/api.mjs — Netlify Function (serverless-http orqali server/api.js)
+  netlify.toml             — Netlify sozlamalari (build, redirect, xavfsizlik sarlavhalari)
+  scripts/build.mjs        — statik frontendni dist/ ga yigʻish (npm run build)
   server/config.js         — .env sozlamalari
   server/routes/           — chat, analyze, medicine, status
   server/services/         — ai.js (Claude), demo.js, safety.js, labParser.js,
@@ -97,7 +130,7 @@ MEDAI/
 |---|---|---|
 | `GET /api/status` | — | Rejim (`demo`/`ai`), model, RAG holati |
 | `POST /api/chat` | `{ messages: [{role, content}] }` | Oxirgi 20 ta xabar. Har bir xabar koʻpi bilan 4000 belgi |
-| `POST /api/analyze-report` | `multipart: file` | PDF/JPG/PNG, koʻpi bilan 10 MB |
+| `POST /api/analyze-report` | `multipart: file` | PDF/JPG/PNG, koʻpi bilan 10 MB (Netlify'da 4 MB) |
 | `POST /api/explain-medicine` | `{ name }` yoki `{ text }` yoki `multipart: file` | PDF/TXT/JPG/PNG |
 
 ---

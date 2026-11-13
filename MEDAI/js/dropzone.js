@@ -4,7 +4,12 @@
  */
 import { formatBytes } from './utils.js';
 
-export const MAX_FILE_BYTES = 10 * 1024 * 1024;
+// Chegara serverdan (/api/status -> limits.maxFileMb) olinadi: oddiy serverda 10 MB, Netlify'da 4 MB.
+let maxFileMb = 10;
+export function setMaxFileMb(mb) {
+  if (Number.isFinite(mb) && mb > 0) maxFileMb = mb;
+  document.querySelectorAll('[data-max-file]').forEach((n) => { n.textContent = String(maxFileMb); });
+}
 
 const TYPES = {
   pdf: { mime: ['application/pdf'], label: 'PDF' },
@@ -26,8 +31,8 @@ export function validateFile(file, allowedExt) {
     return { ok: false, error: 'Fayl turi uning kengaytmasiga mos kelmaydi. Boshqa fayl tanlang.' };
   }
   if (file.size === 0) return { ok: false, error: 'Fayl boʻsh.' };
-  if (file.size > MAX_FILE_BYTES) {
-    return { ok: false, error: `Fayl hajmi juda katta (${formatBytes(file.size)}). Maksimal hajm — 10 MB.` };
+  if (file.size > maxFileMb * 1024 * 1024) {
+    return { ok: false, error: `Fayl hajmi juda katta (${formatBytes(file.size)}). Maksimal hajm — ${maxFileMb} MB.` };
   }
   return { ok: true, ext, label: type.label };
 }
