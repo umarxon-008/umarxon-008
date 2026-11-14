@@ -111,10 +111,10 @@ test('javobni to‘xtatish va xatodan keyin qayta urinish', async () => {
     mock.failNext = true;
     await page.getByLabel('Xabar', { exact: true }).fill('Ikkinchi savol');
     await page.getByLabel('Xabar', { exact: true }).press('Enter');
-    await expect(page.getByText('AI xizmati hozir ishlamayapti', { exact: false })).toBeVisible();
+    await expect(page.getByText(/Ollama ishlayapti, lekin xato qaytardi \(500 mock failure\)/)).toBeVisible();
     await page.getByRole('button', { name: 'Qayta urinish' }).click();
     await expect(page.getByText(/O‘zbek tilida yordam beraman/).last()).toBeVisible();
-    await expect(page.getByText('AI xizmati hozir ishlamayapti', { exact: false })).toHaveCount(0);
+    await expect(page.getByText(/xato qaytardi/)).toHaveCount(0);
   } finally {
     await app.close();
   }

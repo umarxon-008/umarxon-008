@@ -1,5 +1,5 @@
 import type { AiSettings, AiSettingsPatch, ConnectionTest, ProviderId } from '@shared/ipc';
-import { AiErrorMessages } from '@shared/ipc';
+import { AiErrorMessages, type AiErrorCode } from '@shared/ipc';
 import { createGeminiProvider } from '../../modules/ai/gemini';
 import { createGeminiAudio, type GeminiAudio } from '../../modules/ai/gemini-audio';
 import { createOllamaProvider, isLocalUrl } from '../../modules/ai/ollama';
@@ -23,6 +23,29 @@ export function geminiHint(detail: string): string | null {
   if (/PERMISSION_DENIED/i.test(detail))
     return 'Google bu kalit bilan kirishga ruxsat bermadi. aistudio.google.com/apikey sahifasida yangi kalit yaratib ko‘ring.';
   return null;
+}
+
+/**
+ * Suhbat xatosi uchun foydalanuvchiga ko'rsatiladigan matn: qaysi xizmat (Gemini yoki Ollama) ekanini va
+ * Google qaytargan sababni aytadi. Tafsilotda API kalit bo'lmaydi (faqat status va Google xabari).
+ */
+export function describeProviderError(provider: ProviderId, code: AiErrorCode, detail?: string): string {
+  if (provider === 'gemini') {
+    const hint = detail ? geminiHint(detail) : null;
+    const base =
+      hint ??
+      (code === 'AI_UNAVAILABLE'
+        ? 'Google Gemini serveri hozir javob bermayapti yoki band (bu vaqtinchalik). Bir daqiqadan keyin qayta urinib ko‘ring yoki Sozlamalarda boshqa “flash” modelni tanlang.'
+        : code === 'AI_NETWORK'
+          ? 'Google Gemini’ga ulanib bo‘lmadi. Internetni tekshiring; VPN, proxy yoki antivirus to‘sayotgan bo‘lishi mumkin.'
+          : AiErrorMessages[code]);
+    return detail && code !== 'AI_TIMEOUT' ? `${base} (Google javobi: ${detail})` : base;
+  }
+  if (code === 'AI_UNAVAILABLE' && detail && /^\d{3}\b/.test(detail))
+    return `Ollama ishlayapti, lekin xato qaytardi (${detail}). Modelni qayta tanlang yoki Ollama’ni qayta ishga tushiring.`;
+  if (code === 'AI_UNAVAILABLE' || code === 'AI_NETWORK')
+    return 'Ollama’ga ulanib bo‘lmadi: u o‘rnatilmagan yoki ishga tushirilmagan. Ollama’ni ishga tushiring yoki Sozlamalar → Sun’iy intellekt bo‘limida Gemini’ni tanlang.';
+  return AiErrorMessages[code];
 }
 
 /** Ekran tahlili uchun tanlangan "ko'ra oladigan" model */

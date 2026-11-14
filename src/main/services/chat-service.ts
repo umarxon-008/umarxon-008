@@ -19,7 +19,7 @@ import {
 import { makeTitle, type ConversationStore } from '../database/conversation-store';
 import { AppError } from '../ipc/router';
 import type { Logger } from '../logging/logger';
-import type { ResolvedProvider } from './ai-service';
+import { describeProviderError, type ResolvedProvider } from './ai-service';
 
 const MAX_TURNS = 24;
 const MAX_CONTEXT_CHARS = 24_000;
@@ -323,7 +323,7 @@ export class ChatService {
           type: 'error',
           ...base,
           code: pe.code,
-          message: AiErrorMessages[pe.code],
+          message: describeProviderError(provider.id, pe.code, pe.detail),
           retryable: pe.retryable,
         });
         logger.warn('chat.error', { provider: provider.id, code: pe.code, detail: pe.detail });

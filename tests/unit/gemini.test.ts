@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
-import { createGeminiProvider } from '../../src/modules/ai/gemini';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { createGeminiProvider, setGeminiRetryDelays } from '../../src/modules/ai/gemini';
 import { ProviderError } from '../../src/modules/ai/types';
 import { collect, streamOf } from './helpers/streams';
 
@@ -7,6 +7,9 @@ const textOf = (events: { type: string; text?: string }[]) =>
   events.map((e) => (e.type === 'text' ? e.text : '')).join('');
 
 const KEY = 'AIza-test-key-123456';
+
+// Qayta urinish pauzalari testlarda kutilmaydi
+beforeEach(() => setGeminiRetryDelays([0, 0]));
 const req = { model: 'test-model', system: 'SYS', messages: [{ role: 'user' as const, content: 'Salom' }] };
 
 function sse(...objs: unknown[]) {
@@ -195,5 +198,67 @@ describe('Gemini ulanish xatolari: aniq maslahat', () => {
     const err = await provider.listModels().catch((e: unknown) => e);
     expect(String((err as { detail?: string }).detail)).toContain('unregistered callers');
     expect(String((err as { detail?: string }).detail)).not.toContain(key);
+  });
+});
+
+describe('Gemini: vaqtinchalik server xatosi (503 "model band")', () => {
+  const overloaded = () =>
+    new Response(
+      JSON.stringify({
+        error: {
+          code: 503,
+          status: 'UNAVAILABLE',
+          message: 'The model is overloaded. Please try again later.',
+        },
+      }),
+      { status: 503 },
+    );
+
+  it('ikki marta 503 bo‘lsa ham qayta urinib, javobni qaytaradi', async () => {
+    const { setGeminiRetryDelays } = await import('../../src/modules/ai/gemini');
+    setGeminiRetryDelays([0, 0]);
+    let n = 0;
+    const fetchMock = vi.fn(async () =>
+      ++n <= 2
+        ? overloaded()
+        : new Response(sse({ candidates: [{ content: { parts: [{ text: 'Salom!' }] } }] })),
+    );
+    const p = createGeminiProvider({ apiKey: async () => KEY, fetch: fetchMock as unknown as typeof fetch });
+    expect(textOf(await collect(p.streamChat(req, new AbortController().signal)))).toBe('Salom!');
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+  });
+
+  it('uch marta 503: AI_UNAVAILABLE va Google sababi; 429 qayta urinilmaydi', async () => {
+    const { setGeminiRetryDelays } = await import('../../src/modules/ai/gemini');
+    setGeminiRetryDelays([0, 0]);
+    const always503 = vi.fn(async () => overloaded());
+    const p = createGeminiProvider({ apiKey: async () => KEY, fetch: always503 as unknown as typeof fetch });
+    const err = (await collect(p.streamChat(req, new AbortController().signal)).catch(
+      (e: unknown) => e,
+    )) as ProviderError;
+    expect(err.code).toBe('AI_UNAVAILABLE');
+    expect(err.detail).toContain('overloaded');
+    expect(always503).toHaveBeenCalledTimes(3);
+
+    const limit = vi.fn(
+      async () => new Response(JSON.stringify({ error: { status: 'RESOURCE_EXHAUSTED' } }), { status: 429 }),
+    );
+    const p2 = createGeminiProvider({ apiKey: async () => KEY, fetch: limit as unknown as typeof fetch });
+    const err2 = (await collect(p2.streamChat(req, new AbortController().signal)).catch(
+      (e: unknown) => e,
+    )) as ProviderError;
+    expect(err2.code).toBe('AI_RATE_LIMITED');
+    expect(limit).toHaveBeenCalledTimes(1);
+  });
+
+  it('suhbatdagi xabar xizmatni aniq aytadi: Gemini band yoki Ollama ishlamayapti', async () => {
+    const { describeProviderError } = await import('../../src/main/services/ai-service');
+    const g = describeProviderError('gemini', 'AI_UNAVAILABLE', '503 UNAVAILABLE — The model is overloaded.');
+    expect(g).toMatch(/Google Gemini serveri hozir javob bermayapti yoki band/);
+    expect(g).toContain('Google javobi: 503 UNAVAILABLE');
+    expect(describeProviderError('ollama', 'AI_UNAVAILABLE', 'ECONNREFUSED')).toMatch(
+      /Ollama’ga ulanib bo‘lmadi/,
+    );
+    expect(describeProviderError('gemini', 'AI_RATE_LIMITED')).toMatch(/limit/);
   });
 });
