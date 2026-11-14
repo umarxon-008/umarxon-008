@@ -20,10 +20,10 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Kodni olish
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Node.js 22
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -55,7 +55,7 @@ jobs:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
 
       - name: Installer'ni yuklab olish uchun saqlash
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: MARIUS-Setup-windows
           path: dist/MARIUS-Setup-*.exe
@@ -64,7 +64,7 @@ jobs:
 
       - name: E2E xatolik skrinshotlari
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: e2e-test-results
           path: test-results/
