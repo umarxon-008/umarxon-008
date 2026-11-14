@@ -65,6 +65,7 @@ const api: MariusApi = {
     launchApp: (appId) => ipcRenderer.invoke('computer:launchApp', { appId }),
     listWindows: () => ipcRenderer.invoke('computer:listWindows'),
     focusWindow: (pid) => ipcRenderer.invoke('computer:focusWindow', { pid }),
+    media: (action, steps) => ipcRenderer.invoke('computer:media', { action, steps }),
   },
   files: {
     listFolders: () => ipcRenderer.invoke('files:listFolders'),
@@ -111,6 +112,9 @@ const api: MariusApi = {
   data: {
     backup: () => ipcRenderer.invoke('data:backup'),
     restore: () => ipcRenderer.invoke('data:restore'),
+  },
+  vision: {
+    analyzeScreen: (question) => ipcRenderer.invoke('vision:analyzeScreen', { question }),
   },
   voice: {
     transcribe: (audio) => ipcRenderer.invoke('voice:transcribe', { audio, mimeType: 'audio/wav' }),

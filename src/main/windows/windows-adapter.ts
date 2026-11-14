@@ -1,5 +1,5 @@
 import { execFile } from 'node:child_process';
-import type { AppEntry, WindowEntry } from '@shared/ipc';
+import type { AppEntry, MediaAction, WindowEntry } from '@shared/ipc';
 import type { OsAdapter } from './os-adapter';
 import { parseJsonList, runPowerShell } from './powershell';
 
@@ -44,6 +44,27 @@ export function focusScript(pid: number): string {
   ].join(' ');
 }
 
+/**
+ * Windows virtual-key kodlari (VK_VOLUME_MUTE=0xAD … VK_MEDIA_PLAY_PAUSE=0xB3).
+ * WScript.Shell.SendKeys shu belgini tegishli media tugmasi sifatida yuboradi.
+ * Faqat shu jadvaldagi kodlar ishlatiladi: AI ixtiyoriy tugma yoki matn yubora olmaydi.
+ */
+export const MEDIA_KEY_CODES: Record<MediaAction, number> = {
+  mute: 173,
+  volume_down: 174,
+  volume_up: 175,
+  next_track: 176,
+  previous_track: 177,
+  play_pause: 179,
+};
+
+export function mediaKeyScript(action: MediaAction, steps: number): string {
+  const code = MEDIA_KEY_CODES[action];
+  if (code === undefined) throw new Error('unknown media action');
+  if (!Number.isInteger(steps) || steps < 1 || steps > 10) throw new Error('invalid steps');
+  return `$w = New-Object -ComObject WScript.Shell; for ($i = 0; $i -lt ${steps}; $i++) { $w.SendKeys([string][char]${code}); Start-Sleep -Milliseconds 40 }`;
+}
+
 export function createWindowsAdapter(): OsAdapter {
   return {
     kind: 'windows',
@@ -75,6 +96,10 @@ export function createWindowsAdapter(): OsAdapter {
 
     async focusWindow(pid) {
       return (await runPowerShell(focusScript(pid))).trim().toLowerCase() === 'true';
+    },
+
+    async sendMediaKey(action, steps) {
+      await runPowerShell(mediaKeyScript(action, steps));
     },
 
     async battery() {

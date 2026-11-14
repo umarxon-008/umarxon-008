@@ -2278,3 +2278,32 @@ select.input {
 .toggle--indent {
   margin-left: var(--space-6);
 }
+
+/* ---------- Ekran tahlili va media (PHASE 8–9) ---------- */
+.field-row--stack {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+}
+.field-row--stack textarea {
+  resize: vertical;
+  min-height: 56px;
+}
+.screen-answer {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md, 12px);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  background: var(--surface-2, rgba(255, 255, 255, 0.04));
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.screen-answer p {
+  margin: 0 0 6px;
+}
+.media-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}

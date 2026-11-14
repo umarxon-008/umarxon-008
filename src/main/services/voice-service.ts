@@ -6,7 +6,7 @@ import type { Logger } from '../logging/logger';
 
 export interface VoiceServiceDeps {
   settings: () => Settings;
-  audio: GeminiAudio;
+  audio: Pick<GeminiAudio, 'transcribe' | 'synthesize'>;
   /** Gemini kalit saqlangan va chat modeli tanlanganmi (STT shu model bilan ishlaydi) */
   geminiChatModel: () => string | null;
   hasGeminiKey: () => boolean;
@@ -14,7 +14,7 @@ export interface VoiceServiceDeps {
 }
 
 /** Provayder xatosini foydalanuvchiga o'zbekcha ko'rinadigan IPC xatosiga aylantiradi. */
-async function asAppError<T>(fn: () => Promise<T>): Promise<T> {
+export async function asAppError<T>(fn: () => Promise<T>): Promise<T> {
   try {
     return await fn();
   } catch (error) {

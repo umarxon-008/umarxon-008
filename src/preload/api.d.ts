@@ -1,5 +1,6 @@
 import type {
   ActionResult,
+  MediaAction,
   ObsidianStatus,
   MemoryItem,
   Reminder,
@@ -81,6 +82,8 @@ export interface MariusApi {
     launchApp(appId: string): Promise<IpcResult<ActionResult>>;
     listWindows(): Promise<IpcResult<WindowEntry[]>>;
     focusWindow(pid: number): Promise<IpcResult<ActionResult>>;
+    /** Allowlist'dagi media/ovoz tugmasi (1–10 marta) */
+    media(action: MediaAction, steps: number): Promise<IpcResult<ActionResult>>;
   };
   files: {
     listFolders(): Promise<IpcResult<AllowedFolderInfo[]>>;
@@ -137,6 +140,12 @@ export interface MariusApi {
   data: {
     backup(): Promise<IpcResult<{ saved: boolean; path: string | null; message: string }>>;
     restore(): Promise<IpcResult<{ scheduled: boolean; message: string }>>;
+  };
+  vision: {
+    /** Tasdiq oynasidan keyin bitta ekran rasmi olinadi va tahlil qilinadi. Rasm saqlanmaydi. */
+    analyzeScreen(
+      question: string,
+    ): Promise<IpcResult<{ ok: boolean; message: string; description: string | null }>>;
   };
   voice: {
     /** 16 kHz mono WAV (base64). Faqat rozilik berilgan bo'lsa Gemini'ga yuboriladi. */

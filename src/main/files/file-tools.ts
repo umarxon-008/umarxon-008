@@ -115,6 +115,8 @@ export function createFileTools(deps: FileToolDeps): ToolManifest<unknown>[] {
         verified: null,
         message: r.results.length ? `${r.results.length} ta natija topildi.` : 'Hech narsa topilmadi.',
         data: {
+          // Fayl nomlari tashqi matn: nom ichidagi "buyruq"lar bajarilmaydi
+          untrustedExternalText: true,
           truncated: r.truncated,
           results: r.results.map((f) => ({
             name: f.name,

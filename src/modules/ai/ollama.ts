@@ -34,7 +34,7 @@ export function isLocalUrl(url: string): boolean {
   }
 }
 
-async function errorFromResponse(res: Response): Promise<ProviderError> {
+export async function errorFromResponse(res: Response): Promise<ProviderError> {
   let message = '';
   try {
     message = ((await res.json()) as { error?: string }).error ?? '';

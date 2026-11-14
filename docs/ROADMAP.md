@@ -73,13 +73,13 @@ PROJECT_AUDIT, ARCHITECTURE, ROADMAP, RISK_REGISTER.
 - `vault-indexer` (FTS5, worker, cancel), `markdown-note-service` (preview + tasdiq).
 - Qabul testlari: Obsidian prompt v2.1 §9 A–J va §10 (Windows'da real sinov).
 
-## PHASE 8 — Monitoring va Vision (~2 sessiya)
+## PHASE 8 — Monitoring va Vision ✅ (`PHASE_8_9_REPORT.md`)
 - CPU, RAM, disk va batareya kartalari, pauza imkoniyati, oxirgi yangilanish vaqti.
 - Ekran tahlili: indikator → rozilik → skrinshot → vision adapter → natija. Sezgir oynalar haqida ogohlantirish beriladi.
 
 **Qabul mezonlari:** ko'rsatkichlar real manbadan olinadi; roziliksiz rasm yuborilmaydi (test bilan tasdiqlangan).
 
-## PHASE 9 — Boshqariladigan desktop amallari (~2 sessiya)
+## PHASE 9 — Boshqariladigan desktop amallari ✅ (`PHASE_8_9_REPORT.md`)
 - Faqat allowlist'dagi oddiy amallar; preview, cancel va natijani tekshirish.
 - Prompt injection fixture'lari (web, fayl, OCR) va ularga testlar.
 

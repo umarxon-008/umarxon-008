@@ -70,15 +70,15 @@ export class ToolExecutor {
       };
     }
     const input = parsed.data;
-    const needsConfirmation = ctx.source === 'ai' && tool.confirmation === 'always';
+    const needsConfirmation =
+      tool.confirmation === 'always' && (ctx.source === 'ai' || tool.confirmEvenForUser === true);
     const auditId = this.audit.start({
       toolId: tool.id,
       title: tool.title,
       summary: tool.summarize(input),
       permissionLevel: tool.permissionLevel,
       source: ctx.source,
-      confirmation:
-        ctx.source === 'user' ? 'user_initiated' : needsConfirmation ? 'not_required' : 'not_required',
+      confirmation: ctx.source === 'user' && !needsConfirmation ? 'user_initiated' : 'not_required',
       status: 'running',
       conversationId: ctx.conversationId,
       messageId: ctx.messageId,

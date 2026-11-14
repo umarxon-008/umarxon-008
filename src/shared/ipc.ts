@@ -42,6 +42,10 @@ export const SettingsSchema = z.object({
   memoryEnabled: z.boolean(),
   /** Oyna yopilganda MARIUS tray'da qoladi (eslatmalar ishlashi uchun) */
   minimizeToTray: z.boolean(),
+
+  /* --- Ekran tahlili (PHASE 8) --- */
+  /** Standart holatda o'chiq. Yoqilgan bo'lsa ham har bir skrinshot alohida tasdiqlanadi. */
+  screenAnalysisEnabled: z.boolean(),
 });
 export type Settings = z.infer<typeof SettingsSchema>;
 
@@ -61,6 +65,7 @@ export const DEFAULT_SETTINGS: Settings = {
   searchEngine: 'google',
   memoryEnabled: true,
   minimizeToTray: false,
+  screenAnalysisEnabled: false,
 };
 
 /** Faqat ma'lum kalitlar, noma'lum kalit rad etiladi. */
@@ -212,6 +217,17 @@ export const WindowEntrySchema = z.object({
   title: z.string(),
 });
 export type WindowEntry = z.infer<typeof WindowEntrySchema>;
+
+/** Media va ovoz tugmalari (PHASE 9): faqat shu ro'yxat, boshqa tugma bosilmaydi */
+export const MediaActionSchema = z.enum([
+  'volume_up',
+  'volume_down',
+  'mute',
+  'play_pause',
+  'next_track',
+  'previous_track',
+]);
+export type MediaAction = z.infer<typeof MediaActionSchema>;
 
 export const ActionResultSchema = z.object({
   ok: z.boolean(),
@@ -482,6 +498,19 @@ export const IPC = {
     output: ActionResultSchema,
   },
 
+  'computer:media': {
+    input: z.object({ action: MediaActionSchema, steps: z.number().int().min(1).max(10) }).strict(),
+    output: ActionResultSchema,
+  },
+  'vision:analyzeScreen': {
+    input: z.object({ question: z.string().trim().min(1).max(500) }).strict(),
+    output: z.object({
+      ok: z.boolean(),
+      message: z.string(),
+      description: z.string().nullable(),
+    }),
+  },
+
   'files:listFolders': { input: NoInput, output: z.array(AllowedFolderSchema) },
   'files:suggestions': { input: NoInput, output: z.array(FolderSuggestionSchema) },
   'files:addFolder': {
@@ -665,6 +694,10 @@ export const ErrorCodes = {
   MEMORY_DISABLED: 'Xotira o‘chirilgan. Xotira bo‘limida yoqing.',
   SENSITIVE_MEMORY: 'Parol, karta raqami yoki shunga o‘xshash maxfiy ma’lumot xotiraga saqlanmaydi.',
   NO_ALLOWED_FOLDERS: 'Hali birorta papkaga ruxsat berilmagan. Kompyuter → Fayllar bo‘limida papka qo‘shing.',
+  SCREEN_DISABLED: 'Ekran tahlili o‘chirilgan. Sozlamalar → Maxfiylik bo‘limida yoqing.',
+  SCREEN_CAPTURE_FAILED: 'Ekran rasmini olib bo‘lmadi.',
+  VISION_UNAVAILABLE:
+    'Rasmni tushunadigan AI sozlanmagan: Gemini kaliti va modelini kiriting yoki Ollama’da rasmni tushunadigan modelni (masalan, gemma3, llava) tanlang.',
   OS_UNSUPPORTED: 'Bu amal hozircha faqat Windows’da ishlaydi.',
   OS_COMMAND_FAILED: 'Windows buyrug‘i bajarilmadi. Batafsil ma’lumot log faylida.',
   APP_NOT_FOUND: 'Bunday dastur topilmadi. Ro‘yxatni yangilab, qayta urinib ko‘ring.',

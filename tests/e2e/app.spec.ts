@@ -68,6 +68,7 @@ test('renderer’da Node yoki Electron API yo‘q, faqat window.marius bor', asy
         'settings',
         'system',
         'tools',
+        'vision',
         'voice',
         'youtube',
       ],

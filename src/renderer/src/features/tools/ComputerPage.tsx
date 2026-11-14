@@ -14,6 +14,8 @@ import type { ActionResult, AppEntry, ComputerInfo, WindowEntry } from '@shared/
 import { PageHeader } from '../../components/PageHeader';
 import { formatBytes } from '../monitoring/SystemStatusPanel';
 import { FilesSection } from './FilesSection';
+import { MediaSection } from './MediaSection';
+import { ScreenSection } from './ScreenSection';
 
 function ResultLine({ result }: { result: ActionResult | null }) {
   if (!result) return null;
@@ -135,6 +137,13 @@ export function ComputerPage() {
       )}
 
       {info && <FilesSection onResult={setResult} />}
+
+      {info && (
+        <div className="grid grid--wide">
+          <ScreenSection />
+          {info.supported && <MediaSection onResult={setResult} />}
+        </div>
+      )}
 
       {info?.supported && (
         <div className="grid grid--wide">

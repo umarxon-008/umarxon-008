@@ -36,6 +36,8 @@ export interface ToolManifest<I = unknown> {
   permissionLevel: PermissionLevel;
   /** 'always': AI chaqirganda har safar foydalanuvchi tasdig'i (bir martalik) */
   confirmation: 'never' | 'always';
+  /** true: foydalanuvchi o'zi tugmani bossa ham tasdiq oynasi chiqadi (masalan, ekran rasmi: ogohlantirishni ko'rsatish uchun) */
+  confirmEvenForUser?: boolean;
   input: ZodType<I>;
   timeoutMs: number;
   /** Audit uchun qisqa tavsif: maxfiy qiymatlar yozilmaydi */

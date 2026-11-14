@@ -1,4 +1,4 @@
-import type { AppEntry, WindowEntry } from '@shared/ipc';
+import type { AppEntry, MediaAction, WindowEntry } from '@shared/ipc';
 
 /**
  * Operatsion tizim adapteri (ARCHITECTURE §3, 5-qatlam).
@@ -16,4 +16,6 @@ export interface OsAdapter {
   listWindows(): Promise<WindowEntry[]>;
   focusWindow(pid: number): Promise<boolean>;
   battery(): Promise<{ percent: number; charging: boolean } | null>;
+  /** Faqat allowlist'dagi media/ovoz tugmasini `steps` marta bosadi (1–10) */
+  sendMediaKey(action: MediaAction, steps: number): Promise<void>;
 }

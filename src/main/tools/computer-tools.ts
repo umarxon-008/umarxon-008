@@ -1,12 +1,21 @@
 import os from 'node:os';
 import { z } from 'zod';
-import type { AppEntry, WindowEntry } from '@shared/ipc';
+import { MediaActionSchema, type AppEntry, type MediaAction, type WindowEntry } from '@shared/ipc';
 import type { OsAdapter } from '../windows/os-adapter';
 import { readDisk, systemDiskRoot } from '../services/system-metrics';
 import { osDisplayName } from '../services/system-metrics';
 import { AppError } from '../ipc/router';
 import { matchApp, windowMatchesApp } from './app-matching';
 import type { ToolManifest, ToolOutput } from './types';
+
+export const MEDIA_LABELS: Record<MediaAction, string> = {
+  volume_up: 'Ovozni balandlatish',
+  volume_down: 'Ovozni pasaytirish',
+  mute: 'Ovozni o‘chirish/yoqish',
+  play_pause: 'Ijro / pauza',
+  next_track: 'Keyingi trek',
+  previous_track: 'Oldingi trek',
+};
 
 const gb = (bytes: number) => Math.round((bytes / 1024 ** 3) * 10) / 10;
 const sleep = (ms: number, signal?: AbortSignal) =>
@@ -343,6 +352,43 @@ export function createComputerTools(deps: { os: OsAdapter; catalog: AppCatalog; 
     },
   };
 
+  /**
+   * PHASE 9: media va ovoz tugmalari. LEVEL 1 (tasdiqsiz): ma'lumot o'zgarmaydi, natija darhol eshitiladi
+   * va oson qaytariladi. Faqat MEDIA_KEY_CODES jadvalidagi tugmalar, ko'pi bilan 10 marta.
+   */
+  const mediaControl: ToolManifest<{ action: MediaAction; steps?: number | undefined }> = {
+    id: 'media_control',
+    version: '1.0.0',
+    title: 'Ovoz va media',
+    description:
+      'Press a media key on the computer: volume_up / volume_down (each step is about 2%), mute (toggles), play_pause, next_track, previous_track. Use steps (1-10) for volume, default 5.',
+    permissionLevel: 1,
+    confirmation: 'never',
+    input: z
+      .object({ action: MediaActionSchema, steps: z.number().int().min(1).max(10).optional() })
+      .strict(),
+    timeoutMs: 15_000,
+    summarize: (i) => `${MEDIA_LABELS[i.action]}${i.steps && i.steps > 1 ? ` (${i.steps} qadam)` : ''}`,
+    async prepare(input) {
+      if (!osAdapter.supported) throw new AppError('OS_UNSUPPORTED');
+      const isVolume = input.action === 'volume_up' || input.action === 'volume_down';
+      const steps = isVolume ? (input.steps ?? 5) : 1;
+      return {
+        kind: 'action',
+        confirm: {
+          action: MEDIA_LABELS[input.action],
+          target: 'Kompyuter',
+          effect: 'Media tugmasi bosiladi.',
+        },
+        run: async () => {
+          await osAdapter.sendMediaKey(input.action, steps);
+          // Windows ovoz darajasini o'qish uchun alohida API kerak: natija tekshirilmaydi, buni halol aytamiz
+          return { ok: true, verified: null, message: `${MEDIA_LABELS[input.action]}: tugma bosildi.` };
+        },
+      };
+    },
+  };
+
   // Har bir manifest o'z kirish turi bilan; registry ularni zod sxemasi orqali tekshiradi
   return [
     getSystemInfo,
@@ -352,5 +398,6 @@ export function createComputerTools(deps: { os: OsAdapter; catalog: AppCatalog; 
     launchApp,
     listOpenWindows,
     focusWindow,
+    mediaControl,
   ] as unknown as ToolManifest<unknown>[];
 }

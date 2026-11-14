@@ -41,6 +41,8 @@ import { ToolRegistry } from './tools/registry';
 import { ConfirmationBroker } from './tools/confirmation';
 import { ToolExecutor } from './tools/executor';
 import { AppCatalog, createComputerTools } from './tools/computer-tools';
+import { createElectronCapturer, createFakeCapturer } from './vision/screen-capture';
+import { createVisionTools } from './vision/vision-tools';
 import type { OsAdapter } from './windows/os-adapter';
 import { createWindowsAdapter } from './windows/windows-adapter';
 import { createFakeAdapter, createUnsupportedAdapter } from './windows/fake-adapter';
@@ -345,6 +347,16 @@ function registerIpc(settings: SettingsRepository, database: Database): void {
     };
   };
 
+  // ---- Ekran tahlili (PHASE 8) ----
+  for (const tool of createVisionTools({
+    enabled: () => settings.getAll().screenAnalysisEnabled,
+    resolveVision: () => ai.resolveVision(),
+    capturer: useFakeOs ? createFakeCapturer() : createElectronCapturer(() => mainWindow),
+    listWindows: () => (osAdapter.supported ? osAdapter.listWindows() : Promise.resolve([])),
+  })) {
+    registry.register(tool);
+  }
+
   const broker = new ConfirmationBroker(emitConfirmation);
   const executor = new ToolExecutor(registry, broker, audit, logger);
   const toolRunner: ToolRunner = {
@@ -438,6 +450,19 @@ function registerIpc(settings: SettingsRepository, database: Database): void {
       return osAdapter.listWindows();
     },
     'computer:focusWindow': ({ pid }) => runUserAction('focus_window', { pid }),
+    'computer:media': ({ action, steps }) => runUserAction('media_control', { action, steps }),
+    'vision:analyzeScreen': async ({ question }) => {
+      const out = await executor.execute(
+        { id: randomUUID(), name: 'analyze_screen', args: { question } },
+        { source: 'user', conversationId: null, messageId: null, signal: new AbortController().signal },
+      );
+      const d = out.data as { description?: unknown } | undefined;
+      return {
+        ok: out.ok,
+        message: out.message,
+        description: out.ok && typeof d?.description === 'string' ? d.description : null,
+      };
+    },
 
     'files:listFolders': () => folderInfos(),
     'files:suggestions': () => {

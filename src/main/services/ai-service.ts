@@ -3,10 +3,21 @@ import { AiErrorMessages } from '@shared/ipc';
 import { createGeminiProvider } from '../../modules/ai/gemini';
 import { createGeminiAudio, type GeminiAudio } from '../../modules/ai/gemini-audio';
 import { createOllamaProvider, isLocalUrl } from '../../modules/ai/ollama';
+import { createOllamaVision, type OllamaVision } from '../../modules/ai/vision';
 import { ProviderError, type AIProvider, type FetchLike } from '../../modules/ai/types';
 import type { SecretStore } from '../database/secret-store';
 import { GEMINI_SECRET, type ProviderSettingsRepository } from '../database/provider-settings-repository';
 import { AppError } from '../ipc/router';
+
+/** Ekran tahlili uchun tanlangan "ko'ra oladigan" model */
+export interface VisionBackend {
+  provider: ProviderId;
+  model: string;
+  /** Rasm internet orqali tashqi serverga yuboriladimi */
+  cloud: boolean;
+  label: string;
+  describe(prompt: string, imageBase64: string, mimeType: string, signal?: AbortSignal): Promise<string>;
+}
 
 export interface ResolvedProvider {
   provider: AIProvider;
@@ -18,6 +29,7 @@ export class AiService {
   readonly gemini: AIProvider;
   readonly ollama: AIProvider;
   readonly geminiAudio: GeminiAudio;
+  readonly ollamaVision: OllamaVision;
 
   constructor(
     private readonly repo: ProviderSettingsRepository,
@@ -33,6 +45,10 @@ export class AiService {
       apiKey: () => this.secrets.get(GEMINI_SECRET),
       ...(options.fetch ? { fetch: options.fetch } : {}),
       ...(options.geminiBaseUrl ? { baseUrl: options.geminiBaseUrl } : {}),
+    });
+    this.ollamaVision = createOllamaVision({
+      baseUrl: () => this.repo.get().ollamaBaseUrl,
+      ...(options.fetch ? { fetch: options.fetch } : {}),
     });
     this.ollama = createOllamaProvider({
       baseUrl: () => this.repo.get().ollamaBaseUrl,
@@ -122,5 +138,44 @@ export class AiService {
       return { provider: this.ollama, model: c.ollamaModel };
     }
     throw new AppError('AI_NOT_CONFIGURED');
+  }
+
+  /**
+   * Ekran tahlili uchun model. Maxfiylik uchun avval lokal Ollama (faol bo'lsa va rasmni tushunsa),
+   * keyin Gemini. Hech biri bo'lmasa VISION_UNAVAILABLE.
+   */
+  async resolveVision(): Promise<VisionBackend> {
+    const c = this.repo.get();
+    const ollamaOk = async () => {
+      if (!c.ollamaModel) return false;
+      try {
+        return (await this.ollamaVision.supportsVision(c.ollamaModel)) !== false;
+      } catch {
+        return false;
+      }
+    };
+    const ollama = (): VisionBackend => ({
+      provider: 'ollama',
+      model: c.ollamaModel!,
+      cloud: !isLocalUrl(c.ollamaBaseUrl),
+      label: isLocalUrl(c.ollamaBaseUrl) ? 'lokal Ollama' : 'Ollama (tashqi server)',
+      describe: (prompt, image, _mime, signal) =>
+        this.ollamaVision.describe(c.ollamaModel!, prompt, image, signal),
+    });
+    const geminiReady = this.secrets.has(GEMINI_SECRET) && Boolean(c.geminiModel);
+    if (c.provider === 'ollama' && (await ollamaOk())) return ollama();
+    if (geminiReady) {
+      const model = c.geminiModel!;
+      return {
+        provider: 'gemini',
+        model,
+        cloud: true,
+        label: 'Google Gemini',
+        describe: (prompt, image, mime, signal) =>
+          this.geminiAudio.describeImage(model, prompt, image, mime, signal),
+      };
+    }
+    if (c.provider !== 'ollama' && (await ollamaOk())) return ollama();
+    throw new AppError('VISION_UNAVAILABLE');
   }
 }

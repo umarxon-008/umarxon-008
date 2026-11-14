@@ -73,6 +73,7 @@ describe('ToolRegistry', () => {
       'launch_app',
       'list_installed_apps',
       'list_open_windows',
+      'media_control',
     ]);
     const launch = decls.find((d) => d.name === 'launch_app')!;
     expect(launch.parameters).toMatchObject({ type: 'object', properties: { name: { type: 'string' } } });

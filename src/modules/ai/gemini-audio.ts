@@ -110,6 +110,33 @@ export function createGeminiAudio(options: GeminiAudioOptions) {
       return cleanTranscript(text);
     },
 
+    /** Rasm (ekran) + savol → o'zbekcha matnli javob. `inlineData` rasm uchun ham ishlatiladi. */
+    async describeImage(
+      model: string,
+      prompt: string,
+      imageBase64: string,
+      mimeType: string,
+      signal?: AbortSignal,
+    ): Promise<string> {
+      const json = await generate(
+        model,
+        {
+          contents: [
+            { role: 'user', parts: [{ text: prompt }, { inlineData: { mimeType, data: imageBase64 } }] },
+          ],
+          generationConfig: { temperature: 0.2 },
+        },
+        signal,
+      );
+      const text = (json.candidates?.[0]?.content?.parts ?? [])
+        .filter((p) => !p.thought && typeof p.text === 'string')
+        .map((p) => p.text)
+        .join('')
+        .trim();
+      if (!text) throw new ProviderError('AI_BAD_RESPONSE', 'empty vision answer');
+      return text;
+    },
+
     /** Matn → ovoz. Natija base64 audio va uning MIME turi (masalan, audio/L16;codec=pcm;rate=24000). */
     async synthesize(
       model: string,

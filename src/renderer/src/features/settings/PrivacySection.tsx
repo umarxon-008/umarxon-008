@@ -30,6 +30,23 @@ export function PrivacySection() {
         </span>
       </label>
 
+      <label className="toggle">
+        <input
+          type="checkbox"
+          checked={settings.screenAnalysisEnabled}
+          onChange={(e) => void update({ screenAnalysisEnabled: e.target.checked })}
+        />
+        <span className="toggle__track" aria-hidden="true" />
+        <span>
+          <strong>Ekran tahliliga ruxsat</strong>
+          <small>
+            Yoqilsa, siz so‘raganingizda MARIUS ekran rasmini olib, savolingizga javob berishi mumkin. Har bir
+            rasm oldidan alohida tasdiq so‘raladi va qaysi serverga ketishi aytiladi. Rasm kompyuterda
+            saqlanmaydi. Yashirin skrinshot olinmaydi.
+          </small>
+        </span>
+      </label>
+
       <div className="row">
         <div>
           <strong>Barcha suhbatlarni o‘chirish</strong>
