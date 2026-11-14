@@ -65,6 +65,8 @@ const api: MariusApi = {
     launchApp: (appId) => ipcRenderer.invoke('computer:launchApp', { appId }),
     listWindows: () => ipcRenderer.invoke('computer:listWindows'),
     focusWindow: (pid) => ipcRenderer.invoke('computer:focusWindow', { pid }),
+    listProcesses: (sortBy) => ipcRenderer.invoke('computer:listProcesses', { sortBy }),
+    closeApp: (name, force) => ipcRenderer.invoke('computer:closeApp', { name, force }),
     media: (action, steps) => ipcRenderer.invoke('computer:media', { action, steps }),
   },
   files: {

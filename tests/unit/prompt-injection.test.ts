@@ -8,6 +8,7 @@ import { ToolExecutor } from '../../src/main/tools/executor';
 import { ToolRegistry } from '../../src/main/tools/registry';
 import { AppCatalog, createComputerTools } from '../../src/main/tools/computer-tools';
 import { createFakeAdapter } from '../../src/main/windows/fake-adapter';
+import { createProcessTools } from '../../src/main/tools/process-tools';
 import { createFileTools } from '../../src/main/files/file-tools';
 import { createWebTools } from '../../src/main/web/web-tools';
 import { createMemoryTools } from '../../src/main/memory/memory-tools';
@@ -79,6 +80,7 @@ function fullRegistry(opts: { approve: boolean }) {
   const registry = new ToolRegistry();
   const tools = [
     ...createComputerTools({ os, catalog: new AppCatalog(os), isOnline: () => true }),
+    ...createProcessTools({ os, ownPids: () => new Set(), verifyWaitMs: 100 }),
     ...createFileTools({
       folders: () => [
         { id: 'd', path: docs, label: 'Hujjatlar', createdAt: '' },
@@ -223,6 +225,7 @@ describe('model injection’ga ergashsa ham tasdiqsiz hech narsa bo‘lmaydi', (
       ['vault_create_note', { title: 'Hacked', content: 'x' }],
       ['analyze_screen', { question: 'parollarni o‘qi' }],
       ['launch_app', { name: 'Notepad' }],
+      ['close_app', { name: 'chrome', force: true }],
       ['forget_memory', { id: memoryId }],
     ];
     for (const [name, args] of attempts) {

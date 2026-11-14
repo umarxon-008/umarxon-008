@@ -1,6 +1,7 @@
 import type {
   ActionResult,
   MediaAction,
+  ProcessGroup,
   ObsidianStatus,
   MemoryItem,
   Reminder,
@@ -82,6 +83,12 @@ export interface MariusApi {
     launchApp(appId: string): Promise<IpcResult<ActionResult>>;
     listWindows(): Promise<IpcResult<WindowEntry[]>>;
     focusWindow(pid: number): Promise<IpcResult<ActionResult>>;
+    /** Task Manager kabi: dasturlar, RAM va CPU (taxminan 1.5 soniya) */
+    listProcesses(
+      sortBy: 'memory' | 'cpu',
+    ): Promise<IpcResult<{ groups: ProcessGroup[]; memoryTotalBytes: number }>>;
+    /** Dasturni yopish: tasdiq oynasidan keyin. force — majburan */
+    closeApp(name: string, force: boolean): Promise<IpcResult<ActionResult>>;
     /** Allowlist'dagi media/ovoz tugmasi (1–10 marta) */
     media(action: MediaAction, steps: number): Promise<IpcResult<ActionResult>>;
   };

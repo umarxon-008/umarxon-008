@@ -11,6 +11,7 @@ O‘zbek tilida gaplashadigan shaxsiy AI desktop yordamchi. Windows 10/11 uchun 
 - o‘zbekcha AI suhbat (Gemini yoki lokal Ollama);
 - ovozli savol-javob va ovozga javob beruvchi shar;
 - dastur ochish va oynalar;
+- jarayonlar: CPU va RAM, dasturni yopish (Task Manager kabi);
 - ruxsatli papkalarda fayllar;
 - brauzer va YouTube;
 - eslatmalar va xotira;
@@ -81,6 +82,13 @@ Yozuv kompyuterda saqlanmaydi. Mikrofon faqat tugma bosilganda yoqiladi va 30 so
 
 MARIUS’ga “Kalkulyatorni och”, “Qaysi dasturlar ochiq?”, “Diskda qancha joy bor?” deb yozing yoki ayting.
 Dastur ochish yoki oynaga o‘tishdan oldin MARIUS **har safar ruxsat so‘raydi**. Barcha amallar **Tarix** bo‘limida ko‘rinadi.
+**Jarayonlar (Task Manager kabi):** Kompyuter → Jarayonlar bo‘limida qaysi dastur qancha CPU va RAM ishlatayotgani ko‘rinadi (har 10 soniyada yangilanadi). Chatda “Qaysi dastur ko‘p RAM yeyapti?” yoki “Chrome’ni yop” deb so‘rash mumkin.
+
+- Yopishdan oldin **har safar tasdiq** so‘raladi.
+- Standart usul X tugmasini bosish kabi ishlaydi: saqlanmagan ish bo‘lsa, dastur o‘zi so‘raydi.
+- “Majburan yopish” faqat oddiy usul ishlamasa taklif qilinadi va saqlanmagan ish yo‘qolishi haqida ogohlantiradi.
+- Tizim jarayonlari (svchost, explorer va boshqalar) va MARIUS’ning o‘zi hech qachon yopilmaydi.
+
 Fayl o‘chirish, buyruqlar oynasida buyruq bajarish va administrator amallari yo‘q.
 
 ## Fayllar, internet, eslatmalar

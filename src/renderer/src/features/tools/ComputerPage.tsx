@@ -15,6 +15,7 @@ import { PageHeader } from '../../components/PageHeader';
 import { formatBytes } from '../monitoring/SystemStatusPanel';
 import { FilesSection } from './FilesSection';
 import { MediaSection } from './MediaSection';
+import { ProcessesSection } from './ProcessesSection';
 import { ScreenSection } from './ScreenSection';
 
 function ResultLine({ result }: { result: ActionResult | null }) {
@@ -135,6 +136,8 @@ export function ComputerPage() {
           </dl>
         </section>
       )}
+
+      {info?.supported && <ProcessesSection onResult={setResult} />}
 
       {info && <FilesSection onResult={setResult} />}
 

@@ -184,7 +184,20 @@ test('haqiqiy OS adapteri: Windows’da Start menyusi dasturlari o‘qiladi, bos
       expect(apps.ok && apps.data.length).toBeGreaterThan(0);
       const wins = await page.evaluate(() => window.marius.computer.listWindows());
       expect(wins.ok).toBe(true);
+      // Haqiqiy Get-Process skripti: jarayonlar, RAM, CPU va tizim jarayonlari himoyasi
+      const procs = await page.evaluate(() => window.marius.computer.listProcesses('memory'));
+      expect(procs.ok).toBe(true);
+      if (procs.ok) {
+        expect(procs.data.groups.length).toBeGreaterThan(3);
+        expect(procs.data.groups[0]!.memoryBytes).toBeGreaterThan(0);
+        expect(procs.data.groups.some((g) => g.cpuPercent !== null)).toBe(true);
+        expect(procs.data.groups.find((g) => g.name.toLowerCase() === 'svchost')?.protected).toBe(true);
+        // MARIUS o'zini yopa olmaydi
+        expect(procs.data.groups.find((g) => /^electron$/i.test(g.name))?.protected ?? true).toBe(true);
+      }
     } else {
+      const procs = await page.evaluate(() => window.marius.computer.listProcesses('memory'));
+      expect(procs).toMatchObject({ ok: false, error: { code: 'OS_UNSUPPORTED' } });
       expect(info.ok && info.data.supported).toBe(false);
       await nav(page).getByRole('link', { name: 'Kompyuter' }).click();
       await expect(page.getByText(/faqat Windows’da mavjud/)).toBeVisible();

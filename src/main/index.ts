@@ -41,6 +41,8 @@ import { ToolRegistry } from './tools/registry';
 import { ConfirmationBroker } from './tools/confirmation';
 import { ToolExecutor } from './tools/executor';
 import { AppCatalog, createComputerTools } from './tools/computer-tools';
+import { createProcessTools } from './tools/process-tools';
+import { groupProcesses } from './windows/processes';
 import { createElectronCapturer, createFakeCapturer } from './vision/screen-capture';
 import { createVisionTools } from './vision/vision-tools';
 import type { OsAdapter } from './windows/os-adapter';
@@ -271,6 +273,10 @@ function registerIpc(settings: SettingsRepository, database: Database): void {
   for (const tool of createComputerTools({ os: osAdapter, catalog, isOnline: () => net.isOnline() })) {
     registry.register(tool);
   }
+  // MARIUS'ning o'z jarayonlari (main, renderer, GPU...) hech qachon yopilmaydi
+  const ownPids = () => new Set([process.pid, ...app.getAppMetrics().map((m) => m.pid)]);
+  for (const tool of createProcessTools({ os: osAdapter, ownPids })) registry.register(tool);
+
   // ---- Fayllar (PHASE 5) ----
   const folders = new FolderRepository(database);
   for (const tool of createFileTools({
@@ -477,6 +483,14 @@ function registerIpc(settings: SettingsRepository, database: Database): void {
       return osAdapter.listWindows();
     },
     'computer:focusWindow': ({ pid }) => runUserAction('focus_window', { pid }),
+    'computer:listProcesses': async ({ sortBy }) => {
+      if (!osAdapter.supported) throw new AppError('OS_UNSUPPORTED');
+      return {
+        groups: groupProcesses(await osAdapter.listProcesses(), ownPids(), sortBy).slice(0, 40),
+        memoryTotalBytes: os.totalmem(),
+      };
+    },
+    'computer:closeApp': ({ name, force }) => runUserAction('close_app', { name, force }),
     'computer:media': ({ action, steps }) => runUserAction('media_control', { action, steps }),
     'vision:analyzeScreen': async ({ question }) => {
       const out = await executor.execute(

@@ -27,6 +27,9 @@ Har bir release oldidan. Belgilash: ✅ o'tdi · ❌ xato (issue oching) · ⏭ 
 - [ ] **Xotira:** qo'shish, karta raqami rad etilishi, eksport
 - [ ] **Obsidian:** Vault tanlash, qidiruv, ruxsat bilan note yaratish (Obsidian'da ko'rinadi)
 - [ ] **Ekran tahlili:** standart o'chiq; yoqilgach tasdiq, MARIUS yashirinadi, javob keladi; bank sahifasi ochiq bo'lsa ogohlantirish chiqadi
+- [ ] **Jarayonlar:** Kompyuter → Jarayonlar real dasturlarni CPU va RAM bilan ko'rsatadi; Task Manager bilan taxminan mos
+- [ ] Bloknot'da saqlanmagan matn bilan "Yopish" → tasdiq → Bloknot "Saqlansinmi?" deb so'raydi (ma'lumot yo'qolmaydi)
+- [ ] svchost va explorer qatorlarida "Yopish" tugmasi yo'q; chatda "explorer'ni yop" deb so'ralsa rad etiladi
 - [ ] **Media:** ovoz −/+, pauza, keyingi trek
 - [ ] **Zaxira:** nusxa olish, tiklash, qayta ishga tushirish, ma'lumot qaytgani; API kaliti saqlangani
 - [ ] **Windows bilan ishga tushish:** yoqing, kompyuterni qayta yoqing, MARIUS ochiladi (tray yoqilgan bo'lsa, fonda)

@@ -221,6 +221,32 @@ export const WindowEntrySchema = z.object({
 });
 export type WindowEntry = z.infer<typeof WindowEntrySchema>;
 
+/** Bitta OS jarayoni (Windows: Get-Process). cpuPercent: 1 soniyalik o'lchov, barcha yadrolarga nisbatan */
+export const ProcessEntrySchema = z.object({
+  pid: z.number().int().positive(),
+  name: z.string(),
+  memoryBytes: z.number().nonnegative(),
+  cpuPercent: z.number().nonnegative().nullable(),
+  /** 0 = Windows xizmatlari (services) */
+  sessionId: z.number().int().nonnegative(),
+  title: z.string(),
+});
+export type ProcessEntry = z.infer<typeof ProcessEntrySchema>;
+
+/** Task Manager kabi: bir nomdagi jarayonlar bitta qatorda (masalan, Chrome'ning 12 ta jarayoni) */
+export const ProcessGroupSchema = z.object({
+  name: z.string(),
+  count: z.number().int().positive(),
+  memoryBytes: z.number().nonnegative(),
+  cpuPercent: z.number().nonnegative().nullable(),
+  /** Oyna sarlavhasi (ishonchsiz matn) */
+  title: z.string().nullable(),
+  hasWindow: z.boolean(),
+  /** Tizim jarayoni yoki MARIUS'ning o'zi: yopib bo'lmaydi */
+  protected: z.boolean(),
+});
+export type ProcessGroup = z.infer<typeof ProcessGroupSchema>;
+
 /** Media va ovoz tugmalari (PHASE 9): faqat shu ro'yxat, boshqa tugma bosilmaydi */
 export const MediaActionSchema = z.enum([
   'volume_up',
@@ -501,6 +527,14 @@ export const IPC = {
     output: ActionResultSchema,
   },
 
+  'computer:listProcesses': {
+    input: z.object({ sortBy: z.enum(['memory', 'cpu']) }).strict(),
+    output: z.object({ groups: z.array(ProcessGroupSchema), memoryTotalBytes: z.number() }),
+  },
+  'computer:closeApp': {
+    input: z.object({ name: z.string().min(1).max(100), force: z.boolean() }).strict(),
+    output: ActionResultSchema,
+  },
   'computer:media': {
     input: z.object({ action: MediaActionSchema, steps: z.number().int().min(1).max(10) }).strict(),
     output: ActionResultSchema,

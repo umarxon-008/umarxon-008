@@ -24,6 +24,10 @@ Bu ro'yxat halol yozilgan: quyidagilar **ishlamaydi** yoki **to'liq tekshirilmag
 
 ## Kompyuter amallari
 - Faqat Start menyusidagi dasturlar ochiladi. Fonda yoki tray'da ishlaydigan dasturlarda oyna chiqmaydi, shuning uchun natija "tekshirib bo'lmadi" deb ko'rsatilishi mumkin.
+- **Jarayonlar:**
+  - CPU foizi 1 soniyalik o'lchov, shuning uchun Task Manager raqamlaridan biroz farq qilishi mumkin. Ro'yxat har 10 soniyada yangilanadi, real vaqtda emas.
+  - Administrator huquqi bilan ishlayotgan dasturlarni MARIUS yopa olmaydi: MARIUS administrator sifatida ishlamaydi.
+  - Disk va tarmoq sarfi jarayonlar kesimida ko'rsatilmaydi.
 - Media tugmalari ovoz darajasini o'qiy olmaydi: "tugma bosildi" deyiladi, "ovoz 40% bo'ldi" deyilmaydi.
 - Ixtiyoriy klaviatura yoki sichqoncha boshqaruvi, matn yozish va buyruq (shell) bajarish **ataylab yo'q**.
 

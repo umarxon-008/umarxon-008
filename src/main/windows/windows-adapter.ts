@@ -1,5 +1,5 @@
 import { execFile } from 'node:child_process';
-import type { AppEntry, MediaAction, WindowEntry } from '@shared/ipc';
+import type { AppEntry, MediaAction, ProcessEntry, WindowEntry } from '@shared/ipc';
 import type { OsAdapter } from './os-adapter';
 import { parseJsonList, runPowerShell } from './powershell';
 
@@ -42,6 +42,56 @@ export function focusScript(pid: number): string {
     `$h = (Get-Process -Id ${pid}).MainWindowHandle;`,
     `if ($h -eq 0) { 'false' } else { if ([MariusWin.W]::IsIconic($h)) { [void][MariusWin.W]::ShowWindowAsync($h, 9) }; [MariusWin.W]::SetForegroundWindow($h) }`,
   ].join(' ');
+}
+
+/** Ikki o'lchov orasidagi CPU vaqti farqi → foiz (barcha yadrolarga nisbatan, Task Manager kabi) */
+export const LIST_PROCESSES_SCRIPT = [
+  '$c = [Environment]::ProcessorCount; $a = @{};',
+  'foreach ($p in Get-Process) { $a[$p.Id] = $p.CPU };',
+  '$sw = [Diagnostics.Stopwatch]::StartNew(); Start-Sleep -Milliseconds 1000; $s = $sw.Elapsed.TotalSeconds;',
+  'Get-Process | ForEach-Object {',
+  '  $cpu = $null;',
+  '  if ($_.CPU -ne $null -and $a[$_.Id] -ne $null) { $cpu = [math]::Round((($_.CPU - $a[$_.Id]) / $s / $c) * 100, 1); if ($cpu -lt 0) { $cpu = 0 } };',
+  '  [pscustomobject]@{ Id = $_.Id; Name = $_.ProcessName; Mem = $_.WorkingSet64; Cpu = $cpu; Session = $_.SessionId; Title = $_.MainWindowTitle }',
+  '} | ConvertTo-Json -Compress',
+].join(' ');
+
+export function parseProcesses(stdout: string): ProcessEntry[] {
+  return parseJsonList<{
+    Id?: unknown;
+    Name?: unknown;
+    Mem?: unknown;
+    Cpu?: unknown;
+    Session?: unknown;
+    Title?: unknown;
+  }>(stdout)
+    .filter((p) => typeof p.Id === 'number' && p.Id > 0 && typeof p.Name === 'string' && p.Name)
+    .map((p) => ({
+      pid: p.Id as number,
+      name: String(p.Name),
+      memoryBytes: typeof p.Mem === 'number' && p.Mem > 0 ? p.Mem : 0,
+      cpuPercent: typeof p.Cpu === 'number' && p.Cpu >= 0 ? p.Cpu : null,
+      sessionId: typeof p.Session === 'number' && p.Session >= 0 ? p.Session : 0,
+      title: typeof p.Title === 'string' ? p.Title : '',
+    }));
+}
+
+/** PID'lar faqat musbat butun son bo'lsa skriptga qo'shiladi */
+function pidList(pids: number[]): string {
+  if (pids.length === 0 || pids.length > 200) throw new Error('invalid pid list');
+  for (const p of pids) if (!Number.isSafeInteger(p) || p <= 0) throw new Error('invalid pid');
+  return pids.join(',');
+}
+
+export function closeScript(pids: number[], force: boolean): string {
+  const ids = pidList(pids);
+  return force
+    ? `Stop-Process -Id ${ids} -Force -ErrorAction SilentlyContinue`
+    : `foreach ($i in @(${ids})) { $p = Get-Process -Id $i -ErrorAction SilentlyContinue; if ($p -and $p.MainWindowHandle -ne 0) { [void]$p.CloseMainWindow() } }`;
+}
+
+export function runningPidsScript(pids: number[]): string {
+  return `(@(Get-Process -Id ${pidList(pids)} -ErrorAction SilentlyContinue) | ForEach-Object { $_.Id }) -join ','`;
 }
 
 /**
@@ -96,6 +146,23 @@ export function createWindowsAdapter(): OsAdapter {
 
     async focusWindow(pid) {
       return (await runPowerShell(focusScript(pid))).trim().toLowerCase() === 'true';
+    },
+
+    async listProcesses() {
+      return parseProcesses(await runPowerShell(LIST_PROCESSES_SCRIPT, 20_000));
+    },
+
+    async closeProcesses(pids, force) {
+      await runPowerShell(closeScript(pids, force), 20_000);
+    },
+
+    async runningPids(pids) {
+      const out = await runPowerShell(runningPidsScript(pids));
+      return out
+        .trim()
+        .split(',')
+        .map((x) => Number(x))
+        .filter((n) => Number.isSafeInteger(n) && n > 0);
     },
 
     async sendMediaKey(action, steps) {
