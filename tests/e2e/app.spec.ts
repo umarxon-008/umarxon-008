@@ -253,6 +253,6 @@ test('Windows bilan ishga tushganda: tray yoqilgan bo‘lsa oyna fonda qoladi', 
       false,
     );
   } finally {
-    await app.evaluate(({ app: a }) => a.quit());
+    await app.close(); // jarayon tugashini kutadi (Windows'da fayl qulfi qolmasin)
   }
 });
