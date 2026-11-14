@@ -157,8 +157,10 @@ export function createGeminiProvider(options: GeminiOptions): AIProvider {
       const key = await requireKey();
       const guard = createStreamGuard(
         signal,
-        options.firstChunkTimeoutMs ?? 30_000,
-        options.idleTimeoutMs ?? 60_000,
+        // Yangi Gemini modellari javobdan oldin "o'ylaydi" (thinking): bu vaqtda oqimda hech narsa kelmaydi.
+        // Pro modellarda bu bir daqiqadan oshishi mumkin, shuning uchun kutish uzoqroq. Foydalanuvchi istalgan payt to'xtata oladi.
+        options.firstChunkTimeoutMs ?? 120_000,
+        options.idleTimeoutMs ?? 120_000,
       );
       try {
         const url = `${base}/${API_VERSION}/models/${encodeURIComponent(request.model)}:streamGenerateContent?alt=sse`;

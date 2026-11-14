@@ -137,7 +137,13 @@ export class AiService {
       return { ok: true, models, message: `Ulanish muvaffaqiyatli. ${models.length} ta model topildi.` };
     } catch (error) {
       if (error instanceof AppError) return { ok: false, models: [], message: error.message };
-      const code = error instanceof ProviderError && error.code !== 'CANCELLED' ? error.code : 'AI_TIMEOUT';
+      // Kutilmagan xato "vaqt tugadi" deb ko'rsatilmasligi kerak (chalg'itadi)
+      const code =
+        error instanceof ProviderError
+          ? error.code === 'CANCELLED'
+            ? 'AI_TIMEOUT'
+            : error.code
+          : 'AI_NETWORK';
       const detail = error instanceof ProviderError ? (error.detail ?? '') : '';
       const hint = id === 'gemini' ? geminiHint(detail) : null;
       return {

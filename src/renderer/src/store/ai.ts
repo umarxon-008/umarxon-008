@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { AiSettings, AiSettingsPatch, ConnectionTest, ProviderId } from '@shared/ipc';
+import { defaultGeminiModel } from '@shared/gemini-models';
 
 interface AiState {
   settings: AiSettings | null;
@@ -13,7 +14,7 @@ interface AiState {
   test(provider: ProviderId): Promise<ConnectionTest | null>;
 }
 
-export const useAi = create<AiState>((set) => {
+export const useAi = create<AiState>((set, get) => {
   const apply = (r: Awaited<ReturnType<typeof window.marius.ai.getSettings>>): boolean => {
     if (r.ok) set({ settings: r.data, error: null });
     else set({ error: r.error.message });
@@ -41,6 +42,11 @@ export const useAi = create<AiState>((set) => {
         return null;
       }
       set((s) => ({ tests: { ...s.tests, [provider]: r.data } }));
+      // Gemini modeli hali tanlanmagan bo'lsa, tez ishlaydigan "flash" modeli avtomatik tanlanadi
+      if (provider === 'gemini' && r.data.ok && !get().settings?.gemini.model) {
+        const model = defaultGeminiModel(r.data.models);
+        if (model) await get().update({ geminiModel: model });
+      }
       return r.data;
     },
   };

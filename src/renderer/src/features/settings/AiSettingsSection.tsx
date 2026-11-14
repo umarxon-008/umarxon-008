@@ -11,6 +11,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import type { ProviderId } from '@shared/ipc';
+import { classifyGeminiModel, sortGeminiModels } from '@shared/gemini-models';
 import { useAi } from '../../store/ai';
 
 function TestResult({ provider }: { provider: ProviderId }) {
@@ -49,13 +50,55 @@ function ModelSelect({ provider, value }: { provider: ProviderId; value: string 
         }
       >
         <option value="">— tanlang —</option>
-        {options.map((m) => (
-          <option key={m} value={m}>
-            {m}
-          </option>
-        ))}
+        {provider === 'gemini' ? (
+          <GeminiOptions models={options} />
+        ) : (
+          options.map((m) => (
+            <option key={m} value={m}>
+              {m}
+            </option>
+          ))
+        )}
       </select>
+      {provider === 'gemini' && value && classifyGeminiModel(value) === 'chat' && (
+        <small className="muted">
+          Bu model aqlliroq, lekin javob berishdan oldin uzoq o‘ylaydi (ba’zan bir daqiqagacha). Tezroq javob
+          uchun “flash” modelini tanlang.
+        </small>
+      )}
+      {provider === 'gemini' && value && classifyGeminiModel(value) === 'other' && (
+        <small className="alert alert--warn">
+          Bu model suhbat uchun mo‘ljallanmagan, javob bermasligi mumkin. “Tavsiya etiladi” guruhidan tanlang.
+        </small>
+      )}
     </label>
+  );
+}
+
+/** Gemini modellari guruhlarga bo'lingan: tavsiya etiladi (flash), boshqa suhbat modellari, suhbat uchun emas */
+function GeminiOptions({ models }: { models: string[] }) {
+  const sorted = sortGeminiModels(models);
+  const groups = [
+    ['recommended', 'Tavsiya etiladi (tez)'],
+    ['chat', 'Boshqa suhbat modellari (sekinroq)'],
+    ['other', 'Suhbat uchun emas'],
+  ] as const;
+  return (
+    <>
+      {groups.map(([kind, label]) => {
+        const items = sorted.filter((m) => m.kind === kind);
+        if (items.length === 0) return null;
+        return (
+          <optgroup key={kind} label={label}>
+            {items.map((m) => (
+              <option key={m.name} value={m.name}>
+                {m.name}
+              </option>
+            ))}
+          </optgroup>
+        );
+      })}
+    </>
   );
 }
 
