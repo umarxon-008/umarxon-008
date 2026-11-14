@@ -44,6 +44,10 @@ export class AiService {
     return this.secrets.has(GEMINI_SECRET);
   }
 
+  activeProvider(): ProviderId | null {
+    return this.repo.get().provider;
+  }
+
   geminiModel(): string | null {
     return this.repo.get().geminiModel;
   }

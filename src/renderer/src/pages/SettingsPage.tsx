@@ -8,6 +8,8 @@ import { AiSettingsSection } from '../features/settings/AiSettingsSection';
 import { PrivacySection } from '../features/settings/PrivacySection';
 import { VoiceSettingsSection } from '../features/settings/VoiceSettingsSection';
 import { InternetSection } from '../features/settings/InternetSection';
+import { ObsidianSection } from '../features/settings/ObsidianSection';
+import { BackupControls } from '../features/settings/BackupControls';
 import { uz } from '../i18n/uz';
 
 const themes: { value: Theme; label: string; icon: typeof Moon }[] = [
@@ -44,6 +46,8 @@ export function SettingsPage() {
       <VoiceSettingsSection />
 
       <InternetSection />
+
+      <ObsidianSection />
 
       <section className="card settings-section" aria-labelledby="appearance-title">
         <h2 id="appearance-title">Ko‘rinish</h2>
@@ -158,6 +162,7 @@ export function SettingsPage() {
               <FolderOpen size={16} aria-hidden="true" />
               Log papkasini ochish
             </button>
+            <BackupControls />
           </>
         )}
       </section>

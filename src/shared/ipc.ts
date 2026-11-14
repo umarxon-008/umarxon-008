@@ -182,6 +182,8 @@ export const ConfirmationRequestSchema = z.object({
   /** Natijada nima o'zgaradi */
   effect: z.string(),
   permissionLevel: PermissionLevelSchema,
+  /** Yoziladigan matnning oldindan ko'rinishi (Obsidian note va h.k.) */
+  preview: z.string().nullable(),
   expiresAt: z.string(),
 });
 export type ConfirmationRequest = z.infer<typeof ConfirmationRequestSchema>;
@@ -290,6 +292,21 @@ export type ReminderEvent = { type: 'changed' } | { type: 'fired'; reminder: Rem
 export const REMINDER_EVENT_CHANNEL = 'reminders:event';
 
 const IsoDate = z.string().refine((v) => !Number.isNaN(Date.parse(v)), 'Sana noto‘g‘ri');
+
+/* ===================== Obsidian va zaxira (PHASE 7B) ===================== */
+
+export const ObsidianStatusSchema = z.object({
+  enabled: z.boolean(),
+  vaultPath: z.string().nullable(),
+  read: z.boolean(),
+  create: z.boolean(),
+  append: z.boolean(),
+  obsidianInstalled: z.boolean(),
+  accessible: z.boolean(),
+  noteCount: z.number().nullable(),
+  lastIndexedAt: z.string().nullable(),
+});
+export type ObsidianStatus = z.infer<typeof ObsidianStatusSchema>;
 
 /* ===================== Suhbat ===================== */
 
@@ -569,6 +586,29 @@ export const IPC = {
     output: z.array(ReminderSchema),
   },
 
+  'obsidian:status': { input: NoInput, output: ObsidianStatusSchema },
+  'obsidian:update': {
+    input: z
+      .object({ enabled: z.boolean(), read: z.boolean(), create: z.boolean(), append: z.boolean() })
+      .partial()
+      .strict(),
+    output: ObsidianStatusSchema,
+  },
+  /** Vault faqat tizim dialogi orqali tanlanadi; "create" — tanlangan joyda yangi "MARIUS Vault" papkasi */
+  'obsidian:chooseVault': {
+    input: z.object({ mode: z.enum(['existing', 'create']) }).strict(),
+    output: ObsidianStatusSchema,
+  },
+  'obsidian:disconnect': { input: NoInput, output: ObsidianStatusSchema },
+  'obsidian:open': { input: NoInput, output: z.void() },
+  'obsidian:clearIndex': { input: NoInput, output: ObsidianStatusSchema },
+
+  'data:backup': {
+    input: NoInput,
+    output: z.object({ saved: z.boolean(), path: z.string().nullable(), message: z.string() }),
+  },
+  'data:restore': { input: NoInput, output: z.object({ scheduled: z.boolean(), message: z.string() }) },
+
   'voice:transcribe': { input: TranscribeInputSchema, output: z.object({ text: z.string() }) },
   'voice:synthesize': {
     input: z.object({ text: z.string().trim().min(1).max(MAX_TTS_TEXT) }).strict(),
@@ -620,6 +660,7 @@ export const ErrorCodes = {
     'Ovoz uchun Gemini kaliti va modeli kerak. Sozlamalar → Sun’iy intellekt → Gemini bo‘limida kalitni kiriting va modelni tanlang.',
   TTS_NOT_CONFIGURED: 'Gemini ovoz modeli tanlanmagan. Sozlamalar → Ovoz bo‘limida tanlang.',
   FOLDER_TOO_BROAD: 'Butun disk yoki butun profil emas, aniq papkani tanlang (masalan, Hujjatlar).',
+  OBSIDIAN_NO_VAULT: 'Avval Obsidian Vault papkasini tanlang.',
   REMINDER_IN_PAST: 'Eslatma vaqti o‘tib ketgan. Kelajakdagi vaqtni tanlang.',
   MEMORY_DISABLED: 'Xotira o‘chirilgan. Xotira bo‘limida yoqing.',
   SENSITIVE_MEMORY: 'Parol, karta raqami yoki shunga o‘xshash maxfiy ma’lumot xotiraga saqlanmaydi.',

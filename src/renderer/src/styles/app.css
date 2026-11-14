@@ -2261,3 +2261,20 @@ select.input {
   flex: 1;
   min-width: 0;
 }
+
+.confirm-preview pre {
+  margin: var(--space-1) 0 0;
+  max-height: 220px;
+  overflow: auto;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-strong);
+  background: var(--surface-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.toggle--indent {
+  margin-left: var(--space-6);
+}

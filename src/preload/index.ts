@@ -100,6 +100,18 @@ const api: MariusApi = {
       return () => ipcRenderer.removeListener(REMINDER_EVENT_CHANNEL, handler);
     },
   },
+  obsidian: {
+    status: () => ipcRenderer.invoke('obsidian:status'),
+    update: (patch) => ipcRenderer.invoke('obsidian:update', patch),
+    chooseVault: (mode) => ipcRenderer.invoke('obsidian:chooseVault', { mode }),
+    disconnect: () => ipcRenderer.invoke('obsidian:disconnect'),
+    open: () => ipcRenderer.invoke('obsidian:open'),
+    clearIndex: () => ipcRenderer.invoke('obsidian:clearIndex'),
+  },
+  data: {
+    backup: () => ipcRenderer.invoke('data:backup'),
+    restore: () => ipcRenderer.invoke('data:restore'),
+  },
   voice: {
     transcribe: (audio) => ipcRenderer.invoke('voice:transcribe', { audio, mimeType: 'audio/wav' }),
     synthesize: (text) => ipcRenderer.invoke('voice:synthesize', { text }),

@@ -38,6 +38,7 @@ export class ConfirmationBroker {
       target: card.target,
       effect: card.effect,
       permissionLevel: level,
+      preview: card.preview ?? null,
       expiresAt: new Date(Date.now() + this.timeoutMs).toISOString(),
     };
     return new Promise((resolve) => {

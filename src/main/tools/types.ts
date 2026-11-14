@@ -16,6 +16,8 @@ export interface ConfirmationCard {
   action: string;
   target: string;
   effect: string;
+  /** Yoziladigan matnning oldindan ko'rinishi */
+  preview?: string;
 }
 
 /** prepare() natijasi: darhol javob yoki tasdiq talab qiladigan amal */

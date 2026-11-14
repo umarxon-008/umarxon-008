@@ -67,7 +67,7 @@ PROJECT_AUDIT, ARCHITECTURE, ROADMAP, RISK_REGISTER.
 
 **Qabul mezonlari:** vaqt parser testlari (yarim tun, DST, timezone); eslatma restartdan keyin ham saqlanadi.
 
-## PHASE 7B — Local data va Obsidian (v2.1 qo'shimchasi, ~2–3 sessiya)
+## PHASE 7B — Local data va Obsidian ✅ (`PHASE_7B_REPORT.md`; FTS5 o'rniga mtime kesh bilan oddiy qidiruv)
 - `local-data-manager`, "Ma'lumotlar qayerda saqlanadi?" sahifasi, `backup-restore-service`.
 - Settings → Integratsiyalar → Obsidian: default OFF, Vault tanlash, Test access, alohida Read / Create / Append ruxsatlari, Disconnect.
 - `vault-indexer` (FTS5, worker, cancel), `markdown-note-service` (preview + tasdiq).

@@ -1,5 +1,6 @@
 import type {
   ActionResult,
+  ObsidianStatus,
   MemoryItem,
   Reminder,
   ReminderEvent,
@@ -122,6 +123,20 @@ export interface MariusApi {
     setStatus(id: string, status: Reminder['status']): Promise<IpcResult<Reminder[]>>;
     delete(id: string): Promise<IpcResult<Reminder[]>>;
     onEvent(listener: (event: ReminderEvent) => void): () => void;
+  };
+  obsidian: {
+    status(): Promise<IpcResult<ObsidianStatus>>;
+    update(
+      patch: Partial<Pick<ObsidianStatus, 'enabled' | 'read' | 'create' | 'append'>>,
+    ): Promise<IpcResult<ObsidianStatus>>;
+    chooseVault(mode: 'existing' | 'create'): Promise<IpcResult<ObsidianStatus>>;
+    disconnect(): Promise<IpcResult<ObsidianStatus>>;
+    open(): Promise<IpcResult<void>>;
+    clearIndex(): Promise<IpcResult<ObsidianStatus>>;
+  };
+  data: {
+    backup(): Promise<IpcResult<{ saved: boolean; path: string | null; message: string }>>;
+    restore(): Promise<IpcResult<{ scheduled: boolean; message: string }>>;
   };
   voice: {
     /** 16 kHz mono WAV (base64). Faqat rozilik berilgan bo'lsa Gemini'ga yuboriladi. */

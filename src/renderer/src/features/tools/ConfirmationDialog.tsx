@@ -59,6 +59,12 @@ export function ConfirmationDialog() {
             <small>{level.hint}</small>
           </dd>
         </dl>
+        {request.preview && (
+          <div className="confirm-preview">
+            <small className="muted">Oldindan ko‘rish</small>
+            <pre>{request.preview}</pre>
+          </div>
+        )}
         <p className="small muted">
           Bu tasdiq faqat shu bitta amal uchun.{' '}
           {secondsLeft > 0 ? `${secondsLeft} soniyadan keyin avtomatik bekor qilinadi.` : ''}

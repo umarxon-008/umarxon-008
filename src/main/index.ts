@@ -56,6 +56,11 @@ import { MemoryRepository, looksSensitive } from './memory/memory-repository';
 import { ReminderRepository } from './memory/reminder-repository';
 import { ReminderScheduler } from './memory/scheduler';
 import { createMemoryTools } from './memory/memory-tools';
+import { ObsidianConfigRepository } from './obsidian/obsidian-config';
+import { VaultService } from './obsidian/vault';
+import { createObsidianTools } from './obsidian/obsidian-tools';
+import { applyPendingRestore, backupTo, scheduleRestore } from './services/backup';
+import { mkdir, readdir } from 'node:fs/promises';
 import { createWebTools } from './web/web-tools';
 import { createYoutubeClient } from '../modules/ai/youtube';
 
@@ -305,6 +310,41 @@ function registerIpc(settings: SettingsRepository, database: Database): void {
     return d;
   };
 
+  // ---- Obsidian (PHASE 7B, v2.1) ----
+  const obsidianConfig = new ObsidianConfigRepository(database);
+  const vault = new VaultService(() => {
+    const c = obsidianConfig.get();
+    return c.enabled ? c.vaultPath : null;
+  });
+  for (const tool of createObsidianTools({
+    config: () => obsidianConfig.get(),
+    vault,
+    aiIsCloud: () => ai.providerFor(ai.activeProvider() ?? 'gemini').getCapabilities().cloud,
+  })) {
+    registry.register(tool);
+  }
+  const obsidianStatus = async () => {
+    const c = obsidianConfig.get();
+    let accessible = false;
+    let noteCount: number | null = null;
+    if (c.vaultPath) {
+      try {
+        await readdir(c.vaultPath);
+        accessible = true;
+        if (c.enabled) noteCount = (await vault.listNotes()).length;
+      } catch {
+        accessible = false;
+      }
+    }
+    return {
+      ...c,
+      obsidianInstalled: Boolean(app.getApplicationNameForProtocol('obsidian://')),
+      accessible,
+      noteCount,
+      lastIndexedAt: vault.lastIndexedAt,
+    };
+  };
+
   const broker = new ConfirmationBroker(emitConfirmation);
   const executor = new ToolExecutor(registry, broker, audit, logger);
   const toolRunner: ToolRunner = {
@@ -508,6 +548,98 @@ function registerIpc(settings: SettingsRepository, database: Database): void {
       return reminders.list();
     },
 
+    'obsidian:status': () => obsidianStatus(),
+    'obsidian:update': async (patch) => {
+      const c = obsidianConfig.get();
+      if (!c.vaultPath && patch.enabled) throw new AppError('OBSIDIAN_NO_VAULT');
+      obsidianConfig.set(patch);
+      return obsidianStatus();
+    },
+    'obsidian:chooseVault': async ({ mode }) => {
+      if (!mainWindow) return obsidianStatus();
+      const res = await dialog.showOpenDialog(mainWindow, {
+        title: mode === 'create' ? 'Yangi Vault qayerda yaratilsin?' : 'Obsidian Vault papkasini tanlang',
+        properties: ['openDirectory', 'createDirectory'],
+      });
+      const picked = res.filePaths[0];
+      if (res.canceled || !picked) return obsidianStatus();
+      let target = await realpath(picked);
+      if (mode === 'create') {
+        target = join(target, 'MARIUS Vault');
+        await mkdir(target, { recursive: false }).catch((e: NodeJS.ErrnoException) => {
+          if (e.code !== 'EEXIST') throw e;
+        });
+      }
+      // Vault tanlash yozish huquqini bermaydi: Create/Append alohida yoqiladi (v2.1 §4)
+      obsidianConfig.set({ vaultPath: target, enabled: true, read: true, create: false, append: false });
+      vault.clearIndex();
+      return obsidianStatus();
+    },
+    'obsidian:disconnect': () => {
+      obsidianConfig.disconnect();
+      vault.clearIndex();
+      return obsidianStatus();
+    },
+    'obsidian:open': async () => {
+      const c = obsidianConfig.get();
+      if (!c.vaultPath) throw new AppError('OBSIDIAN_NO_VAULT');
+      if (app.getApplicationNameForProtocol('obsidian://')) {
+        await shell.openExternal(`obsidian://open?path=${encodeURIComponent(c.vaultPath)}`);
+      } else {
+        await shell.openPath(c.vaultPath);
+      }
+    },
+    'obsidian:clearIndex': () => {
+      vault.clearIndex();
+      return obsidianStatus();
+    },
+
+    'data:backup': async () => {
+      if (!mainWindow) return { saved: false, path: null, message: '' };
+      const res = await dialog.showSaveDialog(mainWindow, {
+        title: 'MARIUS zaxira nusxasi',
+        defaultPath: join(
+          app.getPath('documents'),
+          `marius-zaxira-${new Date().toISOString().slice(0, 10)}.db`,
+        ),
+        filters: [{ name: 'MARIUS zaxira', extensions: ['db'] }],
+      });
+      if (res.canceled || !res.filePath) return { saved: false, path: null, message: 'Bekor qilindi.' };
+      const stats = backupTo(database, res.filePath);
+      logger.info('data.backup', { conversations: stats.conversations, reminders: stats.reminders });
+      return {
+        saved: true,
+        path: res.filePath,
+        message: `Zaxira saqlandi: ${stats.conversations} ta suhbat, ${stats.reminders} ta eslatma. API kalitlari zaxiraga kirmaydi.`,
+      };
+    },
+    'data:restore': async () => {
+      if (!mainWindow) return { scheduled: false, message: '' };
+      const res = await dialog.showOpenDialog(mainWindow, {
+        title: 'Tiklash uchun MARIUS zaxirasini tanlang',
+        filters: [{ name: 'MARIUS zaxira', extensions: ['db'] }],
+        properties: ['openFile'],
+      });
+      const file = res.filePaths[0];
+      if (res.canceled || !file) return { scheduled: false, message: 'Bekor qilindi.' };
+      let before: string;
+      try {
+        before = scheduleRestore(database, paths().databaseFile, file);
+      } catch (e) {
+        return { scheduled: false, message: e instanceof Error ? e.message : 'Tiklab bo‘lmadi.' };
+      }
+      logger.warn('data.restore_scheduled', {});
+      setTimeout(() => {
+        isQuitting = true;
+        app.relaunch();
+        app.exit(0);
+      }, 1500);
+      return {
+        scheduled: true,
+        message: `Joriy ma’lumotlar nusxasi saqlandi (${before}). MARIUS qayta ishga tushmoqda…`,
+      };
+    },
+
     'voice:transcribe': async ({ audio, mimeType }) => ({ text: await voice.transcribe(audio, mimeType) }),
     'voice:synthesize': ({ text }) => voice.synthesize(text),
   };
@@ -536,6 +668,7 @@ if (!app.requestSingleInstanceLock()) {
     logger.info('app.start', { version: APP_VERSION, platform: process.platform });
 
     try {
+      if (applyPendingRestore(p.databaseFile)) logger.warn('data.restored', {});
       db = openDatabase(p.databaseFile);
     } catch (error) {
       logger.error('database.open_failed', { error });
