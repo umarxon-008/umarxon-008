@@ -35,13 +35,14 @@ interface GenerateResponse {
     finishReason?: string;
   }[];
   promptFeedback?: { blockReason?: string };
-  error?: { code?: number; status?: string; details?: { reason?: string }[] };
+  error?: { code?: number; status?: string; message?: string; details?: { reason?: string }[] };
 }
 
 function httpError(status: number, body: GenerateResponse): ProviderError {
   const s = body.error?.status ?? '';
   const reason = body.error?.details?.find((d) => d.reason)?.reason ?? '';
-  const detail = `${status} ${s} ${reason}`.trim();
+  const googleMessage = (body.error?.message ?? '').replace(/\s+/g, ' ').slice(0, 200);
+  const detail = `${status} ${s} ${reason}${googleMessage ? ` — ${googleMessage}` : ''}`.trim();
   if (status === 401 || status === 403 || reason === 'API_KEY_INVALID')
     return new ProviderError('AI_AUTH_INVALID', detail);
   if (status === 429) return new ProviderError('AI_RATE_LIMITED', detail);
@@ -108,6 +109,21 @@ export function createGeminiAudio(options: GeminiAudioOptions) {
         .join('')
         .trim();
       return cleanTranscript(text);
+    },
+
+    /**
+     * Model shu kalit bilan ishlashini tekshirish: juda qisqa so'rov (bepul limitdan bitta so'rov oladi).
+     * Xato bo'lsa ProviderError (404 — model yo'q, 429 — limit/bepul emas).
+     */
+    async probe(model: string, signal?: AbortSignal): Promise<void> {
+      await generate(
+        model,
+        {
+          contents: [{ role: 'user', parts: [{ text: 'Salom' }] }],
+          generationConfig: { maxOutputTokens: 16 },
+        },
+        signal ?? AbortSignal.timeout(30_000),
+      );
     },
 
     /** Rasm (ekran) + savol → o'zbekcha matnli javob. `inlineData` rasm uchun ham ishlatiladi. */

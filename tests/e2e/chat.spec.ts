@@ -141,7 +141,13 @@ test('Gemini API kaliti: Windows’da shifrlab saqlanadi, boshqa tizimlarda ochi
       await expect(page.getByText('API kalit saqlangan')).toBeVisible();
       await expect(page.getByText('Ulanish muvaffaqiyatli. 1 ta model topildi.')).toBeVisible();
       await expect(page.getByLabel('Gemini API kalit')).toHaveValue(''); // UI'da qolmaydi
-      await page.getByRole('combobox', { name: 'AI model' }).selectOption('mock-gemini');
+      // Model tanlanmagan: ishlaydigan model qisqa so'rov bilan topiladi va tanlanadi
+      await expect(page.getByText('“mock-gemini” modeli ishlayapti va tanlandi.')).toBeVisible();
+      await expect(page.getByRole('combobox', { name: 'AI model' })).toHaveValue('mock-gemini');
+      expect(mock.requests.some((r) => r.path.endsWith('mock-gemini:generateContent'))).toBe(true);
+      // Tugma bilan qayta qidirish ham ishlaydi
+      await page.getByRole('button', { name: 'Ishlaydigan modelni topish' }).click();
+      await expect(page.getByText('✓ mock-gemini — ishlaydi')).toBeVisible();
 
       await nav(page).getByRole('link', { name: 'Suhbat' }).click();
       await expect(page.getByText(/Gemini ishlatilmoqda: xabarlaringiz/)).toBeVisible();

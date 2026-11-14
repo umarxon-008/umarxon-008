@@ -5,7 +5,9 @@ import {
   ExternalLink,
   HardDrive,
   KeyRound,
+  Loader2,
   PlugZap,
+  Search,
   ShieldAlert,
   Trash2,
   XCircle,
@@ -25,6 +27,53 @@ function TestResult({ provider }: { provider: ProviderId }) {
   );
 }
 
+/** Gemini: modellarni qisqa so'rov bilan sinab, birinchi ishlaganini tanlash */
+function FindGeminiModel() {
+  const { probing, probe, findGeminiModel } = useAi();
+  return (
+    <div className="model-probe">
+      <button
+        type="button"
+        className="btn btn--secondary btn--sm"
+        disabled={probing}
+        onClick={() => void findGeminiModel()}
+      >
+        {probing ? (
+          <Loader2 size={14} className="spin" aria-hidden="true" />
+        ) : (
+          <Search size={14} aria-hidden="true" />
+        )}
+        {probing ? 'Modellar sinalmoqda…' : 'Ishlaydigan modelni topish'}
+      </button>
+      <small className="muted">
+        “Model topilmadi” yoki “limit tugadi” chiqsa bosing: modellar bittadan sinab ko‘riladi (har biriga
+        bitta qisqa so‘rov).
+      </small>
+      {probe && (
+        <div role="status">
+          <p className={`test-result ${probe.model ? 'is-ok' : 'is-fail'}`}>
+            {probe.model ? (
+              <CheckCircle2 size={16} aria-hidden="true" />
+            ) : (
+              <XCircle size={16} aria-hidden="true" />
+            )}
+            {probe.message}
+          </p>
+          {probe.tried.length > 0 && (
+            <ul className="model-probe__list">
+              {probe.tried.map((t) => (
+                <li key={t.model} className={t.ok ? 'is-ok' : 'is-fail'}>
+                  {t.ok ? '✓' : '✗'} {t.model} — {t.reason}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ModelSelect({ provider, value }: { provider: ProviderId; value: string | null }) {
   const { tests, update } = useAi();
   const models = tests[provider]?.models ?? [];
@@ -35,43 +84,47 @@ function ModelSelect({ provider, value }: { provider: ProviderId; value: string 
     );
   }
   return (
-    <label className="field-row">
-      <span>Model</span>
-      <select
-        className="input"
-        aria-label="AI model"
-        value={value ?? ''}
-        onChange={(e) =>
-          void update(
-            provider === 'gemini'
-              ? { geminiModel: e.target.value || null }
-              : { ollamaModel: e.target.value || null },
-          )
-        }
-      >
-        <option value="">— tanlang —</option>
-        {provider === 'gemini' ? (
-          <GeminiOptions models={options} />
-        ) : (
-          options.map((m) => (
-            <option key={m} value={m}>
-              {m}
-            </option>
-          ))
+    <>
+      <label className="field-row">
+        <span>Model</span>
+        <select
+          className="input"
+          aria-label="AI model"
+          value={value ?? ''}
+          onChange={(e) =>
+            void update(
+              provider === 'gemini'
+                ? { geminiModel: e.target.value || null }
+                : { ollamaModel: e.target.value || null },
+            )
+          }
+        >
+          <option value="">— tanlang —</option>
+          {provider === 'gemini' ? (
+            <GeminiOptions models={options} />
+          ) : (
+            options.map((m) => (
+              <option key={m} value={m}>
+                {m}
+              </option>
+            ))
+          )}
+        </select>
+        {provider === 'gemini' && value && classifyGeminiModel(value) === 'chat' && (
+          <small className="muted">
+            Bu model aqlliroq, lekin javob berishdan oldin uzoq o‘ylaydi (ba’zan bir daqiqagacha). Tezroq
+            javob uchun “flash” modelini tanlang.
+          </small>
         )}
-      </select>
-      {provider === 'gemini' && value && classifyGeminiModel(value) === 'chat' && (
-        <small className="muted">
-          Bu model aqlliroq, lekin javob berishdan oldin uzoq o‘ylaydi (ba’zan bir daqiqagacha). Tezroq javob
-          uchun “flash” modelini tanlang.
-        </small>
-      )}
-      {provider === 'gemini' && value && classifyGeminiModel(value) === 'other' && (
-        <small className="alert alert--warn">
-          Bu model suhbat uchun mo‘ljallanmagan, javob bermasligi mumkin. “Tavsiya etiladi” guruhidan tanlang.
-        </small>
-      )}
-    </label>
+        {provider === 'gemini' && value && classifyGeminiModel(value) === 'other' && (
+          <small className="alert alert--warn">
+            Bu model suhbat uchun mo‘ljallanmagan, javob bermasligi mumkin. “Tavsiya etiladi” guruhidan
+            tanlang.
+          </small>
+        )}
+      </label>
+      {provider === 'gemini' && <FindGeminiModel />}
+    </>
   );
 }
 

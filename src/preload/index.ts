@@ -31,6 +31,7 @@ const api: MariusApi = {
     setGeminiKey: (key) => ipcRenderer.invoke('ai:setGeminiKey', { key }),
     deleteGeminiKey: () => ipcRenderer.invoke('ai:deleteGeminiKey'),
     testConnection: (provider) => ipcRenderer.invoke('ai:testConnection', { provider }),
+    findGeminiModel: () => ipcRenderer.invoke('ai:findGeminiModel'),
   },
   chat: {
     listConversations: () => ipcRenderer.invoke('chat:listConversations'),

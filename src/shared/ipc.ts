@@ -149,6 +149,14 @@ export const ConnectionTestSchema = z.object({
 });
 export type ConnectionTest = z.infer<typeof ConnectionTestSchema>;
 
+/** "Ishlaydigan modelni topish" natijasi: har bir sinalgan model va sababi */
+export const ModelProbeResultSchema = z.object({
+  model: z.string().nullable(),
+  tried: z.array(z.object({ model: z.string(), ok: z.boolean(), reason: z.string() })),
+  message: z.string(),
+});
+export type ModelProbeResult = z.infer<typeof ModelProbeResultSchema>;
+
 /* ===================== Vositalar (tools), audit, kompyuter ===================== */
 
 /** Ruxsat darajalari (prompt §20.2). 4 = taqiqlangan: bunday vosita registry'da umuman yo'q. */
@@ -483,6 +491,7 @@ export const IPC = {
     input: z.object({ provider: ProviderIdSchema }).strict(),
     output: ConnectionTestSchema,
   },
+  'ai:findGeminiModel': { input: NoInput, output: ModelProbeResultSchema },
 
   'chat:listConversations': { input: NoInput, output: z.array(ConversationSummarySchema) },
   'chat:getConversation': { input: IdInput, output: ConversationSchema },

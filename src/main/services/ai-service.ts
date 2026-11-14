@@ -1,4 +1,5 @@
-import type { AiSettings, AiSettingsPatch, ConnectionTest, ProviderId } from '@shared/ipc';
+import type { AiSettings, AiSettingsPatch, ConnectionTest, ModelProbeResult, ProviderId } from '@shared/ipc';
+import { sortGeminiModels } from '@shared/gemini-models';
 import { AiErrorMessages, type AiErrorCode } from '@shared/ipc';
 import { createGeminiProvider } from '../../modules/ai/gemini';
 import { createGeminiAudio, type GeminiAudio } from '../../modules/ai/gemini-audio';
@@ -18,6 +19,10 @@ export function geminiHint(detail: string): string | null {
     return 'Google bu kalitni qabul qilmadi. Kalitni aistudio.google.com/apikey sahifasida “Create API key” orqali yarating (odatda “AIza” bilan boshlanadi) va to‘liq nusxalang.';
   if (/SERVICE_DISABLED|API_KEY_SERVICE_BLOCKED|has not been used in project|is disabled/i.test(detail))
     return 'Bu kalitga Gemini API (Generative Language API) ruxsat etilmagan. Ehtimol, kalit Google Cloud yoki Vertex AI’da yaratilgan. aistudio.google.com/apikey sahifasida yangi kalit yarating.';
+  if (/RESOURCE_EXHAUSTED|429/.test(detail) && /limit: 0\b/.test(detail))
+    return 'Bu model bepul kalitda ishlamaydi (bepul limiti 0). Sozlamalar → Sun’iy intellekt → “Ishlaydigan modelni topish” tugmasini bosing.';
+  if (/^404\b|NOT_FOUND/.test(detail))
+    return 'Bu model sizning kalitingiz uchun mavjud emas yoki eskirgan. Sozlamalar → Sun’iy intellekt → “Ishlaydigan modelni topish” tugmasini bosing.';
   if (/location is not supported|User location/i.test(detail))
     return 'Google Gemini API sizning hududingizda ishlamayapti. VPN yoki proxy ishlatayotgan bo‘lsangiz, o‘chirib ko‘ring; bo‘lmasa Ollama (internetsiz) variantidan foydalaning.';
   if (/PERMISSION_DENIED/i.test(detail))
@@ -177,6 +182,68 @@ export class AiService {
           .join(' '),
       };
     }
+  }
+
+  /**
+   * Shu kalit bilan haqiqatan ishlaydigan Gemini modelini topadi: tavsiya etilganlar tartibida eng ko'pi 8 ta
+   * modelga qisqa so'rov yuboriladi, birinchi ishlagani tanlanadi. 404 (model yo'q) va 429 (limit yoki bepul emas)
+   * bo'lganlar o'tkazib yuboriladi. Kalit noto'g'ri yoki internet yo'q bo'lsa, darhol to'xtaydi.
+   */
+  async findGeminiModel(maxProbes = 8): Promise<ModelProbeResult> {
+    if (!this.secrets.has(GEMINI_SECRET)) throw new AppError('AI_NOT_CONFIGURED');
+    let models: string[];
+    try {
+      models = await this.gemini.listModels(AbortSignal.timeout(15_000));
+    } catch (error) {
+      const pe = error instanceof ProviderError ? error : null;
+      return {
+        model: null,
+        tried: [],
+        message: describeProviderError(
+          'gemini',
+          pe && pe.code !== 'CANCELLED' ? pe.code : 'AI_NETWORK',
+          pe?.detail,
+        ),
+      };
+    }
+    const candidates = sortGeminiModels(models)
+      .filter((m) => m.kind !== 'other')
+      .slice(0, maxProbes);
+    const tried: ModelProbeResult['tried'] = [];
+    for (const { name } of candidates) {
+      try {
+        await this.geminiAudio.probe(name);
+        tried.push({ model: name, ok: true, reason: 'ishlaydi' });
+        this.repo.update({ provider: 'gemini', geminiModel: name });
+        return { model: name, tried, message: `“${name}” modeli ishlayapti va tanlandi.` };
+      } catch (error) {
+        const pe =
+          error instanceof ProviderError ? error : new ProviderError('AI_BAD_RESPONSE', String(error));
+        const reason =
+          pe.code === 'AI_MODEL_NOT_FOUND'
+            ? 'bu kalit uchun mavjud emas'
+            : pe.code === 'AI_RATE_LIMITED'
+              ? /limit: 0\b/.test(pe.detail ?? '')
+                ? 'bepul kalitda ishlamaydi'
+                : 'limit tugagan'
+              : pe.code === 'AI_UNAVAILABLE'
+                ? 'server band'
+                : AiErrorMessages[pe.code === 'CANCELLED' ? 'AI_TIMEOUT' : pe.code];
+        tried.push({ model: name, ok: false, reason });
+        // Kalit yoki internet muammosi: boshqa modellarni sinash befoyda
+        if (pe.code === 'AI_AUTH_INVALID' || pe.code === 'AI_NETWORK') {
+          return { model: null, tried, message: describeProviderError('gemini', pe.code, pe.detail) };
+        }
+      }
+    }
+    const allLimited = tried.length > 0 && tried.every((t) => /limit/.test(t.reason));
+    return {
+      model: null,
+      tried,
+      message: allLimited
+        ? 'Hamma sinalgan modellarda limit tugagan. Bepul limit odatda bir daqiqadan keyin (kunlik limit esa ertasi kuni) tiklanadi: biroz kutib qayta urinib ko‘ring.'
+        : 'Ishlaydigan model topilmadi. Bir ozdan keyin qayta urinib ko‘ring yoki aistudio.google.com’da kalit holatini tekshiring.',
+    };
   }
 
   /** Chat uchun faol provayder va model. Sozlanmagan bo'lsa tushunarli xato. */

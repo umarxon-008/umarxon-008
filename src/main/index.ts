@@ -450,6 +450,7 @@ function registerIpc(settings: SettingsRepository, database: Database): void {
     'ai:setGeminiKey': ({ key }) => ai.setGeminiKey(key),
     'ai:deleteGeminiKey': () => ai.deleteGeminiKey(),
     'ai:testConnection': ({ provider }) => ai.testConnection(provider),
+    'ai:findGeminiModel': () => ai.findGeminiModel(),
 
     'chat:listConversations': () => chat.listConversations(),
     'chat:getConversation': ({ id }) => chat.getConversation(id),

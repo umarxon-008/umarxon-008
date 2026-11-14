@@ -1,6 +1,7 @@
 import type {
   ActionResult,
   MediaAction,
+  ModelProbeResult,
   ProcessGroup,
   ObsidianStatus,
   MemoryItem,
@@ -54,6 +55,8 @@ export interface MariusApi {
     setGeminiKey(key: string): Promise<IpcResult<AiSettings>>;
     deleteGeminiKey(): Promise<IpcResult<AiSettings>>;
     testConnection(provider: ProviderId): Promise<IpcResult<ConnectionTest>>;
+    /** Gemini modellarini qisqa so'rov bilan sinab, birinchi ishlaganini tanlaydi */
+    findGeminiModel(): Promise<IpcResult<ModelProbeResult>>;
   };
   chat: {
     listConversations(): Promise<IpcResult<ConversationSummary[]>>;

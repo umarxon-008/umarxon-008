@@ -1,6 +1,5 @@
 import { create } from 'zustand';
-import type { AiSettings, AiSettingsPatch, ConnectionTest, ProviderId } from '@shared/ipc';
-import { defaultGeminiModel } from '@shared/gemini-models';
+import type { AiSettings, AiSettingsPatch, ConnectionTest, ModelProbeResult, ProviderId } from '@shared/ipc';
 
 interface AiState {
   settings: AiSettings | null;
@@ -12,6 +11,10 @@ interface AiState {
   setGeminiKey(key: string): Promise<boolean>;
   deleteGeminiKey(): Promise<boolean>;
   test(provider: ProviderId): Promise<ConnectionTest | null>;
+  /** Gemini: ishlaydigan modelni qidirish holati va natijasi */
+  probing: boolean;
+  probe: ModelProbeResult | null;
+  findGeminiModel(): Promise<void>;
 }
 
 export const useAi = create<AiState>((set, get) => {
@@ -25,6 +28,19 @@ export const useAi = create<AiState>((set, get) => {
     error: null,
     testing: null,
     tests: {},
+    probing: false,
+    probe: null,
+    findGeminiModel: async () => {
+      set({ probing: true, probe: null });
+      const r = await window.marius.ai.findGeminiModel();
+      set({ probing: false });
+      if (!r.ok) {
+        set({ error: r.error.message });
+        return;
+      }
+      set({ probe: r.data });
+      await get().load();
+    },
     load: async () => void apply(await window.marius.ai.getSettings()),
     update: async (patch) => apply(await window.marius.ai.updateSettings(patch)),
     setGeminiKey: async (key) => apply(await window.marius.ai.setGeminiKey(key)),
@@ -42,11 +58,8 @@ export const useAi = create<AiState>((set, get) => {
         return null;
       }
       set((s) => ({ tests: { ...s.tests, [provider]: r.data } }));
-      // Gemini modeli hali tanlanmagan bo'lsa, tez ishlaydigan "flash" modeli avtomatik tanlanadi
-      if (provider === 'gemini' && r.data.ok && !get().settings?.gemini.model) {
-        const model = defaultGeminiModel(r.data.models);
-        if (model) await get().update({ geminiModel: model });
-      }
+      // Gemini modeli hali tanlanmagan bo'lsa, haqiqatan ishlaydigani qidirib topiladi va tanlanadi
+      if (provider === 'gemini' && r.data.ok && !get().settings?.gemini.model) await get().findGeminiModel();
       return r.data;
     },
   };
