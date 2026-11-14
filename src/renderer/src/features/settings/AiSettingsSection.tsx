@@ -186,6 +186,12 @@ export function AiSettingsSection() {
               Saqlash
             </button>
           </form>
+          {key.trim().length > 8 && !key.trim().startsWith('AIza') && (
+            <p className="alert alert--warn" role="status">
+              Bu kalit odatiy Gemini kalitiga o‘xshamaydi (ular odatda “AIza” bilan boshlanadi). Agar
+              ishlamasa, kalitni aynan aistudio.google.com/apikey sahifasida yarating.
+            </p>
+          )}
           {keySaved && <p className="small muted">Kalit shifrlab saqlandi.</p>}
 
           <details className="help">

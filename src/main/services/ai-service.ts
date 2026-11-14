@@ -9,6 +9,22 @@ import type { SecretStore } from '../database/secret-store';
 import { GEMINI_SECRET, type ProviderSettingsRepository } from '../database/provider-settings-repository';
 import { AppError } from '../ipc/router';
 
+/**
+ * Gemini ulanish xatosiga aniq maslahat (Google qaytargan sabab bo'yicha).
+ * Masalan, Google Cloud / Vertex AI'da yaratilgan kalit Gemini API (AI Studio) uchun ishlamasligi mumkin.
+ */
+export function geminiHint(detail: string): string | null {
+  if (/API_KEY_INVALID|API key not valid/i.test(detail))
+    return 'Google bu kalitni qabul qilmadi. Kalitni aistudio.google.com/apikey sahifasida “Create API key” orqali yarating (odatda “AIza” bilan boshlanadi) va to‘liq nusxalang.';
+  if (/SERVICE_DISABLED|API_KEY_SERVICE_BLOCKED|has not been used in project|is disabled/i.test(detail))
+    return 'Bu kalitga Gemini API (Generative Language API) ruxsat etilmagan. Ehtimol, kalit Google Cloud yoki Vertex AI’da yaratilgan. aistudio.google.com/apikey sahifasida yangi kalit yarating.';
+  if (/location is not supported|User location/i.test(detail))
+    return 'Google Gemini API sizning hududingizda ishlamayapti. VPN yoki proxy ishlatayotgan bo‘lsangiz, o‘chirib ko‘ring; bo‘lmasa Ollama (internetsiz) variantidan foydalaning.';
+  if (/PERMISSION_DENIED/i.test(detail))
+    return 'Google bu kalit bilan kirishga ruxsat bermadi. aistudio.google.com/apikey sahifasida yangi kalit yaratib ko‘ring.';
+  return null;
+}
+
 /** Ekran tahlili uchun tanlangan "ko'ra oladigan" model */
 export interface VisionBackend {
   provider: ProviderId;
@@ -122,7 +138,15 @@ export class AiService {
     } catch (error) {
       if (error instanceof AppError) return { ok: false, models: [], message: error.message };
       const code = error instanceof ProviderError && error.code !== 'CANCELLED' ? error.code : 'AI_TIMEOUT';
-      return { ok: false, models: [], message: AiErrorMessages[code] };
+      const detail = error instanceof ProviderError ? (error.detail ?? '') : '';
+      const hint = id === 'gemini' ? geminiHint(detail) : null;
+      return {
+        ok: false,
+        models: [],
+        message: [hint ?? AiErrorMessages[code], detail && `Google javobi: ${detail}`]
+          .filter(Boolean)
+          .join(' '),
+      };
     }
   }
 

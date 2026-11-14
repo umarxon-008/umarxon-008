@@ -159,3 +159,41 @@ describe('Gemini adapter', () => {
     expect(String(fetchMock.mock.calls[1]![0])).toContain('pageToken=p2');
   });
 });
+
+describe('Gemini ulanish xatolari: aniq maslahat', () => {
+  it('Google sababi bo‘yicha o‘zbekcha maslahat beriladi', async () => {
+    const { geminiHint } = await import('../../src/main/services/ai-service');
+    expect(geminiHint('400 INVALID_ARGUMENT API_KEY_INVALID — API key not valid.')).toMatch(/aistudio/);
+    expect(
+      geminiHint(
+        '403 PERMISSION_DENIED SERVICE_DISABLED — Generative Language API has not been used in project 1',
+      ),
+    ).toMatch(/Vertex AI/);
+    expect(geminiHint('400 FAILED_PRECONDITION — User location is not supported for the API use.')).toMatch(
+      /hududingizda/,
+    );
+    expect(geminiHint('429 RESOURCE_EXHAUSTED')).toBeNull();
+  });
+
+  it('xato tafsilotida Google xabari bor, kalitning o‘zi yo‘q', async () => {
+    const { createGeminiProvider } = await import('../../src/modules/ai/gemini');
+    const key = 'AQ.SECRET-KEY-VALUE-123';
+    const provider = createGeminiProvider({
+      apiKey: async () => key,
+      fetch: async () =>
+        new Response(
+          JSON.stringify({
+            error: {
+              code: 403,
+              status: 'PERMISSION_DENIED',
+              message: 'Method doesn’t allow unregistered callers.',
+            },
+          }),
+          { status: 403 },
+        ),
+    });
+    const err = await provider.listModels().catch((e: unknown) => e);
+    expect(String((err as { detail?: string }).detail)).toContain('unregistered callers');
+    expect(String((err as { detail?: string }).detail)).not.toContain(key);
+  });
+});
