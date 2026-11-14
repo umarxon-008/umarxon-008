@@ -149,6 +149,19 @@ test('Gemini API kaliti: Windows’da shifrlab saqlanadi, boshqa tizimlarda ochi
       await page.getByRole('button', { name: 'Ishlaydigan modelni topish' }).click();
       await expect(page.getByText('✓ mock-gemini — ishlaydi')).toBeVisible();
 
+      // Diagnostika: hisobot chiqadi, kalit unda yo'q, nusxa buferga tushadi
+      await page.getByText('Ishlamayaptimi? Diagnostika').click();
+      await page.getByRole('button', { name: 'Diagnostikani boshlash' }).click();
+      const report = page.getByLabel('Diagnostika hisoboti');
+      await expect(report).toHaveValue(/=== tugadi ===/, { timeout: 30_000 });
+      const text = await report.inputValue();
+      expect(text).toContain('✓ mock-gemini: ishlaydi');
+      expect(text).toMatch(/✓ mock-gemini \+ \d+ ta vosita: birinchi bo‘lak/);
+      expect(text).not.toContain(MOCK_GEMINI_KEY);
+      await page.getByRole('button', { name: 'Hisobotdan nusxa olish' }).click();
+      await expect(page.getByRole('button', { name: 'Hisobot nusxalandi' })).toBeVisible();
+      expect(await app.evaluate(({ clipboard }) => clipboard.readText())).toBe(text);
+
       await nav(page).getByRole('link', { name: 'Suhbat' }).click();
       await expect(page.getByText(/Gemini ishlatilmoqda: xabarlaringiz/)).toBeVisible();
       await page.getByLabel('Xabar', { exact: true }).fill('Salom');

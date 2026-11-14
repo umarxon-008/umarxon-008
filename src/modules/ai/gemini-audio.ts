@@ -42,7 +42,8 @@ function httpError(status: number, body: GenerateResponse): ProviderError {
   const s = body.error?.status ?? '';
   const reason = body.error?.details?.find((d) => d.reason)?.reason ?? '';
   const googleMessage = (body.error?.message ?? '').replace(/\s+/g, ' ').slice(0, 200);
-  const detail = `${status} ${s} ${reason}${googleMessage ? ` — ${googleMessage}` : ''}`.trim();
+  const head = [status, s, reason].filter(Boolean).join(' ');
+  const detail = googleMessage ? `${head} — ${googleMessage}` : head;
   if (status === 401 || status === 403 || reason === 'API_KEY_INVALID')
     return new ProviderError('AI_AUTH_INVALID', detail);
   if (status === 429) return new ProviderError('AI_RATE_LIMITED', detail);

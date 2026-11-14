@@ -37,6 +37,8 @@ import type {
 export interface MariusApi {
   app: {
     getInfo(): Promise<IpcResult<AppInfo>>;
+    /** Matnni buferga nusxalash (diagnostika hisoboti uchun) */
+    copyText(text: string): Promise<IpcResult<void>>;
   };
   system: {
     getMetrics(): Promise<IpcResult<SystemMetrics>>;
@@ -57,6 +59,8 @@ export interface MariusApi {
     testConnection(provider: ProviderId): Promise<IpcResult<ConnectionTest>>;
     /** Gemini modellarini qisqa so'rov bilan sinab, birinchi ishlaganini tanlaydi */
     findGeminiModel(): Promise<IpcResult<ModelProbeResult>>;
+    /** Nusxalash mumkin bo'lgan matnli hisobot (kalitsiz). Bir nechta qisqa so'rov yuboradi. */
+    diagnostics(): Promise<IpcResult<{ report: string }>>;
   };
   chat: {
     listConversations(): Promise<IpcResult<ConversationSummary[]>>;

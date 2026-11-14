@@ -2,6 +2,7 @@ import { join } from 'node:path';
 import {
   app,
   BrowserWindow,
+  clipboard,
   dialog,
   ipcMain,
   Menu,
@@ -11,6 +12,7 @@ import {
   Notification,
   powerMonitor,
   safeStorage,
+  session,
   shell,
   Tray,
 } from 'electron';
@@ -42,6 +44,8 @@ import { ConfirmationBroker } from './tools/confirmation';
 import { ToolExecutor } from './tools/executor';
 import { AppCatalog, createComputerTools } from './tools/computer-tools';
 import { createProcessTools } from './tools/process-tools';
+import { runAiDiagnostics } from './services/ai-diagnostics';
+import { GEMINI_DEFAULT_BASE_URL } from '../modules/ai/gemini';
 import { groupProcesses } from './windows/processes';
 import { createElectronCapturer, createFakeCapturer } from './vision/screen-capture';
 import { createVisionTools } from './vision/vision-tools';
@@ -451,6 +455,18 @@ function registerIpc(settings: SettingsRepository, database: Database): void {
     'ai:deleteGeminiKey': () => ai.deleteGeminiKey(),
     'ai:testConnection': ({ provider }) => ai.testConnection(provider),
     'ai:findGeminiModel': () => ai.findGeminiModel(),
+    'ai:diagnostics': async () => ({
+      report: await runAiDiagnostics({
+        ai,
+        appVersion: APP_VERSION,
+        osName: osDisplayName(),
+        geminiBaseUrl: geminiBaseUrl ?? GEMINI_DEFAULT_BASE_URL,
+        logFile: join(paths().logDirectory, 'marius.log'),
+        resolveProxy: (url) => session.defaultSession.resolveProxy(url),
+        tools: () => registry.declarations(),
+      }),
+    }),
+    'app:copyText': ({ text }) => clipboard.writeText(text),
 
     'chat:listConversations': () => chat.listConversations(),
     'chat:getConversation': ({ id }) => chat.getConversation(id),

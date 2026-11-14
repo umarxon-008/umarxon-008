@@ -492,6 +492,8 @@ export const IPC = {
     output: ConnectionTestSchema,
   },
   'ai:findGeminiModel': { input: NoInput, output: ModelProbeResultSchema },
+  'ai:diagnostics': { input: NoInput, output: z.object({ report: z.string() }) },
+  'app:copyText': { input: z.object({ text: z.string().max(100_000) }).strict(), output: z.void() },
 
   'chat:listConversations': { input: NoInput, output: z.array(ConversationSummarySchema) },
   'chat:getConversation': { input: IdInput, output: ConversationSchema },

@@ -8,6 +8,7 @@ import {
   Loader2,
   PlugZap,
   Search,
+  Stethoscope,
   ShieldAlert,
   Trash2,
   XCircle,
@@ -74,6 +75,74 @@ function FindGeminiModel() {
   );
 }
 
+/** Diagnostika: nusxalab yuborish mumkin bo'lgan hisobot (kalit kirmaydi) */
+function AiDiagnostics() {
+  const [running, setRunning] = useState(false);
+  const [report, setReport] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const run = async () => {
+    setRunning(true);
+    setReport(null);
+    setError(null);
+    setCopied(false);
+    const r = await window.marius.ai.diagnostics();
+    setRunning(false);
+    if (r.ok) setReport(r.data.report);
+    else setError(r.error.message);
+  };
+  const copy = async () => {
+    if (report && (await window.marius.app.copyText(report)).ok) setCopied(true);
+  };
+  return (
+    <details className="help diagnostics">
+      <summary>Ishlamayaptimi? Diagnostika</summary>
+      <p className="small muted">
+        MARIUS Google’ga ulanish, kalit, modellar va suhbat kabi oqimli javobni tekshiradi (1–2 daqiqa, bir
+        nechta qisqa so‘rov). Hisobotga API kalitingiz va xabarlaringiz kirmaydi: uni nusxalab yordam
+        so‘raganingizda yuborishingiz mumkin.
+      </p>
+      <button
+        type="button"
+        className="btn btn--secondary btn--sm"
+        disabled={running}
+        onClick={() => void run()}
+      >
+        {running ? (
+          <Loader2 size={14} className="spin" aria-hidden="true" />
+        ) : (
+          <Stethoscope size={14} aria-hidden="true" />
+        )}
+        {running ? 'Tekshirilmoqda…' : 'Diagnostikani boshlash'}
+      </button>
+      {error && (
+        <p className="alert alert--error" role="alert">
+          {error}
+        </p>
+      )}
+      {report && (
+        <>
+          <textarea
+            className="accuracy__report"
+            readOnly
+            value={report}
+            rows={14}
+            aria-label="Diagnostika hisoboti"
+          />
+          <button
+            type="button"
+            className="btn btn--ghost btn--sm"
+            aria-label={copied ? 'Hisobot nusxalandi' : 'Hisobotdan nusxa olish'}
+            onClick={() => void copy()}
+          >
+            {copied ? '✓ Nusxalandi' : 'Nusxa olish'}
+          </button>
+        </>
+      )}
+    </details>
+  );
+}
+
 function ModelSelect({ provider, value }: { provider: ProviderId; value: string | null }) {
   const { tests, update } = useAi();
   const models = tests[provider]?.models ?? [];
@@ -124,6 +193,7 @@ function ModelSelect({ provider, value }: { provider: ProviderId; value: string 
         )}
       </label>
       {provider === 'gemini' && <FindGeminiModel />}
+      {provider === 'gemini' && <AiDiagnostics />}
     </>
   );
 }

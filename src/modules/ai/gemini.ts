@@ -90,7 +90,8 @@ async function errorFromResponse(res: Response): Promise<ProviderError> {
   const reason = body.error?.details?.find((d) => d.reason)?.reason ?? '';
   // Google xabari (kalitning o'zini o'z ichiga olmaydi): tashxis uchun foydalanuvchiga ko'rsatiladi
   const googleMessage = (body.error?.message ?? '').replace(/\s+/g, ' ').slice(0, 200);
-  const detail = `${res.status} ${status} ${reason}${googleMessage ? ` — ${googleMessage}` : ''}`.trim();
+  const head = [res.status, status, reason].filter(Boolean).join(' ');
+  const detail = googleMessage ? `${head} — ${googleMessage}` : head;
   if (
     res.status === 401 ||
     res.status === 403 ||

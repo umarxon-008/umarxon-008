@@ -100,6 +100,14 @@ export class AiService {
     });
   }
 
+  /** Diagnostika uchun: kalitning o'zi emas, faqat turi va uzunligi */
+  async geminiKeyInfo(): Promise<{ stored: boolean; kind: string; length: number }> {
+    const key = this.secrets.has(GEMINI_SECRET) ? await this.secrets.get(GEMINI_SECRET) : null;
+    if (!key) return { stored: false, kind: '—', length: 0 };
+    const kind = key.startsWith('AIza') ? 'AIza…' : key.startsWith('AQ.') ? 'AQ.…' : 'boshqa';
+    return { stored: true, kind, length: key.length };
+  }
+
   hasGeminiKey(): boolean {
     return this.secrets.has(GEMINI_SECRET);
   }

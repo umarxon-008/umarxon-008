@@ -14,6 +14,7 @@ const REMINDER_EVENT_CHANNEL = 'reminders:event';
 const api: MariusApi = {
   app: {
     getInfo: () => ipcRenderer.invoke('app:getInfo'),
+    copyText: (text) => ipcRenderer.invoke('app:copyText', { text }),
   },
   system: {
     getMetrics: () => ipcRenderer.invoke('system:getMetrics'),
@@ -32,6 +33,7 @@ const api: MariusApi = {
     deleteGeminiKey: () => ipcRenderer.invoke('ai:deleteGeminiKey'),
     testConnection: (provider) => ipcRenderer.invoke('ai:testConnection', { provider }),
     findGeminiModel: () => ipcRenderer.invoke('ai:findGeminiModel'),
+    diagnostics: () => ipcRenderer.invoke('ai:diagnostics'),
   },
   chat: {
     listConversations: () => ipcRenderer.invoke('chat:listConversations'),
