@@ -3,6 +3,7 @@
 Bu ro'yxat halol yozilgan: quyidagilar **ishlamaydi** yoki **to'liq tekshirilmagan**.
 
 ## Umumiy
+- **Faqat 64-bit Windows** (x64). 32-bit Windows qo'llab-quvvatlanmaydi: Electron 45 32-bit versiyada chiqarilmaydi. Kamida 4 GB RAM kerak, chunki MARIUS jarayonlari ~500–600 MB xotira ishlatadi.
 - **Faqat Windows 10/11.** Interfeys macOS va Linux'da ochiladi, lekin dastur ochish, oynalar, media tugmalari va batareya faqat Windows'da ishlaydi.
 - **Imzosiz installer.** Windows SmartScreen "Windows protected your PC" deb ogohlantiradi. Uni *More info → Run anyway* orqali o'tkazish mumkin. Raqamli imzo pullik sertifikat talab qiladi (R-07).
 - **Haqiqiy Windows 10/11 kompyuterida inson tomonidan hali sinalmagan.** Avtomatik testlar GitHub Actions'ning `windows-latest` (Windows Server) muhitida o'tadi. Desktop Windows'da qo'lda tekshirish kerak: [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md).

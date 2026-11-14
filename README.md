@@ -21,6 +21,17 @@ O‘zbek tilida gaplashadigan shaxsiy AI desktop yordamchi. Windows 10/11 uchun 
 
 Har bir tashqi amal tasdiq bilan bajariladi va “Tarix”ga yoziladi.
 
+## Tizim talablari
+
+|                       | Minimal                | Tavsiya                    |
+| --------------------- | ---------------------- | -------------------------- |
+| Windows               | 10 yoki 11, **64-bit** | 11, 64-bit                 |
+| Operativ xotira (RAM) | 4 GB                   | 8 GB (Ollama uchun 16 GB+) |
+| Disk                  | 1 GB bo‘sh joy         | SSD                        |
+| Internet              | Gemini uchun kerak     | —                          |
+
+**32-bit Windows qo‘llab-quvvatlanmaydi:** Electron 45 32-bit versiyada chiqarilmaydi. Tekshirish: _Sozlamalar → Tizim → Haqida → Tizim turi_. U yerda “32-bit operatsion tizim, x64 protsessor” deb yozilgan bo‘lsa, kompyuterga 64-bit Windows o‘rnatish mumkin. 2 GB RAM bilan esa 64-bit Windows ham MARIUS’ni juda sekin ishlatadi.
+
 ## Windows'da sinab ko‘rish (dasturchi bo‘lmaganlar uchun)
 
 1. GitHub'da repozitoriyning **Actions** bo‘limini oching.
