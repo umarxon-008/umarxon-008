@@ -135,6 +135,16 @@ test('tanishuv → bosh sahifa → sozlamalar; mavzu qayta ishga tushganda saqla
     await page.getByText('Yorug‘', { exact: true }).click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
     await expect(page.getByText('marius.db')).toBeVisible();
+
+    // §23: avtomatik ishga tushish, tray va ekran tahlili standart holatda o'chiq
+    for (const label of [
+      'Windows bilan birga ishga tushish',
+      'Yopilganda tray’da qolish',
+      'Ekran tahliliga ruxsat',
+    ]) {
+      await expect(page.getByRole('checkbox', { name: new RegExp(label) })).not.toBeChecked();
+    }
+    await page.getByText('Windows bilan birga ishga tushish').click();
   } finally {
     await app.close();
   }
@@ -143,6 +153,8 @@ test('tanishuv → bosh sahifa → sozlamalar; mavzu qayta ishga tushganda saqla
   try {
     await expect(page.getByRole('heading', { name: 'Kompyuter holati' })).toBeVisible();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    const s = await page.evaluate(() => window.marius.settings.getAll());
+    expect(s.ok && s.data.launchAtLogin).toBe(true);
   } finally {
     await app.close();
   }
@@ -221,5 +233,26 @@ test('kamera ruxsati rad etiladi (faqat mikrofon audio ruxsat etilgan)', async (
     expect(result).toBe('NotAllowedError');
   } finally {
     await app.close();
+  }
+});
+
+test('Windows bilan ishga tushganda: tray yoqilgan bo‘lsa oyna fonda qoladi', async () => {
+  let { app, page } = await launch(dataDir);
+  try {
+    await page.evaluate(() =>
+      window.marius.settings.update({ onboardingCompleted: true, minimizeToTray: true }),
+    );
+  } finally {
+    await app.close();
+  }
+  ({ app, page } = await launch(dataDir, ['--marius-autostart']));
+  try {
+    await expect(page.getByRole('heading', { name: 'Kompyuter holati' })).toBeAttached();
+    await page.waitForTimeout(500);
+    expect(await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.isVisible())).toBe(
+      false,
+    );
+  } finally {
+    await app.evaluate(({ app: a }) => a.quit());
   }
 });

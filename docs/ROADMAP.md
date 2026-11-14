@@ -83,7 +83,7 @@ PROJECT_AUDIT, ARCHITECTURE, ROADMAP, RISK_REGISTER.
 - Faqat allowlist'dagi oddiy amallar; preview, cancel va natijani tekshirish.
 - Prompt injection fixture'lari (web, fayl, OCR) va ularga testlar.
 
-## PHASE 10 — Hardening va release (~2 sessiya)
+## PHASE 10 — Hardening va release ✅ (`PHASE_10_REPORT.md`; Windows 10/11'da qo'lda sinov kutilmoqda)
 - To'liq regression, `npm audit`, performance va memory leak tekshiruvi.
 - NSIS installer: o'rnatish papkasini tanlash, shortcut, uninstall (user data saqlansinmi yoki o'chirilsinmi tanlovi bilan), startup default o'chiq.
 - README (prerequisites, dev run, env, test, build, package, troubleshooting), `KNOWN_LIMITATIONS.md`, release checklist.

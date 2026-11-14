@@ -2,8 +2,24 @@
 
 O‘zbek tilida gaplashadigan shaxsiy AI desktop yordamchi. Windows 10/11 uchun mo‘ljallangan.
 
-> **Holat:** 4-bosqich (PHASE 4): o‘zbekcha AI suhbat (Gemini yoki lokal Ollama), ovozli savol-javob, real tizim monitoringi, ovozga javob beruvchi shar.
-> Dastur ochish va oynalar bilan ishlash (tasdiq va audit bilan) mavjud. Fayllar, eslatmalar va brauzer qidiruvi keyingi bosqichlarda. Reja: [`docs/ROADMAP.md`](docs/ROADMAP.md).
+> **Holat: v0.9.0 beta.** Rejadagi barcha bosqichlar (PHASE 0–10) yozildi va avtomatik testlardan o‘tdi.
+> Haqiqiy Windows 10/11 kompyuterida qo‘lda tekshirish kerak: [`docs/RELEASE_CHECKLIST.md`](docs/RELEASE_CHECKLIST.md).
+> Nima ishlamasligi haqida: [`docs/KNOWN_LIMITATIONS.md`](docs/KNOWN_LIMITATIONS.md).
+
+**Imkoniyatlar:**
+
+- o‘zbekcha AI suhbat (Gemini yoki lokal Ollama);
+- ovozli savol-javob va ovozga javob beruvchi shar;
+- dastur ochish va oynalar;
+- ruxsatli papkalarda fayllar;
+- brauzer va YouTube;
+- eslatmalar va xotira;
+- Obsidian;
+- ekran tahlili;
+- media tugmalari;
+- zaxira nusxa.
+
+Har bir tashqi amal tasdiq bilan bajariladi va “Tarix”ga yoziladi.
 
 ## Windows'da sinab ko‘rish (dasturchi bo‘lmaganlar uchun)
 
@@ -15,7 +31,12 @@ O‘zbek tilida gaplashadigan shaxsiy AI desktop yordamchi. Windows 10/11 uchun 
    Bu dastur hali raqamli imzoga ega emasligi uchun chiqadi (qarang: `docs/RISK_REGISTER.md`, R-07).
 
 Dastur ma’lumotlari `%APPDATA%\MARIUS` papkasida saqlanadi (`marius.db`, `logs\`).
-O‘chirish: _Sozlamalar → Ilovalar → MARIUS → Uninstall_. Ma’lumotlar papkasi saqlanib qoladi.
+
+**O‘chirish:** _Sozlamalar → Ilovalar → MARIUS → Uninstall_.
+
+- O‘chirishda “MARIUS ma’lumotlari ham o‘chirilsinmi?” deb so‘raladi. Standart javob “Yo‘q”.
+- “Yo‘q” tanlansa, qayta o‘rnatganda hammasi tiklanadi.
+- Yangi versiyani ustidan o‘rnatganda ma’lumotlar hech qachon o‘chirilmaydi.
 
 ## AI’ni ulash (bepul)
 
@@ -50,6 +71,32 @@ Yozuv kompyuterda saqlanmaydi. Mikrofon faqat tugma bosilganda yoqiladi va 30 so
 MARIUS’ga “Kalkulyatorni och”, “Qaysi dasturlar ochiq?”, “Diskda qancha joy bor?” deb yozing yoki ayting.
 Dastur ochish yoki oynaga o‘tishdan oldin MARIUS **har safar ruxsat so‘raydi**. Barcha amallar **Tarix** bo‘limida ko‘rinadi.
 Fayl o‘chirish, buyruqlar oynasida buyruq bajarish va administrator amallari yo‘q.
+
+## Fayllar, internet, eslatmalar
+
+- **Fayllar** (Kompyuter → Fayllar): avval papkaga ruxsat bering (masalan, Hujjatlar). Keyin “Yuklamalarda PDF top”, “Hisobot.docx ni och” deb so‘rash mumkin. O‘chirish va ustiga yozish yo‘q. Fayl mazmuni AI’ga yuborilmaydi.
+- **Internet:** “Internetda Python darslarini qidir”. Qidiruv brauzeringizda ochiladi. YouTube natijalari uchun Sozlamalar → Internet bo‘limiga YouTube Data API kalitini kiriting (ixtiyoriy).
+- **Eslatmalar:** “Ertaga soat 8 da imtihonni eslat”. Noaniq vaqt bo‘lsa, aniq sana bilan tasdiq so‘raladi. MARIUS yopiq bo‘lsa ham eslatma ishlashi uchun Sozlamalarda “Yopilganda tray’da qolish” va “Windows bilan birga ishga tushish”ni yoqing (ikkalasi ham standart holatda o‘chiq).
+- **Xotira:** “Eslab qol: men C++ o‘rganyapman”. Parol yoki karta raqami saqlanmaydi. Hammasini Xotira sahifasida ko‘rish va o‘chirish mumkin.
+
+## Obsidian (ixtiyoriy)
+
+Sozlamalar → **Integratsiyalar → Obsidian** → “Mavjud Vault’ni tanlash”. Standart holatda faqat o‘qish yoqiladi. “Yangi note yaratish” va “oxiriga qo‘shish”ni alohida yoqasiz. Har bir yozishdan oldin matn ko‘rsatiladi va tasdiq so‘raladi. Obsidian o‘rnatilmagan bo‘lsa ham MARIUS to‘liq ishlaydi.
+
+## Ekran tahlili va media
+
+- **Ekran tahlili** (standart holatda o‘chiq): Sozlamalar → Maxfiylik → “Ekran tahliliga ruxsat”. So‘ng chatda “ekranimdagi xato nima?” deb yozing yoki Kompyuter → “Ekranni tahlil qilish” tugmasini bosing.
+  - Har bir rasm oldidan tasdiq so‘raladi va rasm qayerga ketishi aytiladi: Google Gemini yoki lokal Ollama.
+  - Rasm saqlanmaydi.
+  - Bank yoki parol oynasi ochiq bo‘lsa, ogohlantirish chiqadi.
+- **Media:** “Ovozni pasaytir”, “Keyingi qo‘shiq”, “Pauza”. Kompyuter → Ovoz va media bo‘limidagi tugmalar bilan ham boshqarish mumkin.
+
+## Ma’lumotlar va maxfiylik
+
+- Hamma narsa shu kompyuterda saqlanadi. Bulutga avtomatik yuklash yo‘q.
+- Internetga faqat siz tanlagan AI xizmati (Gemini) va siz rozilik bergan ovoz yoki ekran so‘rovlari chiqadi.
+- **Zaxira nusxa:** Sozlamalar → Maxfiylik → “Zaxira nusxa olish”. API kalitlari zaxiraga kirmaydi.
+- Loglarda API kalit va xabar matnlari yozilmaydi.
 
 ## Dasturchilar uchun
 
@@ -89,7 +136,7 @@ Har bir push'da GitHub Actions (`.github/workflows/windows-build.yml`) Windows'd
 
 ### Environment variables
 
-Hozircha kerak emas. API kalitlar `.env` faylida emas, ilova ichida shifrlangan holda saqlanadi (2-bosqich).
+Oddiy foydalanish uchun kerak emas. API kalitlar `.env` faylida emas, ilova ichida shifrlangan holda saqlanadi. Quyidagilar faqat dev va test uchun.
 
 | O‘zgaruvchi               | Vazifasi                                                                                                              |
 | ------------------------- | --------------------------------------------------------------------------------------------------------------------- |
@@ -101,10 +148,13 @@ Hozircha kerak emas. API kalitlar `.env` faylida emas, ilova ichida shifrlangan 
 ### Tuzilma
 
 ```
-src/main       Main process: oyna, xavfsizlik, IPC, ma'lumotlar bazasi, log
+src/main       Main process: oyna, xavfsizlik, IPC, ma'lumotlar bazasi, log,
+               vositalar (tools), fayllar, xotira/eslatmalar, Obsidian, vision, Windows adapteri
 src/preload    Renderer'ga ochilgan yagona API (window.marius)
 src/renderer   React interfeys (OS'ga to'g'ridan-to'g'ri kirish yo'q)
-src/shared     IPC shartnomasi va zod sxemalari
+src/shared     IPC shartnomasi, zod sxemalari, o'zbekcha vaqt parseri
+src/modules/ai Gemini, Ollama, ovoz, vision, YouTube adapterlari
+build/         ikona va NSIS qo'shimchasi (installer.nsh)
 tests/         unit va E2E testlar
 docs/          arxitektura, reja, risklar
 ```

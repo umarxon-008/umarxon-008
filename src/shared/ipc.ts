@@ -42,6 +42,8 @@ export const SettingsSchema = z.object({
   memoryEnabled: z.boolean(),
   /** Oyna yopilganda MARIUS tray'da qoladi (eslatmalar ishlashi uchun) */
   minimizeToTray: z.boolean(),
+  /** Windows bilan birga ishga tushish (prompt §23: standart holatda o'chiq) */
+  launchAtLogin: z.boolean(),
 
   /* --- Ekran tahlili (PHASE 8) --- */
   /** Standart holatda o'chiq. Yoqilgan bo'lsa ham har bir skrinshot alohida tasdiqlanadi. */
@@ -65,6 +67,7 @@ export const DEFAULT_SETTINGS: Settings = {
   searchEngine: 'google',
   memoryEnabled: true,
   minimizeToTray: false,
+  launchAtLogin: false,
   screenAnalysisEnabled: false,
 };
 

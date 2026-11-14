@@ -36,9 +36,10 @@ nsis:
   createStartMenuShortcut: true
   shortcutName: MARIUS
   uninstallDisplayName: MARIUS
-  # Foydalanuvchi ma'lumotlari (%APPDATA%\MARIUS) uninstallda saqlanadi.
-  # O'chirish tanlovi PHASE 10 da qo'shiladi.
+  # Foydalanuvchi ma'lumotlari (%APPDATA%\MARIUS): o'chirishda so'raladi (build/installer.nsh),
+  # standart javob va jim rejim — saqlash. Yangilanishda hech qachon o'chirilmaydi.
   deleteAppDataOnUninstall: false
+  include: build/installer.nsh
   runAfterFinish: true
 
 publish: null

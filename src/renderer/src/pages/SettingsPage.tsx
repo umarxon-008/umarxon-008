@@ -110,6 +110,21 @@ export function SettingsPage() {
             </small>
           </span>
         </label>
+        <label className="toggle">
+          <input
+            type="checkbox"
+            checked={settings.launchAtLogin}
+            onChange={(e) => void update({ launchAtLogin: e.target.checked })}
+          />
+          <span className="toggle__track" aria-hidden="true" />
+          <span>
+            <strong>Windows bilan birga ishga tushish</strong>
+            <small>
+              Kompyuter yoqilganda MARIUS avtomatik ochiladi (tray yoqilgan bo‘lsa, fonda). Faqat o‘rnatilgan
+              ilovada ishlaydi.
+            </small>
+          </span>
+        </label>
         <div className="row">
           <div>
             <strong>Tanishuv oynasi</strong>

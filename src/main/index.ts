@@ -111,6 +111,24 @@ function paths() {
   };
 }
 
+/** Windows avtomatik ishga tushirganda beriladigan belgi */
+const AUTOSTART_ARG = '--marius-autostart';
+/** Registr qiymati nomi (HKCU\...\Run). Uninstaller ham shu nom bilan o'chiradi: build/installer.nsh */
+const LOGIN_ITEM_NAME = 'MARIUS';
+
+/**
+ * "Windows bilan birga ishga tushish" (standart o'chiq). Faqat o'rnatilgan Windows ilovasida:
+ * dev rejimida electron.exe avtomatik ishga tushadigan qilib ro'yxatga olinmasligi kerak.
+ */
+function applyLoginItem(enabled: boolean): void {
+  if (process.platform !== 'win32' || !app.isPackaged) return;
+  try {
+    app.setLoginItemSettings({ openAtLogin: enabled, args: [AUTOSTART_ARG], name: LOGIN_ITEM_NAME });
+  } catch (error) {
+    logger.warn('login_item.failed', { error });
+  }
+}
+
 function createMainWindow(settings: SettingsRepository): BrowserWindow {
   const theme = settings.getAll().theme;
   const win = new BrowserWindow({
@@ -128,7 +146,15 @@ function createMainWindow(settings: SettingsRepository): BrowserWindow {
   const isTrusted = createSenderGuard({ devServerUrl, rendererFile });
   hardenWindow(win, isTrusted, logger);
 
-  win.once('ready-to-show', () => win.show());
+  win.once('ready-to-show', () => {
+    // Avtomatik ishga tushganda: tray bo'lsa fonda qoladi, bo'lmasa vazifalar panelida kichraytirilgan holda
+    if (process.argv.includes(AUTOSTART_ARG)) {
+      if (tray) return;
+      win.minimize();
+      return;
+    }
+    win.show();
+  });
   // Tray yoqilgan bo'lsa, yopish tugmasi oynani yashiradi (eslatmalar ishlashda davom etadi)
   win.on('close', (e) => {
     if (!isQuitting && getSettings?.().minimizeToTray && tray) {
@@ -406,6 +432,7 @@ function registerIpc(settings: SettingsRepository, database: Database): void {
       const updated = settings.update(patch);
       nativeTheme.themeSource = updated.theme;
       if (patch.minimizeToTray !== undefined) updateTray(updated.minimizeToTray);
+      if (patch.launchAtLogin !== undefined) applyLoginItem(updated.launchAtLogin);
       return updated;
     },
     'logs:openFolder': async () => {
@@ -681,11 +708,8 @@ function registerIpc(settings: SettingsRepository, database: Database): void {
 if (!app.requestSingleInstanceLock()) {
   app.quit();
 } else {
-  app.on('second-instance', () => {
-    if (!mainWindow) return;
-    if (mainWindow.isMinimized()) mainWindow.restore();
-    mainWindow.focus();
-  });
+  // Ikkinchi marta ochilganda mavjud oyna ko'rsatiladi (tray'da yashiringan bo'lsa ham)
+  app.on('second-instance', () => showMainWindow());
 
   void app.whenReady().then(() => {
     const p = paths();
@@ -704,6 +728,8 @@ if (!app.requestSingleInstanceLock()) {
     nativeTheme.themeSource = settings.getAll().theme;
     lockDownPermissions(logger, createSenderGuard({ devServerUrl, rendererFile }));
     registerIpc(settings, db);
+    // Sozlama va Windows ro'yxatini moslashtirish (masalan, zaxiradan tiklangandan keyin)
+    applyLoginItem(settings.getAll().launchAtLogin);
     mainWindow = createMainWindow(settings);
     mainWindow.on('closed', () => {
       mainWindow = null;

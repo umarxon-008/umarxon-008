@@ -1,6 +1,6 @@
 name: Windows build
 
-# Har bir push'da Windows'da: typecheck → lint → unit test → build → E2E → installer (.exe)
+# Har bir push'da Windows'da: npm audit → typecheck → lint → unit test → build → E2E → installer (.exe)
 on:
   push:
     branches: ['**']
@@ -30,6 +30,9 @@ jobs:
 
       - name: Paketlarni o'rnatish
         run: npm ci
+
+      - name: Xavfsizlik (installer'ga kiradigan paketlarda zaiflik bo'lmasligi kerak)
+        run: npm audit --omit=dev --audit-level=moderate
 
       - name: Typecheck
         run: npm run typecheck
