@@ -29,8 +29,10 @@ test.afterEach(async () => {
   rmSync(dataDir, { recursive: true, force: true });
 });
 
+/** Bu fayl AI → tasdiq oynasi zanjirini sinaydi: tezkor buyruqlar o'chiriladi (ular alohida sinaladi) */
 async function useOllama(page: Page) {
   await page.evaluate(async (url) => {
+    await window.marius.settings.update({ quickCommands: false });
     await window.marius.ai.updateSettings({
       provider: 'ollama',
       ollamaBaseUrl: url,
@@ -148,6 +150,7 @@ test('Gemini: function calling va thoughtSignature keyingi so‘rovda o‘zgarma
     const ai = await page.evaluate(() => window.marius.ai.getSettings());
     test.skip(!(ai.ok && ai.data.secretStorageAvailable), 'Bu tizimda kalitni shifrlab saqlab bo‘lmaydi');
     await page.evaluate(async (key) => {
+      await window.marius.settings.update({ quickCommands: false });
       await window.marius.ai.setGeminiKey(key);
       await window.marius.ai.updateSettings({ provider: 'gemini', geminiModel: 'mock-gemini' });
     }, MOCK_GEMINI_KEY);
@@ -202,6 +205,49 @@ test('haqiqiy OS adapteri: Windows’da Start menyusi dasturlari o‘qiladi, bos
       await nav(page).getByRole('link', { name: 'Kompyuter' }).click();
       await expect(page.getByText(/faqat Windows’da mavjud/)).toBeVisible();
     }
+  } finally {
+    await app.close();
+  }
+});
+
+test('tezkor buyruqlar: AI’siz va tasdiqsiz bir zumda ochadi; yopishda tasdiq so‘raladi', async () => {
+  const { app, page } = await launchApp(dataDir, FAKE_OS);
+  try {
+    await finishOnboarding(page);
+    await page.evaluate(async (url) => {
+      await window.marius.ai.updateSettings({
+        provider: 'ollama',
+        ollamaBaseUrl: url,
+        ollamaModel: 'mock-uz:latest',
+      });
+    }, mock.url);
+    const aiCalls = () => mock.requests.filter((r) => r.path === '/api/chat').length;
+    const log = page.getByRole('log', { name: 'Xabarlar' });
+
+    const started = Date.now();
+    await ask(page, 'Kalkulyatorni och');
+    await expect(log.getByText('Calculator ochildi.', { exact: true }).first()).toBeVisible();
+    expect(Date.now() - started).toBeLessThan(3000);
+    await expect(page.getByRole('alertdialog')).toHaveCount(0);
+    expect(aiCalls()).toBe(0); // AI'ga hech narsa yuborilmadi
+
+    await page.getByLabel('Xabar', { exact: true }).fill('ovozni pasaytir');
+    await page.getByLabel('Xabar', { exact: true }).press('Enter');
+    await expect(log.getByText('Ovozni pasaytirish: tugma bosildi.').first()).toBeVisible();
+
+    await page.getByLabel('Xabar', { exact: true }).fill('Telegramni yop');
+    await page.getByLabel('Xabar', { exact: true }).press('Enter');
+    const dialog = page.getByRole('alertdialog');
+    await expect(dialog.getByText('Dasturni yopish', { exact: true })).toBeVisible();
+    await dialog.getByRole('button', { name: 'Tasdiqlash' }).click();
+    await expect(log.getByText('Telegram yopildi.').first()).toBeVisible();
+
+    expect(aiCalls()).toBe(0);
+
+    // Noma'lum dastur: tezkor yo'l ishlamaydi, so'rov AI'ga yuboriladi
+    await page.getByLabel('Xabar', { exact: true }).fill('Fotoshopni och');
+    await page.getByLabel('Xabar', { exact: true }).press('Enter');
+    await expect.poll(aiCalls).toBe(1);
   } finally {
     await app.close();
   }

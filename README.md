@@ -78,6 +78,17 @@ Sozlamalar → **Sun’iy intellekt** bo‘limida ikkitadan birini tanlang:
 
 Yozuv kompyuterda saqlanmaydi. Mikrofon faqat tugma bosilganda yoqiladi va 30 soniyada o‘zi o‘chadi.
 
+## Tezkor buyruqlar (AI’siz, bir zumda)
+
+Quyidagi aniq buyruqlar AI’ga yuborilmaydi va 1–2 soniyada bajariladi:
+
+- “Telegramni och”, “Kalkulyatorni och”, “Chrome’ni ochib ber”. Tasdiq so‘ralmaydi, chunki buni o‘zingiz aniq aytdingiz.
+- “Telegramni yop”. Tasdiq bilan.
+- “Ovozni pasaytir/balandlat/o‘chir”, “Pauza”, “Keyingi qo‘shiq”, “Oldingi qo‘shiq”.
+- “Batareya”, “Diskda qancha joy bor?”
+
+Dastur nomi aniq topilmasa yoki buyruq murakkab bo‘lsa, so‘rov odatdagidek AI’ga yuboriladi. O‘chirish: Sozlamalar → “Tezkor buyruqlar”.
+
 ## Kompyuter amallari
 
 MARIUS’ga “Kalkulyatorni och”, “Qaysi dasturlar ochiq?”, “Diskda qancha joy bor?” deb yozing yoki ayting.

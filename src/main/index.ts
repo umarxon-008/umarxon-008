@@ -44,6 +44,9 @@ import { ConfirmationBroker } from './tools/confirmation';
 import { ToolExecutor } from './tools/executor';
 import { AppCatalog, createComputerTools } from './tools/computer-tools';
 import { createProcessTools } from './tools/process-tools';
+import { parseQuickCommand } from '@shared/quick-commands';
+import { matchApp, normalizeAppQuery } from './tools/app-matching';
+import { matchProcess } from './windows/processes';
 import { runAiDiagnostics } from './services/ai-diagnostics';
 import { GEMINI_DEFAULT_BASE_URL } from '../modules/ai/gemini';
 import { groupProcesses } from './windows/processes';
@@ -398,6 +401,7 @@ function registerIpc(settings: SettingsRepository, database: Database): void {
   const toolRunner: ToolRunner = {
     declarations: () => registry.declarations(),
     execute: (call, ctx) => executor.execute(call, { source: 'ai', ...ctx }),
+    executeUser: (call, ctx) => executor.execute(call, { source: 'user', ...ctx }),
     activitiesFor: (ids) => audit.activitiesForMessages(ids),
   };
   const runUserAction = async (name: string, args: Record<string, unknown>) => {
@@ -419,7 +423,41 @@ function registerIpc(settings: SettingsRepository, database: Database): void {
     logger,
     tools: toolRunner,
     memoryForPrompt: () => (settings.getAll().memoryEnabled ? memory.forPrompt() : []),
+    quick: {
+      enabled: () => settings.getAll().quickCommands && osAdapter.supported,
+      // Faqat aniq moslik bo'lsa: dastur nomi bitta dasturga, jarayon nomi bitta jarayonga mos kelishi kerak
+      match: async (text) => {
+        const intent = parseQuickCommand(text);
+        if (!intent) return null;
+        switch (intent.kind) {
+          case 'open_app': {
+            const m = matchApp(intent.name, await catalog.list());
+            return m.kind === 'exact'
+              ? { name: 'launch_app', args: { appId: m.app.id, name: m.app.name } }
+              : null;
+          }
+          case 'close_app': {
+            const m = matchProcess(
+              normalizeAppQuery(intent.name),
+              await osAdapter.listProcesses(),
+              ownPids(),
+            );
+            if (m.kind === 'found' || m.kind === 'protected')
+              return { name: 'close_app', args: { name: m.name } };
+            return null;
+          }
+          case 'media':
+            return { name: 'media_control', args: { action: intent.action } };
+          case 'battery':
+            return { name: 'get_battery_status', args: {} };
+          case 'disk':
+            return { name: 'get_disk_usage', args: {} };
+        }
+      },
+    },
   });
+  // Dasturlar ro'yxati oldindan yuklanadi: birinchi "…ni och" buyrug'i ham tez bajarilsin
+  if (osAdapter.supported) void catalog.list().catch(() => undefined);
   const voice = new VoiceService({
     settings: () => settings.getAll(),
     audio: ai.geminiAudio,

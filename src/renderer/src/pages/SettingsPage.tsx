@@ -113,6 +113,22 @@ export function SettingsPage() {
         <label className="toggle">
           <input
             type="checkbox"
+            checked={settings.quickCommands}
+            onChange={(e) => void update({ quickCommands: e.target.checked })}
+          />
+          <span className="toggle__track" aria-hidden="true" />
+          <span>
+            <strong>Tezkor buyruqlar</strong>
+            <small>
+              “Telegramni och”, “ovozni pasaytir”, “keyingi qo‘shiq”, “batareya” kabi aniq buyruqlar AI’siz,
+              bir zumda bajariladi. Dastur ochish uchun tasdiq so‘ralmaydi (buni o‘zingiz aniq aytdingiz);
+              dasturni yopishda so‘raladi. Nom aniq topilmasa, so‘rov AI’ga yuboriladi.
+            </small>
+          </span>
+        </label>
+        <label className="toggle">
+          <input
+            type="checkbox"
             checked={settings.launchAtLogin}
             onChange={(e) => void update({ launchAtLogin: e.target.checked })}
           />

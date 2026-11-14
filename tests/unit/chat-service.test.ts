@@ -215,3 +215,68 @@ describe('buildContext', () => {
     expect(huge).toHaveLength(1);
   });
 });
+
+describe('Tezkor buyruqlar (AI’siz)', () => {
+  function quickSetup(matchResult: { name: string; args: Record<string, unknown> } | null, enabled = true) {
+    const t = tempDatabase();
+    cleanup = t.cleanup;
+    const events: ChatEvent[] = [];
+    const streamChat = vi.fn();
+    const executeUser = vi.fn(async () => ({
+      ok: true,
+      verified: true,
+      message: 'Telegram Desktop ochildi.',
+    }));
+    const executeAi = vi.fn();
+    const service = new ChatService({
+      stores: { persistent: new SqliteConversationStore(t.db), memory: new MemoryConversationStore() },
+      saveHistory: () => true,
+      resolveProvider: async () => {
+        throw new AppError('AI_NOT_CONFIGURED');
+      },
+      emit: (e) => events.push(e),
+      logger,
+      tools: {
+        declarations: () => [],
+        execute: executeAi,
+        executeUser,
+        activitiesFor: () => [],
+      },
+      quick: { enabled: () => enabled, match: async () => matchResult },
+    });
+    return { service, events, executeUser, executeAi, streamChat };
+  }
+
+  it('aniq buyruq: AI sozlanmagan bo‘lsa ham darhol bajariladi, foydalanuvchi nomidan', async () => {
+    const s = quickSetup({
+      name: 'launch_app',
+      args: { appId: 'TelegramDesktop', name: 'Telegram Desktop' },
+    });
+    const r = await s.service.send(null, 'Telegramni och');
+    await vi.waitFor(() => {
+      if (!s.events.some((e) => e.type === 'done')) throw new Error('not yet');
+    });
+    expect(s.executeUser).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'launch_app',
+        args: { appId: 'TelegramDesktop', name: 'Telegram Desktop' },
+      }),
+      expect.anything(),
+    );
+    expect(s.executeAi).not.toHaveBeenCalled();
+    expect(s.events.find((e) => e.type === 'delta')).toMatchObject({ text: 'Telegram Desktop ochildi.' });
+    const conv = s.service.getConversation(r.conversationId);
+    expect(conv.messages.map((m) => [m.role, m.content, m.status])).toEqual([
+      ['user', 'Telegramni och', 'complete'],
+      ['assistant', 'Telegram Desktop ochildi.', 'complete'],
+    ]);
+  });
+
+  it('mos kelmasa yoki o‘chirilgan bo‘lsa, odatdagidek AI’ga yuboriladi', async () => {
+    const a = quickSetup(null);
+    await expect(a.service.send(null, 'Salom')).rejects.toMatchObject({ code: 'AI_NOT_CONFIGURED' });
+    const b = quickSetup({ name: 'launch_app', args: {} }, false);
+    await expect(b.service.send(null, 'Telegramni och')).rejects.toMatchObject({ code: 'AI_NOT_CONFIGURED' });
+    expect(b.executeUser).not.toHaveBeenCalled();
+  });
+});

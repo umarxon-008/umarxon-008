@@ -68,6 +68,15 @@ export interface ToolRunner {
     },
   ): Promise<{ ok: boolean; message: string; verified: boolean | null; data?: unknown; errorCode?: string }>;
   activitiesFor(messageIds: string[]): ToolActivity[];
+  /** Foydalanuvchining aniq buyrug'i (tezkor buyruq): source 'user', AI tasdiq siyosati qo'llanmaydi */
+  executeUser?: ToolRunner['execute'];
+}
+
+/** Tezkor buyruqlar: aniq buyruq AI'siz bajariladi (main process dastur/jarayon nomini aniq tekshiradi) */
+export interface QuickCommands {
+  enabled(): boolean;
+  /** Mos vosita chaqiruvi yoki null (null bo'lsa xabar AI'ga yuboriladi) */
+  match(text: string): Promise<{ name: string; args: Record<string, unknown> } | null>;
 }
 
 export interface ChatServiceDeps {
@@ -81,6 +90,7 @@ export interface ChatServiceDeps {
   tools?: ToolRunner;
   /** Foydalanuvchi tasdiqlagan xotira (PHASE 7): modelga minimal miqdorda */
   memoryForPrompt?: () => string[];
+  quick?: QuickCommands;
 }
 
 /** Suhbat servisi: xabar yuborish, oqim, to'xtatish, qayta urinish (ARCHITECTURE §5). */
@@ -129,7 +139,10 @@ export class ChatService {
 
   async send(conversationId: string | null, text: string): Promise<ChatSendResult> {
     if (this.isBusy()) throw new AppError('BUSY');
-    const resolved = await this.deps.resolveProvider(); // sozlanmagan bo'lsa, hech narsa yozilmasdan xato
+    // Tezkor buyruq: AI kerak emas (AI sozlanmagan bo'lsa ham ishlaydi)
+    const quick = await this.matchQuick(text);
+    // sozlanmagan bo'lsa, hech narsa yozilmasdan xato
+    const resolved = quick ? null : await this.deps.resolveProvider();
 
     let store: ConversationStore;
     let convId: string;
@@ -151,8 +164,67 @@ export class ChatService {
       provider: null,
       model: null,
     });
-    const { requestId, assistantMessage } = this.start(store, convId, resolved);
+    const { requestId, assistantMessage } = quick
+      ? this.startQuick(store, convId, quick)
+      : this.start(store, convId, resolved!);
     return { conversationId: convId, requestId, userMessage, assistantMessage };
+  }
+
+  private async matchQuick(text: string): Promise<{ name: string; args: Record<string, unknown> } | null> {
+    const { quick, tools } = this.deps;
+    if (!quick || !tools?.executeUser || !quick.enabled()) return null;
+    try {
+      return await quick.match(text);
+    } catch (error) {
+      this.deps.logger.warn('chat.quick_match_failed', { error });
+      return null;
+    }
+  }
+
+  /** Tezkor buyruqni bajaradi: AI chaqirilmaydi, natija darhol javob sifatida yoziladi */
+  private startQuick(
+    store: ConversationStore,
+    conversationId: string,
+    call: { name: string; args: Record<string, unknown> },
+  ) {
+    const assistantMessage = store.addMessage({
+      conversationId,
+      role: 'assistant',
+      content: '',
+      status: 'streaming',
+      provider: null,
+      model: null,
+    });
+    const requestId = randomUUID();
+    const controller = new AbortController();
+    this.active.set(requestId, { controller, conversationId, messageId: assistantMessage.id });
+    const base = { requestId, conversationId, messageId: assistantMessage.id };
+    const started = Date.now();
+    void (async () => {
+      let content: string;
+      try {
+        const out = await this.deps.tools!.executeUser!(
+          { id: randomUUID(), ...call },
+          {
+            conversationId,
+            messageId: assistantMessage.id,
+            signal: controller.signal,
+            onActivity: (activity) => this.deps.emit({ type: 'tool', ...base, activity }),
+          },
+        );
+        content = out.message;
+      } catch (error) {
+        this.deps.logger.warn('chat.quick_failed', { tool: call.name, error });
+        content = 'Amal bajarilmadi. Batafsil ma’lumot log faylida.';
+      } finally {
+        this.active.delete(requestId);
+      }
+      store.updateMessage(assistantMessage.id, { content, status: 'complete' });
+      this.deps.emit({ type: 'delta', ...base, text: content });
+      this.deps.emit({ type: 'done', ...base, status: 'complete' });
+      this.deps.logger.info('chat.quick', { tool: call.name, ms: Date.now() - started });
+    })();
+    return { requestId, assistantMessage };
   }
 
   /** Oxirgi javob xato bilan tugagan yoki to'xtatilgan bo'lsa, uni qayta yaratadi. */

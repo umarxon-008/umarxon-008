@@ -29,12 +29,32 @@ export class AppCatalog {
   private cache: { at: number; apps: AppEntry[] } | null = null;
   constructor(private readonly os: OsAdapter) {}
 
+  private loading: Promise<AppEntry[]> | null = null;
+
+  /**
+   * Start menyusi dasturlari. Get-StartApps bir necha soniya oladi, shuning uchun ro'yxat keshlanadi:
+   * eskirgan bo'lsa ham darhol qaytariladi va fonda yangilanadi (tezkor buyruqlar kutib qolmasligi uchun).
+   */
   async list(refresh = false): Promise<AppEntry[]> {
     if (!this.os.supported) throw new AppError('OS_UNSUPPORTED');
-    if (!refresh && this.cache && Date.now() - this.cache.at < 5 * 60_000) return this.cache.apps;
-    const apps = await this.os.listApps();
-    this.cache = { at: Date.now(), apps };
-    return apps;
+    if (!refresh && this.cache) {
+      if (Date.now() - this.cache.at >= 5 * 60_000) void this.load().catch(() => undefined);
+      return this.cache.apps;
+    }
+    return this.load();
+  }
+
+  private load(): Promise<AppEntry[]> {
+    this.loading ??= this.os
+      .listApps()
+      .then((apps) => {
+        this.cache = { at: Date.now(), apps };
+        return apps;
+      })
+      .finally(() => {
+        this.loading = null;
+      });
+    return this.loading;
   }
 
   async byId(id: string): Promise<AppEntry | undefined> {

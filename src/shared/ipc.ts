@@ -42,6 +42,8 @@ export const SettingsSchema = z.object({
   memoryEnabled: z.boolean(),
   /** Oyna yopilganda MARIUS tray'da qoladi (eslatmalar ishlashi uchun) */
   minimizeToTray: z.boolean(),
+  /** Tezkor buyruqlar: "Telegramni och", "ovozni pasaytir" kabi aniq buyruqlar AI'siz, darhol bajariladi */
+  quickCommands: z.boolean(),
   /** Windows bilan birga ishga tushish (prompt §23: standart holatda o'chiq) */
   launchAtLogin: z.boolean(),
 
@@ -67,6 +69,7 @@ export const DEFAULT_SETTINGS: Settings = {
   searchEngine: 'google',
   memoryEnabled: true,
   minimizeToTray: false,
+  quickCommands: true,
   launchAtLogin: false,
   screenAnalysisEnabled: false,
 };
