@@ -1,0 +1,226 @@
+// NeuraMed - Prisma Schema
+// Database: PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── ENUMS ────────────────────────────────────────────────────────────────────
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum PregnancyStatus {
+  NOT_APPLICABLE
+  PREGNANT
+  BREASTFEEDING
+  PLANNING
+}
+
+enum ReminderStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
+enum NotificationType {
+  PUSH
+  ALARM
+  BOTH
+}
+
+enum DoseLogStatus {
+  TAKEN
+  SKIPPED
+  POSTPONED
+}
+
+enum UrgencyLevel {
+  LOW
+  MEDIUM
+  HIGH
+  EMERGENCY
+}
+
+enum ReportType {
+  LAB
+  IMAGING
+}
+
+// ─── USER ─────────────────────────────────────────────────────────────────────
+
+model User {
+  id               String          @id @default(cuid())
+  name             String?
+  email            String?         @unique
+  phone            String?         @unique
+  passwordHash     String?
+  age              Int?
+  gender           Gender?
+  heightCm         Float?
+  weightKg         Float?
+  allergiesJson    String?         // JSON array of allergy strings (encrypted)
+  chronicConditionsJson String?    // JSON array (encrypted)
+  currentMedicationsJson String?   // JSON array (encrypted)
+  pregnancyStatus  PregnancyStatus @default(NOT_APPLICABLE)
+  emergencyContact String?         // encrypted JSON {name, phone}
+  language         String          @default("uz")
+  pushSubscriptionJson String?     // encrypted Web Push subscription
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  deletedAt        DateTime?
+
+  reminders        Reminder[]
+  labReports       LabReport[]
+  imagingReports   ImagingReport[]
+  doctorVisitPreps DoctorVisitPrep[]
+  sessions         Session[]
+
+  @@index([email])
+  @@index([phone])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+}
+
+// ─── MEDICATION ───────────────────────────────────────────────────────────────
+
+model Medication {
+  id               String     @id @default(cuid())
+  name             String
+  genericName      String?
+  brandNames       String?    // JSON array
+  form             String?    // tablet, capsule, syrup, injection, etc.
+  rxcui            String?    @unique // RxNorm concept ID
+  sourceProvider   String     @default("DailyMed") // DailyMed | openFDA
+  sourceSetId      String?    // DailyMed SPL setid
+  sourceUrl        String?
+  lastUpdated      String?
+  rawLabelJson     String?    // raw API response (JSON string)
+  simplifiedInfoJson String?  // AI-simplified JSON (MedicationInfo type)
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  reminders        Reminder[]
+
+  @@index([name])
+  @@index([rxcui])
+}
+
+// ─── REMINDER ─────────────────────────────────────────────────────────────────
+
+model Reminder {
+  id               String           @id @default(cuid())
+  userId           String
+  medicationId     String?
+  medicationName   String           // display name (in case medication record deleted)
+  dose             String           // "500 mg"
+  timesPerDay      Int              @default(1)
+  scheduleJson     String           // JSON array of times: ["08:00", "20:00"]
+  foodRule         String?          // "ovqat bilan" | "bo'sh qorin" | "ahamiyatsiz"
+  startDate        DateTime
+  endDate          DateTime?
+  status           ReminderStatus   @default(ACTIVE)
+  notificationType NotificationType @default(PUSH)
+  notes            String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  medication       Medication?      @relation(fields: [medicationId], references: [id])
+  doseLogs         DoseLog[]
+
+  @@index([userId, status])
+}
+
+model DoseLog {
+  id         String        @id @default(cuid())
+  reminderId String
+  scheduledAt DateTime
+  status     DoseLogStatus
+  takenAt    DateTime?
+  note       String?
+  createdAt  DateTime      @default(now())
+
+  reminder   Reminder      @relation(fields: [reminderId], references: [id], onDelete: Cascade)
+
+  @@index([reminderId])
+  @@index([scheduledAt])
+}
+
+// ─── LAB REPORT ───────────────────────────────────────────────────────────────
+
+model LabReport {
+  id              String   @id @default(cuid())
+  userId          String
+  fileUrl         String?  // encrypted storage URL
+  fileName        String?
+  extractedText   String?  // OCR result
+  parsedMarkersJson String? // JSON array of LabMarker
+  aiExplanationJson String? // AI response JSON
+  hasUrgentValues Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ─── IMAGING REPORT ───────────────────────────────────────────────────────────
+
+model ImagingReport {
+  id              String   @id @default(cuid())
+  userId          String
+  fileUrl         String?
+  fileName        String?
+  reportType      String?  // X-Ray, MRI, CT, Ultrasound, etc.
+  extractedText   String?
+  aiExplanationJson String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ─── DOCTOR VISIT PREP ────────────────────────────────────────────────────────
+
+model DoctorVisitPrep {
+  id              String       @id @default(cuid())
+  userId          String
+  symptomsJson    String       // JSON array of symptoms
+  duration        String?      // "3 kun", "1 hafta"
+  hasTemperature  Boolean?
+  allergiesJson   String?
+  currentMedsJson String?
+  chronicCondJson String?
+  pregnancyNote   String?
+  aiResultJson    String?      // AI generated prep result
+  urgencyLevel    UrgencyLevel @default(LOW)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}

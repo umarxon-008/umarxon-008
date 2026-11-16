@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="crossGrad" x1="64" y1="64" x2="448" y2="448" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0E7C5A" />
+      <stop offset="50%" stop-color="#16A34A" />
+      <stop offset="100%" stop-color="#7C3AED" />
+    </linearGradient>
+    <linearGradient id="orbitGrad" x1="0" y1="256" x2="512" y2="256" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#16A34A" stop-opacity="0.7" />
+      <stop offset="100%" stop-color="#7C3AED" stop-opacity="0.7" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#F8FAFC" />
+  <!-- Orbital lines -->
+  <ellipse cx="256" cy="256" rx="210" ry="92" transform="rotate(-28 256 256)" stroke="url(#orbitGrad)" stroke-width="6" fill="none" />
+  <ellipse cx="256" cy="256" rx="210" ry="92" transform="rotate(28 256 256)" stroke="url(#orbitGrad)" stroke-width="4" stroke-dasharray="12 10" fill="none" />
+  <!-- Medical Cross -->
+  <path d="M196 88C196 74.7452 206.745 64 220 64H292C305.255 64 316 74.7452 316 88V196H424C437.255 196 448 206.745 448 220V292C448 305.255 437.255 316 424 316H316V424C316 437.255 305.255 448 292 448H220C206.745 448 196 437.255 196 424V316H88C74.7452 316 64 305.255 64 292V220C64 206.745 74.7452 196 88 196H196V88Z" fill="url(#crossGrad)" />
+  <!-- Left biological brain hemisphere -->
+  <path d="M252 184C224 184 204 202 204 226C192 232 186 246 190 262C186 276 196 294 212 300C218 316 234 324 252 324V184Z" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" fill="none" />
+  <path d="M220 226C232 226 240 236 240 248M212 268C226 268 236 278 244 288" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" />
+  <!-- Right digital circuit brain hemisphere -->
+  <path d="M260 184V324M260 208H292L308 224M260 252H314M260 292H288L304 276" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="312" cy="228" r="8" fill="#FFFFFF" />
+  <circle cx="320" cy="252" r="8" fill="#FFFFFF" />
+  <circle cx="308" cy="272" r="8" fill="#FFFFFF" />
+  <!-- Bottom left green leaves -->
+  <path d="M104 396C104 364 136 348 164 356C156 384 136 404 104 396Z" fill="#16A34A" />
+  <!-- Bottom right white-violet capsule -->
+  <g transform="rotate(-35 392 388)">
+    <rect x="352" y="370" width="40" height="36" rx="18" fill="#FFFFFF" stroke="#7C3AED" stroke-width="5" />
+    <rect x="384" y="370" width="40" height="36" rx="18" fill="#7C3AED" />
+  </g>
+  <!-- Sparkles -->
+  <circle cx="132" cy="126" r="6" fill="#16A34A" />
+  <circle cx="388" cy="120" r="7" fill="#7C3AED" />
+</svg>
