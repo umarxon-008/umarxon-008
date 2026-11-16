@@ -91,6 +91,9 @@ model User {
   stockItems       StockItem[]
   stockMovements   StockMovement[]
   traceReports     TraceReport[]
+  healthCard       HealthCard?
+  vitalReadings    VitalReading[]
+  checkups         Checkup[]
 
   @@index([email])
   @@index([phone])
@@ -328,6 +331,49 @@ model TraceReport {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ─── Salomatligim (AIVITA bilan taqqoslash natijasida qo'shilgan) ──────────────
+
+/// QR tibbiy karta: qon guruhi, izoh va ochiq havola (egasi istalgan vaqtda o'chiradi)
+model HealthCard {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  bloodType    String?
+  notes        String?  // encrypted
+  shareToken   String?  @unique
+  shareEnabled Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/// Hayotiy ko'rsatkich o'lchovi: bosim (value/value2), puls, vazn, qand, harorat, SpO2, uyqu
+model VitalReading {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  value     Float
+  value2    Float?
+  note      String?
+  at        DateTime @default(now())
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+}
+
+/// Chekap natijasi (Health Score)
+model Checkup {
+  id          String   @id @default(cuid())
+  userId      String
+  answersJson String
+  score       Int
+  scoresJson  String
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }

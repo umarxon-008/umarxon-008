@@ -27,9 +27,13 @@ interface LocalDB {
   stockItem: Record<string, any>[];
   stockMovement: Record<string, any>[];
   traceReport: Record<string, any>[];
+  // Salomatligim
+  healthCard: Record<string, any>[];
+  vitalReading: Record<string, any>[];
+  checkup: Record<string, any>[];
 }
 
-const EXTRA_TABLES = ["assistantThread", "appointment", "doctorMessage", "stockItem", "stockMovement", "traceReport"] as const;
+const EXTRA_TABLES = ["assistantThread", "appointment", "doctorMessage", "stockItem", "stockMovement", "traceReport", "healthCard", "vitalReading", "checkup"] as const;
 
 function getInitialLocalDB(): LocalDB {
   const now = new Date().toISOString();
@@ -50,11 +54,11 @@ function getInitialLocalDB(): LocalDB {
         gender: "FEMALE",
         heightCm: 165,
         weightKg: 60,
-        allergiesJson: null,
-        chronicConditionsJson: null,
+        allergiesJson: JSON.stringify(["Penitsillin"]),
+        chronicConditionsJson: JSON.stringify(["Temir tanqisligi anemiyasi"]),
         currentMedicationsJson: null,
         pregnancyStatus: "NOT_APPLICABLE",
-        emergencyContact: null,
+        emergencyContact: JSON.stringify({ name: "Karim Karimov (turmush oʻrtogʻi, namuna)", phone: "+998 90 000 00 00" }),
         language: "uz",
         pushSubscriptionJson: null,
         createdAt: now,
@@ -123,6 +127,9 @@ function getInitialLocalDB(): LocalDB {
     stockItem: [],
     stockMovement: [],
     traceReport: [],
+    healthCard: [],
+    vitalReading: [],
+    checkup: [],
   };
 }
 
@@ -132,7 +139,15 @@ function loadLocalDB(): LocalDB {
       const raw = fs.readFileSync(DB_FILE, "utf8");
       const db = JSON.parse(raw) as LocalDB;
       // Eski fayllarda yangi jadvallar bo'lmasligi mumkin
+      const hadCard = Array.isArray((db as any).healthCard);
       for (const t of EXTRA_TABLES) if (!Array.isArray((db as any)[t])) (db as any)[t] = [];
+      // Demo hisob uchun tibbiy karta namunalari (faqat bir marta, bo'sh bo'lsa)
+      const demo = db.user.find((u) => u.id === "usr_neuramed_demo");
+      if (!hadCard && demo) {
+        demo.allergiesJson ??= JSON.stringify(["Penitsillin"]);
+        demo.chronicConditionsJson ??= JSON.stringify(["Temir tanqisligi anemiyasi"]);
+        demo.emergencyContact ??= JSON.stringify({ name: "Karim Karimov (turmush oʻrtogʻi, namuna)", phone: "+998 90 000 00 00" });
+      }
       return db;
     }
   } catch {
