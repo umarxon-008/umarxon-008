@@ -13,3 +13,7 @@ public/worker-*.js
 *.tsbuildinfo
 next-env.d.ts
 .DS_Store
+
+# testlar
+/test-results/
+/playwright-report/
