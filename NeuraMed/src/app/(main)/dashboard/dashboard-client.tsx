@@ -19,10 +19,12 @@ import { Disclaimer } from "@/components/ui/disclaimer";
 import { formatDate, getTimeLabel, foodRuleLabel } from "@/lib/utils";
 import type { ReminderWithMed } from "@/types";
 import { registerServiceWorker } from "@/hooks/use-push-notifications";
+import { PlatformOverview, type PlatformSummary } from "@/components/modules/platform-overview";
 
 interface Props {
   userName: string;
   reminders: ReminderWithMed[];
+  platform: PlatformSummary;
   recentReports: {
     id: string;
     fileName: string;
@@ -31,7 +33,7 @@ interface Props {
   }[];
 }
 
-export function DashboardClient({ userName, reminders, recentReports }: Props) {
+export function DashboardClient({ userName, reminders, recentReports, platform }: Props) {
   // Vaqtga bog'liq qiymatlar faqat brauzerda hisoblanadi (server va brauzer HTML'i mos kelishi uchun).
   const [now, setNow] = useState<Date | null>(null);
   useEffect(() => {
@@ -69,8 +71,12 @@ export function DashboardClient({ userName, reminders, recentReports }: Props) {
       {/* Disclaimer */}
       <Disclaimer compact />
 
+      {/* NeuraMed modullari (MEDAI, PHARMA TRACE, MEDCONNECT, MEDSTOCK AI) */}
+      <PlatformOverview s={platform} />
+
       {/* Quick actions */}
-      <div className="grid grid-cols-2 gap-3">
+      <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300 -mb-2">Shaxsiy yordamchi</h2>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Link href="/medications/search">
           <Card className="h-full hover:shadow-md transition-shadow cursor-pointer">
             <CardContent className="p-4 flex flex-col gap-3">

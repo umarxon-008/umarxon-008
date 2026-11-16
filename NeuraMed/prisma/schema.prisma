@@ -85,6 +85,12 @@ model User {
   imagingReports   ImagingReport[]
   doctorVisitPreps DoctorVisitPrep[]
   sessions         Session[]
+  assistantThreads AssistantThread[]
+  appointments     Appointment[]
+  doctorMessages   DoctorMessage[]
+  stockItems       StockItem[]
+  stockMovements   StockMovement[]
+  traceReports     TraceReport[]
 
   @@index([email])
   @@index([phone])
@@ -221,6 +227,107 @@ model DoctorVisitPrep {
   updatedAt       DateTime     @updatedAt
 
   user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ─── MEDAI (AI yordamchi) ─────────────────────────────────────────────────────
+
+model AssistantThread {
+  id           String   @id @default(cuid())
+  userId       String
+  title        String
+  messagesJson String   // JSON: [{role, content, mode, sources, sourceNote, flags, createdAt}]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ─── MEDCONNECT (shifokor bilan aloqa) ────────────────────────────────────────
+// Shifokorlar va muassasalar namunaviy (src/data/connect-data.js); qabul real emas.
+
+model Appointment {
+  id        String   @id @default(cuid())
+  userId    String
+  doctorId  String
+  date      String   // YYYY-MM-DD
+  time      String   // HH:MM
+  name      String
+  phone     String?
+  reason    String?
+  status    String   @default("pending") // pending | cancelled
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model DoctorMessage {
+  id        String   @id @default(cuid())
+  userId    String
+  doctorId  String
+  sender    String   // me | doctor (avtomatik demo javob)
+  text      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, doctorId])
+}
+
+// ─── MEDSTOCK AI (zaxira) ─────────────────────────────────────────────────────
+
+model StockItem {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  category  String
+  unit      String
+  qty       Int
+  min       Int
+  avgDaily  Float
+  batch     String
+  expiry    String   // YYYY-MM-DD
+  shelf     String
+  price     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model StockMovement {
+  id        String   @id @default(cuid())
+  userId    String
+  itemId    String
+  type      String   // in | out
+  qty       Int
+  note      String?
+  at        DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ─── PHARMA TRACE ─────────────────────────────────────────────────────────────
+// Mahsulotlar namunaviy (src/data/trace-data.js); foydalanuvchi xabarlari saqlanadi.
+
+model TraceReport {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  reason    String
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }

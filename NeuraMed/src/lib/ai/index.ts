@@ -7,7 +7,7 @@
 
 import OpenAI from "openai";
 import { z } from "zod";
-import {
+import { CHAT_SYSTEM,
   MEDICATION_PROMPT,
   LAB_REPORT_PROMPT,
   IMAGING_REPORT_PROMPT,
@@ -475,4 +475,27 @@ ${input.pregnancyNote ? `Homiladorlik/emizish: ${input.pregnancyNote}` : ""}`.tr
     result.emergency_signs = Array.from(new Set([...(result.emergency_signs ?? []), ...emergencies]));
   }
   return sanitizeDeep(result);
+}
+
+
+// ── MEDAI chat (erkin savol-javob) ────────────────────────────────────────────
+export interface ChatTurn { role: "user" | "assistant"; content: string }
+
+/** OpenAI orqali chat javobi. Kalit bo'lmasa yoki xato bo'lsa — null (chaqiruvchi demo javobga o'tadi). */
+export async function chatAssistant(history: ChatTurn[]): Promise<string | null> {
+  const c = getClient();
+  if (!c) return null;
+  try {
+    const completion = await c.chat.completions.create({
+      model: MODEL,
+      temperature: 0.2,
+      max_tokens: 900,
+      messages: [{ role: "system", content: CHAT_SYSTEM }, ...history.slice(-20)],
+    });
+    const text = completion.choices[0]?.message?.content?.trim();
+    return text ? sanitizeString(text) : null;
+  } catch (error) {
+    console.error("MEDAI chat xatosi:", error instanceof Error ? error.message : error);
+    return null;
+  }
 }

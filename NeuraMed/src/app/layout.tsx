@@ -3,7 +3,7 @@ import { ThemeProvider } from "next-themes";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "NeuraMed — Shaxsiy tibbiy yordamchi",
+  title: "NeuraMed — Yagona tibbiy platforma",
   description:
     "NeuraMed sizga dori, laboratoriya tahlili va rentgen hisobotini oddiy tilda tushuntiradi. Dori eslatmasi va shifokor qabuliga tayyorlov.",
   manifest: "/manifest.json",
@@ -30,7 +30,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#0E7C5A" },
+    { media: "(prefers-color-scheme: light)", color: "#0F8F84" },
     { media: "(prefers-color-scheme: dark)", color: "#0F172A" },
   ],
 };

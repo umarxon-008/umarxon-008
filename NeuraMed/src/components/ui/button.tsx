@@ -19,7 +19,7 @@ const buttonVariants = cva(
         destructive:
           "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30",
         gradient:
-          "bg-gradient-to-r from-primary-500 to-violet-500 text-white shadow-sm hover:opacity-90",
+          "bg-gradient-primary text-white shadow-sm hover:opacity-90",
         link: "text-primary-500 underline-offset-4 hover:underline p-0 h-auto",
       },
       size: {

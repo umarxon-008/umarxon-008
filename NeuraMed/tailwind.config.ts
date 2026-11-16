@@ -10,18 +10,19 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Logotipdagi xoch rangi (teal-yashil)
         primary: {
-          DEFAULT: "#0E7C5A",
-          50: "#E6F4F0",
-          100: "#C2E4D8",
-          200: "#9DD4BF",
-          300: "#78C4A6",
-          400: "#53B48D",
-          500: "#0E7C5A",
-          600: "#0C6A4D",
-          700: "#0A5840",
-          800: "#084633",
-          900: "#063426",
+          DEFAULT: "#0F8F84",
+          50: "#E6F6F4",
+          100: "#C0E9E4",
+          200: "#93D9D1",
+          300: "#5FC5BA",
+          400: "#2FB0A3",
+          500: "#0F8F84",
+          600: "#0C776E",
+          700: "#0A5F58",
+          800: "#084A45",
+          900: "#063632",
         },
         emerald: {
           DEFAULT: "#16A34A",
@@ -34,6 +35,7 @@ const config: Config = {
           600: "#6D28D9",
         },
         "deep-blue": "#1E3A8A",
+        brand: { navy: "#0B2F55", teal: "#0E9AA0", emerald: "#10B981", purple: "#6D28D9" },
         background: {
           light: "#F8FAFC",
           dark: "#0F172A",
@@ -61,7 +63,9 @@ const config: Config = {
         card: "0 1px 3px rgba(0,0,0,0.05), 0 10px 24px rgba(0,0,0,0.05)",
       },
       backgroundImage: {
-        "gradient-primary": "linear-gradient(135deg, #0E7C5A 0%, #7C3AED 100%)",
+        // Logotip gradienti: emerald -> teal -> binafsha
+        "gradient-primary": "linear-gradient(135deg, #10B981 0%, #0E9AA0 45%, #6D28D9 100%)",
+        "gradient-brand-deep": "linear-gradient(135deg, #0B2F55 0%, #0B5D73 50%, #4C1D95 100%)",
         "gradient-emerald": "linear-gradient(135deg, #16A34A 0%, #0E7C5A 100%)",
         "gradient-violet": "linear-gradient(135deg, #7C3AED 0%, #1E3A8A 100%)",
       },

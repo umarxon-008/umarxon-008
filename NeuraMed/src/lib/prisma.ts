@@ -20,7 +20,16 @@ interface LocalDB {
   labReport: Record<string, any>[];
   imagingReport: Record<string, any>[];
   doctorVisitPrep: Record<string, any>[];
+  // MEDPERFECT modullari
+  assistantThread: Record<string, any>[];
+  appointment: Record<string, any>[];
+  doctorMessage: Record<string, any>[];
+  stockItem: Record<string, any>[];
+  stockMovement: Record<string, any>[];
+  traceReport: Record<string, any>[];
 }
+
+const EXTRA_TABLES = ["assistantThread", "appointment", "doctorMessage", "stockItem", "stockMovement", "traceReport"] as const;
 
 function getInitialLocalDB(): LocalDB {
   const now = new Date().toISOString();
@@ -108,6 +117,12 @@ function getInitialLocalDB(): LocalDB {
     labReport: [],
     imagingReport: [],
     doctorVisitPrep: [],
+    assistantThread: [],
+    appointment: [],
+    doctorMessage: [],
+    stockItem: [],
+    stockMovement: [],
+    traceReport: [],
   };
 }
 
@@ -115,7 +130,10 @@ function loadLocalDB(): LocalDB {
   try {
     if (fs.existsSync(DB_FILE)) {
       const raw = fs.readFileSync(DB_FILE, "utf8");
-      return JSON.parse(raw) as LocalDB;
+      const db = JSON.parse(raw) as LocalDB;
+      // Eski fayllarda yangi jadvallar bo'lmasligi mumkin
+      for (const t of EXTRA_TABLES) if (!Array.isArray((db as any)[t])) (db as any)[t] = [];
+      return db;
     }
   } catch {
     // ignore
@@ -369,6 +387,7 @@ export const prisma = new Proxy(rawPrisma, {
         "labReport",
         "imagingReport",
         "doctorVisitPrep",
+        ...EXTRA_TABLES,
       ].includes(prop)
     ) {
       return wrapModel(prop as keyof LocalDB, (target as any)[prop]);

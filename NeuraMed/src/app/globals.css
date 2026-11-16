@@ -91,7 +91,15 @@
   }
 
   .gradient-text {
-    @apply bg-gradient-to-r from-primary-500 to-violet-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-emerald-500 via-teal-500 to-violet-600 bg-clip-text text-transparent;
+  }
+
+  /* NeuraMed modullari uchun umumiy bloklar */
+  .module-icon {
+    @apply inline-flex items-center justify-center rounded-2xl text-white shadow-lg bg-gradient-primary;
+  }
+  .demo-note {
+    @apply flex items-start gap-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-xs text-amber-800 dark:text-amber-300 leading-relaxed;
   }
 
   .status-badge-normal {

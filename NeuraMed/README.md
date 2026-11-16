@@ -1,116 +1,86 @@
-# NeuraMed — Shaxsiy Tibbiy Yordamchi
+# NeuraMed — Yagona tibbiy platforma
 
-> ⚠️ **NeuraMed tashxis qo'ymaydi, dori buyurmaydi. Faqat rasmiy manbalardan ma'lumot beradi.**
+> ⚠️ **NeuraMed tashxis qoʻymaydi, dori buyurmaydi va dozani oʻzgartirmaydi.** Shoshilinch holatda — **103** yoki **112**.
 
-NeuraMed — dori, laboratoriya tahlili va rentgen hisobotini oddiy o'zbek tilida tushuntiruvchi AI tibbiy yordamchi. Dori eslatmasi, shifokor qabuliga tayyorlov va ko'p tillilik bilan ta'minlangan PWA ilova.
+NeuraMed — ikki loyihaning birlashmasi:
+
+- **NeuraMed** (asos) — shaxsiy tibbiy yordamchi: dori maʼlumoti, eslatmalar, tahlil va rentgen hisobotlarini oddiy oʻzbek tilida tushuntirish, shifokor qabuliga tayyorlanish. PWA.
+- **MEDPERFECT** — MEDAI, PHARMA TRACE, MEDCONNECT va MEDSTOCK AI modullari. Endi ular ham NeuraMed ichida, bitta hisob, bitta dizayn va bitta backend (Next.js API + Prisma) ustida ishlaydi.
+
+## 🧩 Modullar
+
+| Modul | Sahifa | Nima qiladi | Holat |
+|-------|--------|-------------|-------|
+| Shaxsiy yordamchi | `/dashboard`, `/medications`, `/reminders`, `/lab-reports`, `/imaging-reports`, `/doctor-visit` | Dori, eslatma, tahlil, rentgen, qabulga tayyorlanish | Ishlaydi |
+| MEDAI | `/assistant`, `/library` | AI yordamchi (suhbatlar tarixi, manbalar, xavf ogohlantirishi) va 26 atamali tibbiy kutubxona | Ishlaydi: OpenAI kaliti boʻlsa AI, boʻlmasa qoidaga asoslangan demo |
+| PHARMA TRACE | `/trace` | QR/partiya boʻyicha dori kelib chiqishi, 4 bosqichli taʼminot zanjiri, shubhali holat haqida xabar | Demo maʼlumot |
+| MEDCONNECT | `/connect` | Shifokor va muassasalar, boʻsh vaqtlar, qabulga yozilish, shifokor bilan chat | Demo maʼlumot, avtomatik javob |
+| MEDSTOCK AI | `/stock` | Dorixona zaxirasi, kam qolgan/muddati yaqin dorilar, chiqim grafigi, buyurtma tavsiyasi | Demo ombor, qoidaga asoslangan tahlil |
+
+Namunaviy maʼlumotlar har doim **DEMO** yoki **(namuna)** belgisi bilan koʻrsatiladi. Shifokorlar, klinikalar, dori partiyalari va ombor toʻqima; real tizimlarga ulanmagan.
 
 ---
 
-## 🚀 Tez boshlash
+## 🚀 Lokal kompyuterda ishga tushirish (localhost)
 
-### 1. Talablar
-
-- Node.js 18+
-- PostgreSQL 14+
-- OpenAI API key
-
-### 2. O'rnatish
+Talab: **Node.js 18+** (20 tavsiya etiladi). PostgreSQL **shart emas** — u boʻlmasa, loyiha avtomatik ravishda `storage/local-dev-db.json` lokal bazasidan foydalanadi.
 
 ```bash
-# Papkaga o'ting
-cd NeuroMed
-
-# Paketlarni o'rnating
-npm install
-
-# .env.local faylini sozlang
-cp .env.example .env.local
-# .env.local faylini oching va qiymatlarni to'ldiring
-```
-
-### 3. Environment Variables
-
-`.env.local` faylini to'ldiring:
-
-```env
-DATABASE_URL="postgresql://postgres:password@localhost:5432/neuramed"
-AUTH_SECRET="random-32-char-string"
-JWT_SECRET="another-random-32-char-string"
-OPENAI_API_KEY="sk-..."
-ENCRYPTION_KEY="64-hex-chars"  # openssl rand -hex 32
-```
-
-### 4. VAPID keys yaratish (Push Notifications)
-
-```bash
-npm run vapid:generate
-# Natijani .env.local ga qo'shing
-```
-
-### 5. Database
-
-```bash
-# Schema yaratish
-npm run db:push
-
-# Yoki migration bilan
-npm run db:migrate
-
-# Test ma'lumot qo'shish
-npm run db:seed
-```
-
-### 6. Ishga tushirish
-
-```bash
+cd NeuraMed
+npm install          # paketlar + prisma generate
+cp .env.example .env.local   # ixtiyoriy: qiymatlarni boʻsh qoldirsangiz ham ishlaydi
 npm run dev
-# http://localhost:3000
+```
+
+Brauzerda oching: **http://localhost:3000**
+
+Test hisobi (lokal bazada avtomatik yaratiladi):
+
+- Email: `test@neuramed.uz`
+- Parol: `Test12345!`
+
+### Muhit oʻzgaruvchilari (`.env.local`)
+
+| Oʻzgaruvchi | Kerakmi | Izoh |
+|-------------|---------|------|
+| `OPENAI_API_KEY` | Ixtiyoriy | `sk-...` boʻlsa MEDAI va tushuntirishlar AI orqali; boʻlmasa demo rejim |
+| `DATABASE_URL` | Ixtiyoriy | PostgreSQL. Boʻlmasa — lokal JSON baza |
+| `JWT_SECRET` | Productionda majburiy | Kamida 32 belgi. Lokal rejimda vaqtinchalik kalit ishlatiladi |
+| `ENCRYPTION_KEY` | Productionda majburiy | 64 hex belgi: `openssl rand -hex 32` |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | Ixtiyoriy | Push bildirishnomalar: `npm run vapid:generate` |
+
+> 🔐 `.env.local` faylini hech qachon gitga qoʻshmang va boshqalarga yubormang — u `.gitignore` da.
+
+### PostgreSQL bilan (ixtiyoriy)
+
+```bash
+npm run db:push    # jadvallarni yaratish
+npm run db:seed    # test maʼlumot
+```
+
+### Production build
+
+```bash
+npm run build
+npm start          # http://localhost:3000
 ```
 
 ---
 
-## 📁 Loyiha tuzilmasi
+## 📁 Asosiy tuzilma
 
 ```
-NeuraMed/
-├── prisma/
-│   └── schema.prisma          # Ma'lumot modeli
-├── public/
-│   ├── manifest.json          # PWA manifest
-│   └── sw-custom.js           # Service Worker
-├── scripts/
-│   ├── generate-vapid.ts      # VAPID key generator
-│   └── seed.ts                # Test ma'lumotlar
-├── src/
-│   ├── app/
-│   │   ├── (auth)/            # Login, Register, Onboarding
-│   │   ├── (main)/            # Asosiy sahifalar
-│   │   │   ├── dashboard/     # Bosh sahifa
-│   │   │   ├── medications/   # Dori qidirish va detail
-│   │   │   ├── reminders/     # Dori eslatmalari
-│   │   │   ├── lab-reports/   # Laboratoriya tahlillari
-│   │   │   ├── imaging-reports/ # Rentgen hisobotlari
-│   │   │   ├── doctor-visit/  # Shifokor qabuliga tayyorlanish
-│   │   │   ├── profile/       # Foydalanuvchi profili
-│   │   │   └── settings/      # Sozlamalar
-│   │   └── api/               # API routes
-│   ├── components/
-│   │   ├── ui/                # Button, Card, Input, Badge...
-│   │   └── layout/            # BottomNav, TopBar
-│   ├── hooks/                 # Custom React hooks
-│   ├── i18n/                  # uz, ru, en tarjimalar
-│   ├── lib/
-│   │   ├── ai/                # OpenAI integration + prompts
-│   │   ├── api/               # DailyMed, openFDA, RxNorm
-│   │   ├── auth/              # JWT + session
-│   │   ├── notifications/     # Web Push
-│   │   ├── ocr/               # Tesseract.js
-│   │   ├── encryption.ts      # AES-256-GCM
-│   │   ├── offline-db.ts      # IndexedDB
-│   │   └── prisma.ts          # DB client
-│   ├── store/                 # Zustand state
-│   └── types/                 # TypeScript types
-└── .env.local                 # Environment variables
+src/
+├── app/(auth)/            # login, register, onboarding
+├── app/(main)/            # barcha sahifalar (dashboard, assistant, library, trace, connect, stock, more, about ...)
+├── app/api/               # backend: auth, medications, reminders, lab/imaging, assistant, trace, connect, stock
+├── components/layout/     # logotip, yon menyu (kompyuter), pastki menyu (telefon)
+├── components/modules/    # modullar uchun umumiy UI (DEMO belgisi, modal, KPI, xavfsiz markdown)
+├── lib/medai/             # MEDAI: xavfsizlik qoidalari, demo javoblar, kutubxona (MEDPERFECT'dan)
+├── lib/modules/           # PHARMA TRACE, MEDCONNECT, MEDSTOCK biznes-mantigʻi
+└── data/                  # namunaviy maʼlumotlar va tibbiy atamalar
+prisma/schema.prisma       # User, Reminder, LabReport ... + AssistantThread, Appointment, DoctorMessage, StockItem, StockMovement, TraceReport
+public/brand/              # NeuraMed logotipi (tabletkali)
 ```
 
 ---
@@ -132,6 +102,19 @@ NeuraMed/
 | GET/PATCH/DELETE | `/api/profile` | Profil boshqaruv |
 | POST | `/api/notifications/subscribe` | Push subscribe |
 | POST | `/api/notifications/send` | Push yuborish |
+| GET/POST | `/api/assistant` | MEDAI: suhbatlar roʻyxati / savol yuborish |
+| GET/DELETE | `/api/assistant/[id]` | MEDAI suhbati |
+| GET | `/api/trace?q=...` | PHARMA TRACE: qidiruv va statistika |
+| GET | `/api/trace/[id]` | Mahsulot va taʼminot zanjiri |
+| POST | `/api/trace/reports` | Shubhali holat haqida xabar (demo) |
+| GET | `/api/connect` | MEDCONNECT: shifokorlar va muassasalar |
+| GET | `/api/connect/slots?doctorId=` | Boʻsh vaqtlar |
+| GET/POST | `/api/connect/appointments` | Qabullar / yozilish |
+| PATCH | `/api/connect/appointments/[id]` | Qabulni bekor qilish |
+| GET/POST | `/api/connect/messages` | Shifokor bilan demo chat |
+| GET | `/api/stock` | MEDSTOCK AI: zaxira va tahlil |
+| POST | `/api/stock/movements` | Kirim / chiqim |
+| POST | `/api/stock/reset` | Demo omborni tiklash |
 
 ---
 
@@ -216,13 +199,12 @@ CMD ["npm", "start"]
 
 ---
 
-## 🔮 Kelajakdagi modullar (Integration Points)
+## 🔮 Keyingi bosqich (real versiya)
 
-Quyidagi modullar uchun integration point qoldirilgan:
-
-- **Rentgen AI tashxis** — `src/lib/ai/imaging-ai.ts` (hozir stub)
-- **Shifokor chat** — `src/app/(main)/doctor-chat/` (placeholder)
-- **Dorixona integratsiya** — `src/lib/api/pharmacy.ts` (stub)
+- **PHARMA TRACE** — davlat reestri / ishlab chiqaruvchi API bilan integratsiya
+- **MEDCONNECT** — real klinika jadvali, shifokor kabineti, bildirishnomalar
+- **MEDSTOCK AI** — dorixona hisob tizimi bilan sinxronlash, sotuv tarixiga asoslangan prognoz
+- **MEDAI** — tasdiqlangan tibbiy hujjatlar bazasi (RAG) va ekspert tekshiruvi
 - **Supabase Storage** — `STORAGE_PROVIDER=supabase` env bilan yoqiladi
 - **Cloudflare R2** — `STORAGE_PROVIDER=r2` env bilan yoqiladi
 

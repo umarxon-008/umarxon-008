@@ -5,13 +5,25 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatDate(date: Date | string, locale = "uz-UZ"): string {
-  const d = typeof date === "string" ? new Date(date) : date;
-  return d.toLocaleDateString("uz-UZ", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+const UZ_MONTHS = ["yanvar", "fevral", "mart", "aprel", "may", "iyun", "iyul", "avgust", "sentabr", "oktabr", "noyabr", "dekabr"];
+const UZ_MONTHS_SHORT = ["yan", "fev", "mar", "apr", "may", "iyn", "iyl", "avg", "sen", "okt", "noy", "dek"];
+
+/**
+ * Sanani o'zbekcha formatlaydi. Brauzerlarda "uz-UZ" lokali turlicha ishlagani uchun
+ * Intl ishlatilmaydi — server va brauzer bir xil matn chiqaradi (hydration xatosi bo'lmaydi).
+ */
+export function uzDate(date: Date | string, opts: { short?: boolean; year?: boolean } = {}): string {
+  let y: number, m: number, d: number;
+  const ymd = typeof date === "string" && /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+  if (ymd) { y = +ymd[1]; m = +ymd[2] - 1; d = +ymd[3]; }
+  else { const x = new Date(date); y = x.getUTCFullYear(); m = x.getUTCMonth(); d = x.getUTCDate(); }
+  if (Number.isNaN(y)) return "—";
+  const month = (opts.short ? UZ_MONTHS_SHORT : UZ_MONTHS)[m];
+  return opts.year === false ? `${d}-${month}` : `${d}-${month}, ${y}`;
+}
+
+export function formatDate(date: Date | string, _locale = "uz-UZ"): string {
+  return uzDate(date);
 }
 
 export function formatTime(time: string): string {
