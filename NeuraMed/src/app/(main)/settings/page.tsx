@@ -15,6 +15,9 @@ const languages: { value: Locale; label: string; flag: string }[] = [
   { value: "uz", label: "O'zbek", flag: "🇺🇿" },
   { value: "ru", label: "Русский", flag: "🇷🇺" },
   { value: "en", label: "English", flag: "🇬🇧" },
+  { value: "kk", label: "Қазақша", flag: "🇰🇿" },
+  { value: "ky", label: "Кыргызча", flag: "🇰🇬" },
+  { value: "tg", label: "Тоҷикӣ", flag: "🇹🇯" },
 ];
 
 const themes = [

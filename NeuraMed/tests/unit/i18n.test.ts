@@ -7,6 +7,11 @@ import ts from "typescript";
 import { makeT } from "@/i18n/translate";
 import ru from "@/i18n/messages/ru";
 import en from "@/i18n/messages/en";
+import kk from "@/i18n/messages/kk";
+import ky from "@/i18n/messages/ky";
+import tg from "@/i18n/messages/tg";
+
+const DICTS = { ru, en, kk, ky, tg } as const;
 import { uzDate } from "@/lib/utils";
 
 test("makeT: tarjima, zaxira va {o'zgaruvchi}lar", () => {
@@ -17,8 +22,8 @@ test("makeT: tarjima, zaxira va {o'zgaruvchi}lar", () => {
   assert.equal(makeT(null)("{n} kun", { n: 5 }), "5 kun");
 });
 
-test("ru va en lug'atlarida joy-ushlagichlar mos", () => {
-  for (const [name, dict] of [["ru", ru], ["en", en]] as const) {
+test("barcha lug'atlarda joy-ushlagichlar mos", () => {
+  for (const [name, dict] of Object.entries(DICTS)) {
     for (const [k, v] of Object.entries(dict)) {
       const a = (k.match(/\{\w+\}/g) || []).sort().join();
       const b = (v.match(/\{\w+\}/g) || []).sort().join();
@@ -27,8 +32,8 @@ test("ru va en lug'atlarida joy-ushlagichlar mos", () => {
   }
 });
 
-/** Koddagi barcha t("...") matnlari ru va en lug'atida bo'lishi kerak. */
-test("har bir t(\"...\") matnining ru/en tarjimasi bor", () => {
+/** Koddagi barcha t("...") matnlari har bir tilning lug'atida bo'lishi kerak. */
+test("har bir t(\"...\") matnining 5 tildagi tarjimasi bor", () => {
   const files: string[] = [];
   const walk = (d: string) => fs.readdirSync(d, { withFileTypes: true }).forEach((e) => {
     const p = path.join(d, e.name);
@@ -45,7 +50,8 @@ test("har bir t(\"...\") matnining ru/en tarjimasi bor", () => {
     const visit = (n: ts.Node) => {
       if (ts.isCallExpression(n) && n.expression.getText(sf) === "t" && n.arguments[0] && ts.isStringLiteral(n.arguments[0])) {
         const k = n.arguments[0].text;
-        if (k.trim() && !SAME.test(k) && (!has(ru, k) || !has(en, k))) missing.push(`${path.relative(process.cwd(), f)}: ${k}`);
+        if (!k.trim() || SAME.test(k)) return;
+        for (const [name, d] of Object.entries(DICTS)) if (!has(d, k)) missing.push(`${name} · ${path.relative(process.cwd(), f)}: ${k}`);
       }
       ts.forEachChild(n, visit);
     };
@@ -54,8 +60,11 @@ test("har bir t(\"...\") matnining ru/en tarjimasi bor", () => {
   assert.deepEqual(missing, []);
 });
 
-test("sanalar uch tilda", () => {
+test("sanalar har xil tillarda", () => {
   assert.equal(uzDate("2026-11-16", { short: true }), "16-noy, 2026");
   assert.equal(uzDate("2026-11-16", { locale: "ru" }), "16 ноября 2026");
   assert.equal(uzDate("2026-11-16", { locale: "en", short: true }), "Nov 16, 2026");
+  assert.equal(uzDate("2026-11-16", { locale: "kk" }), "16 қараша 2026");
+  assert.equal(uzDate("2026-11-16", { locale: "tg" }), "16 ноябр 2026");
+  assert.equal(uzDate("2026-11-16", { locale: "ky" }), "2026-ж. 16-ноябрь");
 });

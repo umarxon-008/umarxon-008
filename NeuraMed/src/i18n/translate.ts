@@ -31,5 +31,8 @@ export function makeT(messages: Messages | null): TFunction {
 export async function loadMessages(locale: Locale): Promise<Messages | null> {
   if (locale === "ru") return (await import("./messages/ru")).default;
   if (locale === "en") return (await import("./messages/en")).default;
+  if (locale === "kk") return (await import("./messages/kk")).default;
+  if (locale === "ky") return (await import("./messages/ky")).default;
+  if (locale === "tg") return (await import("./messages/tg")).default;
   return null;
 }

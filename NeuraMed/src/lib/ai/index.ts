@@ -486,6 +486,9 @@ const LANG_LINE: Record<string, string> = {
   uz: "",
   ru: "\n\nОтвечай на русском языке, соблюдая все правила выше.",
   en: "\n\nAnswer in English, following all the rules above.",
+  kk: "\n\nЖоғарыдағы барлық ережелерді сақтай отырып, қазақ тілінде жауап бер.",
+  ky: "\n\nЖогорудагы бардык эрежелерди сактап, кыргыз тилинде жооп бер.",
+  tg: "\n\nБо риояи ҳамаи қоидаҳои боло ба забони тоҷикӣ ҷавоб деҳ.",
 };
 
 export async function chatAssistant(history: ChatTurn[], locale = "uz"): Promise<string | null> {

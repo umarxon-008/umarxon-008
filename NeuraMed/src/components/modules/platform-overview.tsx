@@ -28,7 +28,7 @@ export function PlatformOverview({ s }: { s: PlatformSummary }) {
   const alerts = [
     s.trace.suspicious.length && { href: `/trace/${s.trace.suspicious[0].id}`, icon: ShieldAlert, tone: "red", text: t("PHARMA TRACE: {names} partiyasi shubhali deb belgilangan", { names: s.trace.suspicious.map((p) => t(p.name)).join(", ") }) },
     s.stock.low + s.stock.expired > 0 && { href: "/stock", icon: AlertTriangle, tone: "amber", text: t("MEDSTOCK: {low} ta dori kam qolgan, {expired} tasining muddati oʻtgan · {reorder} ta buyurtma tavsiyasi", { low: s.stock.low, expired: s.stock.expired, reorder: s.stock.reorder }) },
-    s.connect.upcoming && { href: "/connect?tab=appointments", icon: CalendarCheck, tone: "teal", text: `MEDCONNECT: ${uzDate(s.connect.upcoming.date, { year: false, locale })}, ${s.connect.upcoming.time} — ${s.connect.upcoming.doctor} (${t(s.connect.upcoming.specialty)})` },
+    s.connect.upcoming && { href: "/connect?tab=appointments", icon: CalendarCheck, tone: "teal", text: `MEDCONNECT: ${uzDate(s.connect.upcoming.date, { year: false, locale })}, ${s.connect.upcoming.time} — ${t(s.connect.upcoming.doctor)} (${t(s.connect.upcoming.specialty)})` },
   ].filter(Boolean) as { href: string; icon: React.ElementType; tone: string; text: string }[];
   const toneCls: Record<string, string> = {
     red: "bg-red-50 text-red-800 border-red-100 dark:bg-red-900/20 dark:text-red-200 dark:border-red-900",

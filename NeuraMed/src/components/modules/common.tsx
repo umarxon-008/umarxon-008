@@ -158,6 +158,9 @@ const WEEK: Record<string, string[]> = {
   uz: ["Yak", "Du", "Se", "Ch", "Pa", "Ju", "Sh"],
   ru: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
   en: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+  kk: ["Жс", "Дс", "Сс", "Ср", "Бс", "Жм", "Сн"],
+  ky: ["Жк", "Дш", "Шй", "Шр", "Бш", "Жм", "Иш"],
+  tg: ["Яш", "Дш", "Сш", "Чш", "Пш", "Ҷм", "Шб"],
 };
 export const weekdayName = (day: number, locale = "uz") => (WEEK[locale] || WEEK.uz)[day];
 export const weekday = (iso: string, locale = "uz") => weekdayName(new Date(`${iso.slice(0, 10)}T12:00:00Z`).getUTCDay(), locale);

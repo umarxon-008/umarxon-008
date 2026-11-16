@@ -137,13 +137,15 @@ public/brand/              # NeuraMed logotipi (tabletkali)
 
 ---
 
-## 🌍 Tillar: oʻzbek, rus, ingliz
+## 🌍 Tillar: oʻzbek, qozoq, qirgʻiz, tojik, rus, ingliz
 
 Tilni **Sozlamalar → Til** boʻlimida tanlang — sahifa darhol shu tilga oʻtadi (tanlov cookie'da saqlanadi).
 
-- Tarjima kaliti — oʻzbekcha matnning oʻzi: koddagi `t("Saqlash")` rus tilida `src/i18n/messages/ru.ts`, ingliz tilida `en.ts` dan olinadi; tarjima topilmasa oʻzbekcha qoladi.
+- Markaziy Osiyo uchun: oʻzbek, qozoq (`kk`), qirgʻiz (`ky`), tojik (`tg`), shuningdek rus va ingliz.
+- Tarjima kaliti — oʻzbekcha matnning oʻzi: koddagi `t("Saqlash")` boshqa tillarda `src/i18n/messages/{ru,en,kk,ky,tg}.ts` dan olinadi; tarjima topilmasa oʻzbekcha qoladi.
+- Qozoq, qirgʻiz va tojik tarjimalarini ona tili egasi tekshirib chiqishi tavsiya etiladi.
 - Server komponentlarida `const t = await getT()` (`@/i18n/server`), brauzer komponentlarida `const t = useT()` (`@/i18n/client`).
-- Yangi matn qoʻshsangiz, `ru.ts` va `en.ts` ga tarjimasini yozing — `npm run test:unit` tarjimasi yoʻq matnlarni koʻrsatadi.
+- Yangi matn qoʻshsangiz, barcha lugʻatlarga tarjimasini yozing — `npm run test:unit` tarjimasi yoʻq matnlarni koʻrsatadi.
 - MEDAI kutubxonasi maqolalari va demo javoblar hozircha faqat oʻzbekcha; OpenAI kaliti boʻlsa, AI tanlangan tilda javob beradi.
 
 ---

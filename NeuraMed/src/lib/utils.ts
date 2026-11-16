@@ -14,6 +14,18 @@ const MONTHS: Record<string, { long: string[]; short: string[] }> = {
     long: ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"],
     short: ["янв.", "фев.", "мар.", "апр.", "мая", "июн.", "июл.", "авг.", "сен.", "окт.", "нояб.", "дек."],
   },
+  kk: {
+    long: ["қаңтар", "ақпан", "наурыз", "сәуір", "мамыр", "маусым", "шілде", "тамыз", "қыркүйек", "қазан", "қараша", "желтоқсан"],
+    short: ["қаң.", "ақп.", "нау.", "сәу.", "мам.", "мау.", "шіл.", "там.", "қыр.", "қаз.", "қар.", "жел."],
+  },
+  ky: {
+    long: ["январь", "февраль", "март", "апрель", "май", "июнь", "июль", "август", "сентябрь", "октябрь", "ноябрь", "декабрь"],
+    short: ["янв.", "фев.", "мар.", "апр.", "май", "июн.", "июл.", "авг.", "сен.", "окт.", "ноя.", "дек."],
+  },
+  tg: {
+    long: ["январ", "феврал", "март", "апрел", "май", "июн", "июл", "август", "сентябр", "октябр", "ноябр", "декабр"],
+    short: ["янв", "фев", "мар", "апр", "май", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"],
+  },
   en: {
     long: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
     short: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
@@ -34,7 +46,8 @@ export function uzDate(date: Date | string, opts: { short?: boolean; year?: bool
   const month = MONTHS[lang][opts.short ? "short" : "long"][m];
   const withYear = opts.year !== false;
   if (lang === "en") return withYear ? `${month} ${d}, ${y}` : `${month} ${d}`;
-  if (lang === "ru") return withYear ? `${d} ${month} ${y}` : `${d} ${month}`;
+  if (lang === "ru" || lang === "kk" || lang === "tg") return withYear ? `${d} ${month} ${y}` : `${d} ${month}`;
+  if (lang === "ky") return withYear ? `${y}-ж. ${d}-${month}` : `${d}-${month}`;
   return withYear ? `${d}-${month}, ${y}` : `${d}-${month}`;
 }
 

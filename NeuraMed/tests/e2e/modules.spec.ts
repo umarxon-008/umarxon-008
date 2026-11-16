@@ -53,7 +53,7 @@ test("MEDSTOCK AI: kirim saqlanadi, noto'g'ri chiqim rad etiladi", async ({ page
   await expect(page.getByRole("dialog").getByRole("alert")).toContainText("Omborda faqat");
 });
 
-test("Til almashtirish: English va Русский", async ({ page }) => {
+test("Til almashtirish: English, Русский, Қазақша, Тоҷикӣ", async ({ page }) => {
   await page.goto("/settings");
   await page.getByRole("button", { name: /English/ }).click();
   await expect(page.getByText("Appearance")).toBeVisible();
@@ -62,6 +62,10 @@ test("Til almashtirish: English va Русский", async ({ page }) => {
   await page.goto("/settings");
   await page.getByRole("button", { name: /Русский/ }).click();
   await expect(page.getByText("Оформление")).toBeVisible();
+  await page.getByRole("button", { name: /Қазақша/ }).click();
+  await expect(page.getByText("Көрініс")).toBeVisible();
+  await page.getByRole("button", { name: /Тоҷикӣ/ }).click();
+  await expect(page.getByText("Намуди зоҳирӣ")).toBeVisible();
   await page.getByRole("button", { name: /O'zbek/ }).click();
   await expect(page.getByText("Koʻrinish").or(page.getByText("Ko'rinish"))).toBeVisible();
 });
