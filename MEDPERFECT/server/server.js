@@ -34,7 +34,7 @@ export function createApp() {
 
   // Statik fayllar (faqat ochiq papkalar; server/, .env, node_modules ochilmaydi)
   const staticOpts = { maxAge: '1h', index: false };
-  for (const dir of ['css', 'js', 'assets', 'data', 'shared']) {
+  for (const dir of ['css', 'js', 'assets', 'data', 'shared', 'public']) {
     app.use(`/${dir}`, express.static(path.join(ROOT_DIR, dir), staticOpts));
   }
   app.get('/vendor/lucide.min.js', (_req, res) => res.sendFile(path.join(NODE_MODULES, 'lucide/dist/umd/lucide.min.js')));

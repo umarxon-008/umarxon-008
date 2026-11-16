@@ -148,3 +148,59 @@
   .about-cta { flex-direction: column; align-items: stretch; }
   .try-row { justify-content: flex-start; }
 }
+
+/* ---------------- MEDPERFECT modullari — moslashuvchan ---------------- */
+@media (max-width: 1279px) {
+  .module-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpi-row--5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .doctor-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .insight-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 1023px) {
+  .kpi-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .home-panels { grid-template-columns: minmax(0, 1fr); }
+  .info-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .chain { grid-template-columns: minmax(0, 1fr); }
+  .chain-step { flex-direction: row; }
+  .chain-step:not(:last-child)::after { top: 52px; bottom: -14px; left: 22px; right: auto; width: 3px; height: auto; }
+  .chain-step--pending:not(:last-child)::after, .chain-step--current:not(:last-child)::after { background: repeating-linear-gradient(180deg, var(--border-strong) 0 6px, transparent 6px 11px); }
+  .chain-step--issue:not(:last-child)::after { background: repeating-linear-gradient(180deg, var(--danger) 0 6px, transparent 6px 11px); }
+  .dm-layout { grid-template-columns: minmax(0, 1fr); }
+  .chat-contacts { flex-direction: row; overflow-x: auto; }
+  .chat-contact { width: auto; flex: none; }
+  .chat-contact__text small { display: none; }
+}
+@media (max-width: 767px) {
+  .home-hero { grid-template-columns: minmax(0, 1fr); padding: 26px 20px; border-radius: 20px; }
+  .home-hero__logo { order: -1; justify-self: start; padding: 8px; border-radius: 22px; }
+  .home-hero__logo img { width: 88px; height: 88px; border-radius: 14px; }
+  .home-hero__title { font-size: 27px; }
+  .home-hero__text { font-size: 14.5px; }
+  .module-grid, .doctor-grid, .clinic-grid { grid-template-columns: minmax(0, 1fr); }
+  .kpi-row, .kpi-row--5 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .kpi { padding: 12px; gap: 10px; }
+  .kpi__icon { width: 36px; height: 36px; border-radius: 11px; }
+  .kpi__value { font-size: 19px; }
+  .module-hero { gap: 12px; align-items: flex-start; }
+  .module-hero__icon { width: 46px; height: 46px; border-radius: 14px; }
+  .module-hero__title { font-size: 21px; }
+  .trace-search { flex-direction: column; }
+  .info-grid { grid-template-columns: minmax(0, 1fr); }
+  .trace-row { flex-wrap: wrap; }
+  .trace-row .status-badge { order: 3; }
+  .quick-actions { grid-template-columns: minmax(0, 1fr); }
+  .appt-card { flex-wrap: wrap; }
+  .risk-bar { grid-template-columns: minmax(0, 1fr) 60px; }
+  .risk-bar__name { grid-column: 1 / -1; }
+  .tabs--module { align-self: stretch; }
+  .tabs--module .tab { flex: 0 0 auto; }
+  /* Zaxira jadvali -> kartalar */
+  .stock-table thead { display: none; }
+  .stock-table, .stock-table tbody, .stock-table tr { display: block; }
+  .stock-table tr { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; padding: 14px; border-bottom: 1px solid var(--border); position: relative; }
+  .stock-table td { display: block; padding: 0 !important; border: 0; }
+  .stock-table td:first-child { grid-column: 1 / -1; padding-right: 40px !important; }
+  .stock-table td[data-label]:not(:first-child)::before { content: attr(data-label); display: block; font-size: 11px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.04em; }
+  .stock-table .cell-actions { position: absolute; top: 10px; right: 10px; width: auto; }
+}
+@media (max-width: 767px) { .kpi__value { white-space: normal; overflow-wrap: anywhere; } }

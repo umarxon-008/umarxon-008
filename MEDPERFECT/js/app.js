@@ -13,15 +13,20 @@ import { initMedicine } from './medicine.js';
 import { initLibrary, showLibrary, loadLibrary } from './library.js';
 import { initHistory, renderHistory, renderRecent } from './history.js';
 import { initSettings, syncSettingsForm, renderSystemStatus, wipeAll } from './settings.js';
+import { showHome } from './modules/home.js';
+import { showTrace } from './modules/trace.js';
+import { showConnect } from './modules/connect.js';
+import { showStock } from './modules/stock.js';
+import { openAuth } from './modules/auth.js';
 
-const ROUTES = ['chat', 'analysis', 'medicine', 'library', 'history', 'settings', 'about'];
+const ROUTES = ['home', 'trace', 'connect', 'stock', 'chat', 'analysis', 'medicine', 'library', 'history', 'settings', 'about'];
 let drawer;
 let serverStatus = null;
 
 /* ---------------- Router ---------------- */
 function parseHash() {
-  const [, route = 'chat', param = null] = (location.hash || '#/chat').split('/');
-  return { route: ROUTES.includes(route) ? route : 'chat', param };
+  const [, route = 'home', param = null] = (location.hash || '#/home').split('/');
+  return { route: ROUTES.includes(route) ? route : 'home', param };
 }
 
 function navigate() {
@@ -40,12 +45,16 @@ function navigate() {
   $('.profile-card').classList.toggle('is-active', route === 'settings');
   $('#pageTitle').textContent = t(`nav.${route}`);
   $('#pageSubtitle').textContent = t(`page.${route}.sub`);
-  document.title = `${t(`nav.${route}`)} — MEDAI`;
+  document.title = `${t(`nav.${route}`)} — MEDPERFECT`;
   const changed = document.body.dataset.route !== route;
   document.body.dataset.route = route;
   if (changed) $('#main').scrollTop = 0; // yangi bo'lim yuqoridan ochiladi
   drawer?.close();
 
+  if (route === 'home') showHome();
+  if (route === 'trace') showTrace(param);
+  if (route === 'connect') showConnect(param);
+  if (route === 'stock') showStock(param);
   if (route === 'chat') renderChat();
   if (route === 'library') showLibrary();
   if (route === 'history') renderHistory();
@@ -174,11 +183,13 @@ function init() {
     if (action === 'privacy') showPrivacyInfo();
     if (action === 'about-modes') showModesInfo();
     if (action === 'clear-data') wipeAll();
+    if (action === 'auth') openAuth();
   });
   $('#privacyLink').addEventListener('click', showPrivacyInfo);
   $('#view-about').addEventListener('click', (e) => {
     const action = e.target.closest('[data-about-action]')?.dataset.aboutAction;
     if (action === 'chat') { go('chat'); $('#chatInput').focus(); }
+    if (action === 'home') go('home');
     if (action === 'sample') { go('analysis'); loadSample(); }
   });
   $('#langSelect').addEventListener('change', (e) => {
@@ -190,7 +201,8 @@ function init() {
 
   store.subscribe((reason) => {
     syncProfile();
-    if (reason === 'wipe') { renderChat(); renderRecent(); }
+    if (reason === 'wipe') { renderChat(); renderRecent(); navigate(); }
+    if (reason === 'settings' && document.body.dataset.route === 'home') showHome();
   });
   window.addEventListener('beforeunload', (e) => { if (isChatBusy()) e.preventDefault(); });
   window.addEventListener('hashchange', navigate);

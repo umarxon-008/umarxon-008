@@ -1,6 +1,6 @@
-# Repozitoriy ildizidan deploy qilinganda: loyiha MEDAI/ papkasida joylashgan
+# Repozitoriy ildizidan deploy qilinganda: loyiha MEDPERFECT/ papkasida joylashgan
 [build]
-  base = "MEDAI"
+  base = "MEDPERFECT"
   command = "npm run build"
   publish = "dist"
   functions = "netlify/functions"

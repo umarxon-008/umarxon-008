@@ -197,7 +197,7 @@ function showTyping(on) {
   }
 }
 
-const avatar = () => el('span', { class: 'msg__avatar', 'aria-hidden': 'true' }, [el('img', { src: 'assets/icons/logo.svg', alt: '', width: 32, height: 32 })]);
+const avatar = () => el('span', { class: 'msg__avatar', 'aria-hidden': 'true' }, [el('img', { src: 'public/assets/medperfect-logo-256.png', alt: '', width: 32, height: 32 })]);
 
 export function render() {
   const conv = store.active();

@@ -1,25 +1,34 @@
-# MEDAI — Medical Artificial Intelligence Assistant
+# MEDPERFECT — yagona tibbiyot va farmatsevtika platformasi
 
-MEDAI — tibbiy maʼlumotlarni sodda oʻzbek tilida tushuntiruvchi web-platforma (MVP). U PHARMA GUARD AI ekotizimining alohida moduli.
+![MEDPERFECT](public/assets/medperfect-logo-256.png)
 
-> ⚠️ **MEDAI shifokor emas.** U tashxis qoʻymaydi, davolash belgilamaydi va dori dozasini tavsiya qilmaydi yoki oʻzgartirmaydi. Shoshilinch holatda **103** (tez yordam) yoki **112** ga qoʻngʻiroq qiling.
+MEDPERFECT — hackathon uchun tayyorlangan MVP. U toʻrtta modulni yagona platformada birlashtiradi:
+
+| Modul | Vazifasi | Holati |
+|---|---|---|
+| **MEDAI** | Tibbiy maʼlumot yordamchisi: chat, laboratoriya tahlilini tushuntirish, dori yoʻriqnomasi, 26 atamalik kutubxona, suhbatlar tarixi | Ishlaydi (demo rejim). AI (Claude) integratsiyasining kodi tayyor |
+| **PHARMA TRACE** | Dori vositasini QR kod, mahsulot ID, partiya yoki nom boʻyicha tekshirish: ishlab chiqaruvchi, partiya, sanalar, 4 bosqichli taʼminot zanjiri, holat (tekshirilgan / kutilmoqda / shubhali) | Ishlaydi, 8 ta namunaviy dori |
+| **MEDCONNECT** | Shifokorlar va muassasalar katalogi, shifokor profili, qabulga yozilish (sana va vaqt), yozilishlar tarixi, demo chat | Ishlaydi, 6 ta namunaviy shifokor va 4 ta muassasa |
+| **MEDSTOCK AI** | Dorixona zaxirasi: miqdor, minimal zaxira, muddat, ogohlantirishlar, kirim/chiqim, diagrammalar va qoidaga asoslangan tavsiyalar | Ishlaydi, 14 ta namunaviy pozitsiya |
+
+Bosh sahifada (dashboard) logotip, platforma haqida qisqa maʼlumot, 4 ta modul kartasi, umumiy statistika, ogohlantirishlar va soʻnggi faoliyat bor. Barcha modullar bir xil dizayn tizimidan foydalanadi: logotip ranglari (deep navy, teal, emerald, deep purple), Inter shrifti va Lucide ikonlari.
+
+> ⚠️ **Demo maʼlumotlar.** Barcha dori, ishlab chiqaruvchi, shifokor, muassasa va zaxira maʼlumotlari **toʻqima (namunaviy)**. Platforma davlat dori reestri, real sertifikatlash yoki real qabul tizimiga ulanmagan. Shifokor chatidagi javoblar avtomatik demo javoblardir. MEDSTOCK tahlili oddiy qoidalarga asoslangan, AI emas. Kirish va roʻyxatdan oʻtish oynasi faqat taqdimot uchun: akkaunt yaratilmaydi.
+
+> ⚠️ **Tibbiy xavfsizlik.** MEDPERFECT shifokor oʻrnini bosmaydi: tashxis qoʻymaydi, davolash va dori dozasini belgilamaydi. Shoshilinch holatda **103** (tez yordam) yoki **112** ga qoʻngʻiroq qiling.
 
 ---
 
-## Imkoniyatlar
+## Eng tez usul: demo versiyani ochish (server kerak emas)
 
-| Boʻlim | Nima qiladi |
-|---|---|
-| **AI yordamchi** | Chat. Enter bilan yuborish, Shift+Enter bilan yangi qator. Xavfsiz Markdown, manbalar va sana, javobni nusxalash, «foydali boʻldimi?» bahosi, xatoda «Qayta urinish». Shoshilinch holat, tashxis va doza soʻrovlari uchun xavfsizlik qoidalari ishlaydi. |
-| **Tibbiy tahlil** | PDF, JPG yoki PNG faylni drag-and-drop bilan yuklaydi. Ish 3 bosqichda boradi: **yuklash → qiymatlarni tasdiqlash → natija**. Har bir qiymat faqat hujjatda yozilgan meʼyoriy oraliq bilan solishtiriladi. Oraliq boʻlmasa, MEDAI uni oʻzidan qoʻymaydi. Natijada maʼnosi, cheklovlar va shifokorga beriladigan savollar chiqadi. |
-| **Dori qoʻllanmasi** | Dori nomi, yoʻriqnoma fayli (PDF/TXT; rasm faqat AI rejimida) yoki joylashtirilgan matn qabul qilinadi. Natijada quyidagi boʻlimlar chiqadi: faol modda, qoʻllanish sohasi, qarshi koʻrsatmalar, nojoʻya taʼsirlar, oʻzaro taʼsirlar, saqlash shartlari, manba va sana. **Dozalash boʻlimi ataylab koʻrsatilmaydi.** |
-| **Tibbiy kutubxona** | 26 ta atama: qon tahlili, biokimyo, gormonlar, siydik tahlili, umumiy va dori atamalari. Qidiruv, turkum boʻyicha filtr va batafsil oyna bor. Har bir atamada sodda taʼrif, tibbiy izoh, bogʻliq tushunchalar va manba beriladi. |
-| **Suhbatlar tarixi** | Suhbat nomi avtomatik yaratiladi. Qidiruv, ochish va oʻchirish (tasdiqlash dialogi bilan) mavjud, oxirgi xabar vaqti koʻrsatiladi. Tarix **faqat shu qurilmada** (localStorage) saqlanadi. |
-| **Profil va sozlamalar** | Ism (ixtiyoriy), tarixni saqlashni yoqish/oʻchirish, animatsiyalarni kamaytirish, tizim holati va barcha maʼlumotlarni oʻchirish. |
+```bash
+npm install
+npm run build
+```
 
-Qoʻshimcha: **«Loyiha haqida»** sahifasi (taqdimot uchun: muammo, yechim, xavfsizlik, yoʻl xaritasi), bosh ekranda **«Sinab koʻring»** stsenariylari va namuna fayllar (tahlil va yoʻriqnoma).
+Keyin **`dist/index.html`** faylini ikki marta bosib oching. Hamma modul brauzerda ishlaydi. `dist/` papkasini Netlify Drop orqali internetga ham joylash mumkin.
 
-Interfeys toʻliq **oʻzbek tilida** (lotin yozuvi). Rus va ingliz tillari uchun tuzilma tayyor (`js/i18n.js`).
+Maʼlumotlar (yozilishlar, zaxira harakatlari, suhbatlar) faqat shu brauzerda (`localStorage`) saqlanadi. Ularni tozalash uchun: **Profil → Barcha maʼlumotlarni oʻchirish**. Zaxira uchun: **MEDSTOCK → Demo maʼlumotni tiklash**.
 
 ---
 
@@ -28,7 +37,7 @@ Interfeys toʻliq **oʻzbek tilida** (lotin yozuvi). Rus va ingliz tillari uchun
 **Talab:** Node.js 18.17 yoki undan yangi versiya (22 LTS tavsiya etiladi).
 
 ```bash
-cd MEDAI
+cd MEDPERFECT
 npm install
 cp .env.example .env      # Windows: copy .env.example .env
 npm start
@@ -70,7 +79,7 @@ Demo javoblar interfeysda doim **«DEMO · qoidaga asoslangan javob (AI emas)»*
 
 ## Netlify'ga joylash
 
-Loyiha Netlify uchun tayyor: frontend statik fayl sifatida (`dist/`), API esa **Netlify Functions** orqali ishlaydi (`netlify/functions/api.mjs`). Sozlamalar `netlify.toml` faylida turadi. Repozitoriy ildizidagi `netlify.toml` loyiha `MEDAI/` papkasida ekanini Netlify'ga bildiradi.
+Loyiha Netlify uchun tayyor: frontend statik fayl sifatida (`dist/`), API esa **Netlify Functions** orqali ishlaydi (`netlify/functions/api.mjs`). Sozlamalar `netlify.toml` faylida turadi. Repozitoriy ildizidagi `netlify.toml` loyiha `MEDPERFECT/` papkasida ekanini Netlify'ga bildiradi.
 
 ### 1-usul: GitHub orqali (tavsiya etiladi)
 1. Kodni GitHub'ga yuklang.
@@ -79,7 +88,7 @@ Loyiha Netlify uchun tayyor: frontend statik fayl sifatida (`dist/`), API esa **
 
 ### 2-usul: Netlify CLI (GitHub'siz)
 ```bash
-cd MEDAI
+cd MEDPERFECT
 npm install
 npx netlify-cli login
 npx netlify-cli deploy --build --prod
@@ -103,8 +112,17 @@ npx netlify-cli deploy --build --prod
 ## Loyiha tuzilmasi
 
 ```
-MEDAI/
+MEDPERFECT/
   index.html               — yagona sahifali ilova (SPA, hash router)
+  public/assets/           — MEDPERFECT logotipi (medperfect-logo.png va kichik nusxalari)
+  css/platform.css         — MEDPERFECT dizayn tizimi va modullar uslublari
+  js/modules/home.js       — bosh sahifa (dashboard)
+  js/modules/trace.js      — PHARMA TRACE
+  js/modules/connect.js    — MEDCONNECT
+  js/modules/stock.js      — MEDSTOCK AI
+  js/modules/auth.js       — kirish / roʻyxatdan oʻtish (demo oyna)
+  js/modules/common.js     — modullar uchun umumiy yordamchilar (saqlash, sana, KPI)
+  js/data/                 — modullarning namunaviy maʼlumotlari
   css/style.css            — dizayn tizimi (ranglar, komponentlar)
   css/responsive.css       — desktop / laptop / planshet / mobil
   js/app.js                — ishga tushirish, router, server holati
@@ -164,11 +182,11 @@ MEDAI/
 
 ```bash
 npm test             # 20 ta unit va API test (Node test runner)
-npm run test:e2e     # 34 ta brauzer testi (Playwright kerak: npm i -D playwright && npx playwright install chromium)
+npm run test:e2e     # 39 ta brauzer testi (Playwright kerak: npm i -D playwright && npx playwright install chromium)
 npm run fixtures     # sintetik namuna fayllarni qayta yaratish
 ```
 
-**Oxirgi natija:** unit/API — 20/20 ✔, E2E — 34/34 ✔ (serversiz statik rejim va file:// testlari ham shu jumladan). Barcha testlarda faqat sintetik maʼlumotlar ishlatilgan.
+**Oxirgi natija:** unit/API — 20/20 ✔, E2E — 39/39 ✔ (barcha 4 modul, serversiz statik rejim va file:// testlari ham shu jumladan). Barcha testlarda faqat sintetik maʼlumotlar ishlatilgan.
 
 | Promptdagi test | Holat |
 |---|---|

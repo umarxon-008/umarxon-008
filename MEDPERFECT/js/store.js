@@ -127,7 +127,12 @@ export const store = {
   /** Barcha mahalliy ma'lumotlarni o'chirish (sozlamalar ham). */
   wipe() {
     state = structuredClone(DEFAULTS);
-    try { localStorage.removeItem(KEY); sessionStorage.clear(); } catch { /* ignore */ }
+    try {
+      localStorage.removeItem(KEY);
+      // MEDPERFECT modullari ma'lumotlari (yozilishlar, zaxira harakatlari va h.k.)
+      Object.keys(localStorage).filter((k) => k.startsWith('medperfect.')).forEach((k) => localStorage.removeItem(k));
+      sessionStorage.clear();
+    } catch { /* ignore */ }
     listeners.forEach((fn) => fn('wipe'));
   },
 };

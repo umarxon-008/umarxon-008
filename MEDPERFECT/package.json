@@ -1,8 +1,8 @@
 {
-  "name": "medai",
-  "version": "0.1.0",
+  "name": "medperfect",
+  "version": "0.3.0",
   "private": true,
-  "description": "MEDAI — tibbiy ma'lumotlarni tushuntiruvchi AI yordamchi (PHARMA GUARD AI moduli)",
+  "description": "MEDPERFECT — yagona tibbiyot va farmatsevtika platformasi (MEDAI, PHARMA TRACE, MEDCONNECT, MEDSTOCK AI)",
   "type": "module",
   "main": "server/server.js",
   "scripts": {

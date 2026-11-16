@@ -3,11 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>MEDAI — Tibbiy maʼlumot yordamchisi</title>
-  <meta name="description" content="MEDAI — tibbiy maʼlumotlar, laboratoriya natijalari va dori yoʻriqnomalarini sodda oʻzbek tilida tushuntiruvchi yordamchi.">
-  <meta name="theme-color" content="#102B46">
-  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+  <title>MEDPERFECT — Yagona tibbiyot va farmatsevtika platformasi</title>
+  <meta name="description" content="MEDPERFECT — MEDAI tibbiy yordamchi, PHARMA TRACE dori kuzatuvi, MEDCONNECT tibbiy aloqa va MEDSTOCK AI zaxira boshqaruvini birlashtirgan platforma.">
+  <meta name="theme-color" content="#0B2F55">
+  <link rel="icon" href="public/assets/favicon-64.png" type="image/png">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/platform.css">
   <link rel="stylesheet" href="css/responsive.css">
   <script src="vendor/lucide.min.js" defer></script>
   <script src="js/boot-check.js"></script>
@@ -20,24 +21,36 @@
     <!-- ============ SIDEBAR ============ -->
     <aside class="sidebar" id="sidebar" aria-label="Asosiy navigatsiya">
       <div class="sidebar__brand">
-        <img src="assets/icons/logo.svg" alt="" width="38" height="38">
+        <img class="brand__logo" src="public/assets/medperfect-logo-256.png" alt="MEDPERFECT logotipi" width="44" height="44">
         <div class="brand">
-          <span class="brand__name">MEDAI</span>
-          <span class="brand__tagline" data-i18n="brand.tagline">Tibbiy maʼlumot yordamchisi</span>
+          <span class="brand__name">MEDPERFECT</span>
+          <span class="brand__tagline" data-i18n="brand.tagline">Yagona tibbiyot platformasi</span>
         </div>
         <button type="button" class="icon-btn sidebar__close" id="sidebarClose" aria-label="Menyuni yopish"><i data-lucide="x"></i></button>
       </div>
 
-      <button type="button" class="btn btn--primary btn--block" id="newChatBtn">
-        <i data-lucide="message-square-plus"></i><span data-i18n="action.newChat">Yangi suhbat</span>
-      </button>
-
       <nav class="nav" aria-label="Boʻlimlar">
-        <a href="#/chat" class="nav__item" data-route="chat"><i data-lucide="message-square"></i><span data-i18n="nav.chat">AI yordamchi</span></a>
-        <a href="#/analysis" class="nav__item" data-route="analysis"><i data-lucide="flask-conical"></i><span data-i18n="nav.analysis">Tibbiy tahlil</span></a>
-        <a href="#/medicine" class="nav__item" data-route="medicine"><i data-lucide="pill"></i><span data-i18n="nav.medicine">Dori qoʻllanmasi</span></a>
-        <a href="#/library" class="nav__item" data-route="library"><i data-lucide="book-open"></i><span data-i18n="nav.library">Tibbiy kutubxona</span></a>
-        <a href="#/history" class="nav__item" data-route="history"><i data-lucide="history"></i><span data-i18n="nav.history">Suhbatlar tarixi</span></a>
+        <a href="#/home" class="nav__item" data-route="home"><i data-lucide="layout-dashboard"></i><span data-i18n="nav.home">Bosh sahifa</span></a>
+
+        <div class="nav__group">
+          <div class="nav__group-head">
+            <span class="nav__group-title"><span class="module-dot module-dot--medai"></span>MEDAI</span>
+            <button type="button" class="icon-btn icon-btn--sm nav__group-action" id="newChatBtn" aria-label="Yangi suhbat" data-tooltip="Yangi suhbat"><i data-lucide="message-square-plus"></i></button>
+          </div>
+          <a href="#/chat" class="nav__item" data-route="chat"><i data-lucide="message-square"></i><span data-i18n="nav.chat">AI yordamchi</span></a>
+          <a href="#/analysis" class="nav__item" data-route="analysis"><i data-lucide="flask-conical"></i><span data-i18n="nav.analysis">Tibbiy tahlil</span></a>
+          <a href="#/medicine" class="nav__item" data-route="medicine"><i data-lucide="pill"></i><span data-i18n="nav.medicine">Dori qoʻllanmasi</span></a>
+          <a href="#/library" class="nav__item" data-route="library"><i data-lucide="book-open"></i><span data-i18n="nav.library">Tibbiy kutubxona</span></a>
+          <a href="#/history" class="nav__item" data-route="history"><i data-lucide="history"></i><span data-i18n="nav.history">Suhbatlar tarixi</span></a>
+        </div>
+
+        <div class="nav__group">
+          <div class="nav__group-head"><span class="nav__group-title">Modullar</span></div>
+          <a href="#/trace" class="nav__item" data-route="trace"><i data-lucide="scan-search"></i><span data-i18n="nav.trace">PHARMA TRACE</span></a>
+          <a href="#/connect" class="nav__item" data-route="connect"><i data-lucide="stethoscope"></i><span data-i18n="nav.connect">MEDCONNECT</span></a>
+          <a href="#/stock" class="nav__item" data-route="stock"><i data-lucide="boxes"></i><span data-i18n="nav.stock">MEDSTOCK AI</span></a>
+        </div>
+
         <a href="#/about" class="nav__item nav__item--accent" data-route="about"><i data-lucide="rocket"></i><span data-i18n="nav.about">Loyiha haqida</span></a>
       </nav>
 
@@ -83,6 +96,7 @@
             </button>
             <div class="menu__panel" id="profileMenu" role="menu" aria-label="Profil menyusi" hidden>
               <div class="menu__header"><strong id="menuName">Mehmon</strong><small>Maʼlumotlar shu qurilmada saqlanadi</small></div>
+              <button type="button" role="menuitem" class="menu__item" data-action="auth"><i data-lucide="log-in"></i>Kirish / Roʻyxatdan oʻtish</button>
               <a role="menuitem" href="#/settings" class="menu__item"><i data-lucide="user"></i>Profil va sozlamalar</a>
               <button type="button" role="menuitem" class="menu__item" data-action="privacy"><i data-lucide="shield-check"></i>Maxfiylik va xavfsizlik</button>
               <button type="button" role="menuitem" class="menu__item" data-action="about-modes"><i data-lucide="server"></i>Ishlash rejimi</button>
@@ -101,8 +115,20 @@
 
       <main id="main" class="content" tabindex="-1">
 
+        <!-- ============ MEDPERFECT BOSH SAHIFA ============ -->
+        <section class="view" id="view-home" aria-labelledby="pageTitle" hidden><div class="page page--wide"></div></section>
+
+        <!-- ============ PHARMA TRACE ============ -->
+        <section class="view" id="view-trace" aria-labelledby="pageTitle" hidden><div class="page"></div></section>
+
+        <!-- ============ MEDCONNECT ============ -->
+        <section class="view" id="view-connect" aria-labelledby="pageTitle" hidden><div class="page page--wide"></div></section>
+
+        <!-- ============ MEDSTOCK AI ============ -->
+        <section class="view" id="view-stock" aria-labelledby="pageTitle" hidden><div class="page page--wide"></div></section>
+
         <!-- ============ AI YORDAMCHI ============ -->
-        <section class="view view--chat" id="view-chat" aria-labelledby="pageTitle">
+        <section class="view view--chat" id="view-chat" aria-labelledby="pageTitle" hidden>
           <div class="chat">
             <div class="chat__toolbar" id="chatToolbar" hidden>
               <div class="chat__title"><i data-lucide="message-square"></i><span id="chatTitle">Yangi suhbat</span></div>
@@ -111,7 +137,7 @@
 
             <div class="chat__scroll" id="chatScroll">
               <div class="welcome" id="welcome">
-                <div class="welcome__logo"><img src="assets/icons/logo.svg" alt="" width="64" height="64"></div>
+                <div class="welcome__logo"><img src="public/assets/medperfect-logo-256.png" alt="" width="72" height="72"></div>
                 <h2 class="welcome__title" id="welcomeGreeting">Salom! Men MEDAI</h2>
                 <p class="welcome__text">Tibbiy maʼlumotlarni tushunishingizga yordam beruvchi AI yordamchiman. Tahlil natijalari, dori yoʻriqnomalari va tibbiy atamalarni sodda tilda tushuntiraman.</p>
 
@@ -448,39 +474,39 @@
         <section class="view view--about" id="view-about" aria-labelledby="pageTitle" hidden>
           <div class="page about">
             <div class="about-hero">
-              <span class="about-hero__badge"><i data-lucide="shield-check"></i>PHARMA GUARD AI ekotizimi moduli</span>
-              <h2 class="about-hero__title">Tibbiy maʼlumotni <span>tushunarli</span> qiladigan yordamchi</h2>
-              <p class="about-hero__text">MEDAI laboratoriya natijalari, dori yoʻriqnomalari va tibbiy atamalarni oddiy oʻzbek tilida tushuntiradi — tashxis qoʻymasdan, xavfsiz va manbaga tayangan holda.</p>
+              <span class="about-hero__badge"><i data-lucide="sparkles"></i>Hackathon loyihasi · MVP</span>
+              <div class="about-hero__brand"><img src="public/assets/medperfect-logo-256.png" alt="MEDPERFECT logotipi" width="72" height="72"><span>MEDPERFECT</span></div>
+              <h2 class="about-hero__title">Tibbiyot va farmatsevtika — <span>bitta platformada</span></h2>
+              <p class="about-hero__text">MEDPERFECT bemor, shifokor, dorixona va tibbiyot muassasalarini yagona raqamli ekotizimga birlashtiradi: tibbiy maʼlumotni tushuntiradi, dorining haqiqiyligini tekshiradi, qabulga yozadi va zaxirani nazorat qiladi.</p>
               <div class="btn-row about-hero__cta">
-                <button type="button" class="btn btn--primary" data-about-action="chat"><i data-lucide="message-square"></i>Demoni sinash</button>
+                <button type="button" class="btn btn--primary" data-about-action="home"><i data-lucide="layout-dashboard"></i>Platformani koʻrish</button>
                 <button type="button" class="btn btn--secondary" data-about-action="sample"><i data-lucide="flask-conical"></i>Tahlil namunasini koʻrish</button>
               </div>
               <ul class="about-stats">
-                <li><strong>6</strong><span>ishlaydigan boʻlim</span></li>
-                <li><strong>26</strong><span>tibbiy atama</span></li>
-                <li><strong>54</strong><span>avtomatik test</span></li>
-                <li><strong>0 soʻm</strong><span>demo xarajati</span></li>
+                <li><strong>4</strong><span>integratsiyalashgan modul</span></li>
+                <li><strong>26</strong><span>tibbiy atama (MEDAI)</span></li>
+                <li><strong>8 · 6 · 14</strong><span>dori · shifokor · zaxira namunasi</span></li>
+                <li><strong>0 soʻm</strong><span>demo xarajati, serversiz ishlaydi</span></li>
               </ul>
             </div>
 
             <section class="about-block">
               <h3 class="about-block__title">Muammo</h3>
-              <div class="about-grid about-grid--3">
-                <div class="card about-card"><span class="about-card__icon about-card__icon--warn"><i data-lucide="file-question"></i></span><h4>Tahlil blankasi tushunarsiz</h4><p>Lotincha qisqartmalar, raqamlar va birliklar oddiy odam uchun maʼno anglatmaydi. Natija «yaxshimi yoki yomonmi» — shifokorgacha nomaʼlum.</p></div>
-                <div class="card about-card"><span class="about-card__icon about-card__icon--warn"><i data-lucide="scroll-text"></i></span><h4>Yoʻriqnomalar uzun va murakkab</h4><p>Qarshi koʻrsatmalar va nojoʻya taʼsirlar mayda shrift va tibbiy tilda yozilgan — muhim maʼlumot eʼtibordan chetda qoladi.</p></div>
-                <div class="card about-card"><span class="about-card__icon about-card__icon--warn"><i data-lucide="search-x"></i></span><h4>Ishonchsiz maʼlumot</h4><p>Internetdagi tibbiy maslahatlar koʻpincha manbasiz, oʻzbek tilida emas va oʻz-oʻzini davolashga undaydi.</p></div>
+              <div class="about-grid about-grid--4">
+                <div class="card about-card"><span class="about-card__icon about-card__icon--warn"><i data-lucide="file-question"></i></span><h4>Tibbiy maʼlumot tushunarsiz</h4><p>Tahlil blankalari va dori yoʻriqnomalari murakkab tilda yozilgan, ishonchli izoh oʻzbek tilida kam.</p></div>
+                <div class="card about-card"><span class="about-card__icon about-card__icon--warn"><i data-lucide="shield-question"></i></span><h4>Soxta dori xavfi</h4><p>Bemor va dorixona dorining kelib chiqishi va partiyasini oson tekshira olmaydi.</p></div>
+                <div class="card about-card"><span class="about-card__icon about-card__icon--warn"><i data-lucide="calendar-clock"></i></span><h4>Shifokorga yetib borish qiyin</h4><p>Mutaxassisni topish, boʻsh vaqtni bilish va yozilish koʻpincha qoʻngʻiroq va navbat orqali.</p></div>
+                <div class="card about-card"><span class="about-card__icon about-card__icon--warn"><i data-lucide="package-x"></i></span><h4>Zaxira yoʻqotishlari</h4><p>Dorilar tugab qoladi yoki muddati oʻtib ketadi — dorixona va klinikalar zarar koʻradi.</p></div>
               </div>
             </section>
 
             <section class="about-block">
-              <h3 class="about-block__title">Yechim — MEDAI imkoniyatlari</h3>
-              <div class="about-grid about-grid--3">
-                <a class="card about-card about-card--link" href="#/chat"><span class="about-card__icon"><i data-lucide="message-square"></i></span><h4>AI yordamchi</h4><p>Tibbiy savollarga sodda javob, manba va sana bilan. Natijani yozsangiz — oraliq bilan solishtiradi.</p></a>
-                <a class="card about-card about-card--link" href="#/analysis"><span class="about-card__icon"><i data-lucide="flask-conical"></i></span><h4>Tahlilni tushuntirish</h4><p>PDF blankani yuklang: koʻrsatkichlar ajratiladi, siz tasdiqlaysiz, natija hujjatdagi meʼyor bilan solishtiriladi.</p></a>
-                <a class="card about-card about-card--link" href="#/medicine"><span class="about-card__icon"><i data-lucide="pill"></i></span><h4>Dori qoʻllanmasi</h4><p>Yoʻriqnoma boʻlimlarga ajratiladi: qarshi koʻrsatmalar, nojoʻya va oʻzaro taʼsirlar, saqlash.</p></a>
-                <a class="card about-card about-card--link" href="#/library"><span class="about-card__icon"><i data-lucide="book-open"></i></span><h4>Tibbiy kutubxona</h4><p>Gemoglobin, ALT, TTG kabi atamalar — sodda taʼrif, tibbiy izoh va manba bilan.</p></a>
-                <a class="card about-card about-card--link" href="#/history"><span class="about-card__icon"><i data-lucide="history"></i></span><h4>Suhbatlar tarixi</h4><p>Suhbatlar faqat foydalanuvchi qurilmasida saqlanadi — server maʼlumot yigʻmaydi.</p></a>
-                <div class="card about-card"><span class="about-card__icon about-card__icon--danger"><i data-lucide="siren"></i></span><h4>Xavfsizlik qoidalari</h4><p>Shoshilinch belgilarda 103 ga yoʻnaltiradi, tashxis va doza soʻrovlarini xavfsiz rad etadi.</p></div>
+              <h3 class="about-block__title">Yechim — 4 ta modul, yagona platforma</h3>
+              <div class="about-grid about-grid--4">
+                <a class="card about-card about-card--link" href="#/chat"><span class="about-card__icon"><i data-lucide="brain-circuit"></i></span><h4>MEDAI</h4><p>Tibbiy AI yordamchi: tahlil natijalari, dori yoʻriqnomalari va atamalarni sodda tilda tushuntiradi.</p></a>
+                <a class="card about-card about-card--link" href="#/trace"><span class="about-card__icon"><i data-lucide="scan-search"></i></span><h4>PHARMA TRACE</h4><p>QR kod yoki partiya raqami orqali dorining kelib chiqishi va taʼminot zanjirini tekshirish.</p></a>
+                <a class="card about-card about-card--link" href="#/connect"><span class="about-card__icon"><i data-lucide="stethoscope"></i></span><h4>MEDCONNECT</h4><p>Shifokorlar va muassasalar katalogi, onlayn qabulga yozilish va shifokor bilan xabar almashish.</p></a>
+                <a class="card about-card about-card--link" href="#/stock"><span class="about-card__icon"><i data-lucide="boxes"></i></span><h4>MEDSTOCK AI</h4><p>Dorixona zaxirasi: kam qolgan va muddati yaqin dorilar, kirim-chiqim va buyurtma tavsiyalari.</p></a>
               </div>
             </section>
 
@@ -517,21 +543,21 @@
                 <div class="card about-phase">
                   <span class="mode-badge mode-badge--demo"><i data-lucide="check-circle-2"></i>Hozir · Demo (MVP)</span>
                   <ul class="check-list">
-                    <li>Qoidaga asoslangan chat: 26 atama va amaliy mavzular</li>
-                    <li>Matnli PDF tahlilni avtomatik oʻqish va solishtirish</li>
-                    <li>Yoʻriqnomani boʻlimlarga ajratish</li>
-                    <li>Server shart emas — brauzerda ishlaydi</li>
-                    <li>Mobil, planshet va kompyuterga moslashgan</li>
+                    <li>MEDAI: qoidaga asoslangan chat, PDF tahlil, yoʻriqnoma, 26 atama</li>
+                    <li>PHARMA TRACE: 8 ta namunaviy dori, QR/ID qidiruv, 4 bosqichli zanjir</li>
+                    <li>MEDCONNECT: 6 ta namunaviy shifokor, qabulga yozilish, demo chat</li>
+                    <li>MEDSTOCK AI: 14 ta pozitsiya, ogohlantirishlar, diagrammalar, tavsiyalar</li>
+                    <li>Server shart emas — brauzerda va oflayn ishlaydi</li>
                   </ul>
                 </div>
                 <div class="card about-phase about-phase--next">
                   <span class="mode-badge mode-badge--ai"><i data-lucide="rocket"></i>Keyingi bosqich · Toʻliq versiya</span>
                   <ul class="check-list">
-                    <li>AI (Claude) bilan erkin savol-javob — integratsiya tayyor</li>
-                    <li>Rasm va skanlardan matn oʻqish (OCR)</li>
-                    <li>Rasmiy manbalar bazasi (RAG): dori reestri, klinik protokollar</li>
-                    <li>Rus tili, akkaunt va qurilmalararo sinxronizatsiya</li>
-                    <li>PHARMA GUARD AI platformasi bilan birlashish</li>
+                    <li>MEDAI: haqiqiy AI (Claude) — integratsiya kodi tayyor</li>
+                    <li>PHARMA TRACE: davlat dori reestri va ishlab chiqaruvchilar bilan integratsiya, kamera orqali QR</li>
+                    <li>MEDCONNECT: real klinikalar, shifokor kabineti, SMS eslatmalar</li>
+                    <li>MEDSTOCK AI: sotuv tarixi asosida prognoz (ML), yetkazib beruvchilarga avtomatik buyurtma</li>
+                    <li>Akkaunt tizimi, rollar, xavfsiz server va maʼlumotlarni mahalliy saqlash</li>
                   </ul>
                 </div>
               </div>
@@ -542,7 +568,8 @@
               <div class="chip-row">
                 <span class="chip chip--static">HTML5 · CSS3 · Vanilla JS</span>
                 <span class="chip chip--static">Node.js · Express</span>
-                <span class="chip chip--static">Claude API (ulashga tayyor)</span>
+                <span class="chip chip--static">Claude API (MEDAI, ulashga tayyor)</span>
+                <span class="chip chip--static">SVG diagrammalar</span>
                 <span class="chip chip--static">pdf.js</span>
                 <span class="chip chip--static">Netlify Functions</span>
                 <span class="chip chip--static">Playwright testlari</span>
@@ -556,7 +583,7 @@
               </div>
               <button type="button" class="btn btn--primary" data-about-action="chat"><i data-lucide="arrow-right"></i>Boshlash</button>
             </div>
-            <p class="muted small center">MEDAI tibbiy maslahat oʻrnini bosmaydi. Demo versiya maʼlumotlari tibbiy ekspert tomonidan hali tekshirilmagan.</p>
+            <p class="muted small center">MEDPERFECT tibbiy maslahat oʻrnini bosmaydi. Barcha modul maʼlumotlari namunaviy; MEDAI kutubxonasi tibbiy ekspert tomonidan hali tekshirilmagan.</p>
           </div>
         </section>
       </main>

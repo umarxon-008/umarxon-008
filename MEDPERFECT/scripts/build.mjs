@@ -28,7 +28,7 @@ fs.mkdirSync(out('vendor/pdfjs'), { recursive: true });
 fs.mkdirSync(out('js'), { recursive: true });
 
 // 1) Statik papkalar
-for (const dir of ['css', 'assets', 'data']) fs.cpSync(path.join(root, dir), out(dir), { recursive: true });
+for (const dir of ['css', 'assets', 'data', 'public']) fs.cpSync(path.join(root, dir), out(dir), { recursive: true });
 
 // 2) JS: bitta oddiy skript (modulsiz) — file:// da ham ishlaydi
 await build({

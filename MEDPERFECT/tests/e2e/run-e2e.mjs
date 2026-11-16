@@ -55,7 +55,7 @@ async function newPage(opts = {}) {
   page.on('console', (m) => { if (m.type() === 'error') consoleErrors.push(m.text()); });
   page.on('pageerror', (e) => consoleErrors.push(e.message));
   page.on('dialog', (d) => { consoleErrors.push(`Kutilmagan dialog (XSS?): ${d.message()}`); d.dismiss(); });
-  await page.goto(BASE, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE}/#/chat`, { waitUntil: 'networkidle' });
   return page;
 }
 
@@ -312,7 +312,7 @@ await check('Tibbiy kutubxona: qidiruv, boʻsh natija va batafsil oyna', async (
 });
 
 await check('13. Navigatsiyadagi barcha tugmalar', async () => {
-  const routes = { chat: 'AI yordamchi', analysis: 'Tibbiy tahlil', medicine: 'Dori qoʻllanmasi', library: 'Tibbiy kutubxona', history: 'Suhbatlar tarixi', about: 'Loyiha haqida' };
+  const routes = { home: 'Bosh sahifa', chat: 'AI yordamchi', analysis: 'Tibbiy tahlil', medicine: 'Dori qoʻllanmasi', library: 'Tibbiy kutubxona', history: 'Suhbatlar tarixi', trace: 'PHARMA TRACE', connect: 'MEDCONNECT', stock: 'MEDSTOCK AI', about: 'Loyiha haqida' };
   for (const [route, title] of Object.entries(routes)) {
     await page.click(`.nav__item[data-route="${route}"]`);
     await page.waitForFunction((t) => document.querySelector('#pageTitle').textContent === t, title);
@@ -349,11 +349,116 @@ await check('Dori qoʻllanmasi: «Namuna yoʻriqnoma» tugmasi', async () => {
 await check('Loyiha haqida: taqdimot sahifasi va tugmalari', async () => {
   await page.goto(`${BASE}/#/about`);
   await page.waitForSelector('#view-about:not([hidden]) .about-hero');
-  assert((await page.locator('.about-card').count()) >= 9, 'imkoniyat kartalari yetarli emas');
+  assert((await page.locator('.about-card').count()) >= 8, 'imkoniyat kartalari yetarli emas');
   await page.screenshot({ path: `${SHOTS}/desktop-12-about.png` });
   await page.locator('[data-about-action="sample"]').click();
   await page.waitForSelector('#view-analysis:not([hidden]) #labFileChip:not([hidden])');
   await page.click('#labRemoveBtn');
+});
+
+// ---------- MEDPERFECT modullari ----------
+await check('MEDPERFECT: bosh sahifa, 4 ta modul kartasi va ogohlantirishlar', async () => {
+  await page.goto(`${BASE}/#/home`);
+  await page.waitForSelector('#view-home .home-hero');
+  assert(await page.locator('.home-hero__logo img[src*="medperfect-logo"]').count() === 1, 'logotip yoʻq');
+  assert((await page.locator('.module-card').count()) === 4, '4 ta modul kartasi boʻlishi kerak');
+  assert((await page.locator('#view-home .feed-item').count()) >= 3, 'ogohlantirishlar paneli boʻsh');
+  await page.screenshot({ path: `${SHOTS}/desktop-20-home.png` });
+  for (const [cls, route] of [['trace', 'trace'], ['connect', 'connect'], ['stock', 'stock'], ['medai', 'chat']]) {
+    await page.goto(`${BASE}/#/home`);
+    await page.click(`.module-card--${cls}`);
+    await page.waitForFunction((r) => document.body.dataset.route === r, route);
+  }
+});
+
+await check('PHARMA TRACE: QR kod boʻyicha qidirish, zanjir va holat', async () => {
+  await page.goto(`${BASE}/#/trace`);
+  await page.waitForSelector('#traceSearch');
+  await page.fill('#traceSearch', 'QR-MP-9Z4T-1004');
+  await page.click('.trace-search button[type="submit"]');
+  await page.waitForSelector('.trace-detail');
+  const text = await page.locator('.trace-detail').innerText();
+  assert(text.includes('Ibuprofen') && text.includes('Shubhali') && text.includes('NF-2311-907'), 'shubhali mahsulot koʻrsatilmadi');
+  assert((await page.locator('.chain-step').count()) === 4, 'zanjir 4 bosqichli boʻlishi kerak');
+  await page.screenshot({ path: `${SHOTS}/desktop-21-trace.png`, fullPage: true });
+  await page.click('.trace-detail .btn--danger');
+  await page.waitForSelector('.modal.is-open');
+  await page.click('.modal__footer .btn--primary');
+  await page.waitForSelector('.toast--success');
+  await page.fill('#traceSearch', 'mavjud-emas-123');
+  await page.click('.trace-search button[type="submit"]');
+  await page.waitForSelector('#view-trace .empty-state');
+  await page.fill('#traceSearch', 'paratsetamol');
+  await page.click('.trace-search button[type="submit"]');
+  await page.waitForFunction(() => document.querySelector('.trace-detail')?.innerText.includes('Tekshirilgan'));
+});
+
+await check('MEDCONNECT: shifokor profili, qabulga yozilish, bekor qilish va demo chat', async () => {
+  await page.goto(`${BASE}/#/connect`);
+  await page.waitForSelector('.doctor-card');
+  assert((await page.locator('.doctor-card').count()) >= 5, 'kamida 5 ta shifokor boʻlishi kerak');
+  await page.click('.chip[data-spec="Kardiolog"]');
+  await page.waitForFunction(() => document.querySelectorAll('.doctor-card').length === 1);
+  await page.click('.doctor-card [data-act="profile"]');
+  await page.waitForSelector('.modal.is-open .doctor-profile');
+  await page.click('.modal__footer .btn--primary');
+  await page.waitForSelector('.modal.is-open .booking');
+  await page.click('.modal__footer .btn--primary'); // vaqt tanlanmagan — xato
+  await page.waitForSelector('#bookError:not([hidden])');
+  await page.locator('.time-chip:not([disabled])').first().click();
+  await page.fill('#bookName', 'Aziza');
+  await page.fill('#bookReason', 'Bosimni tekshirish');
+  await page.screenshot({ path: `${SHOTS}/desktop-22-booking.png` });
+  await page.click('.modal__footer .btn--primary');
+  await page.waitForSelector('.appt-card');
+  assert((await page.locator('.appt-card').innerText()).includes('Jasur Toshmatov'), 'yozilish koʻrinmadi');
+  await page.reload({ waitUntil: 'networkidle' });
+  await page.waitForSelector('.appt-card');
+  await page.click('.appt-card [data-cancel]');
+  await page.click('.modal__footer .btn--danger');
+  await page.waitForFunction(() => document.querySelector('.appt-card')?.innerText.includes('Bekor qilingan'));
+  await page.click('.tab[data-tab="messages"]');
+  await page.fill('#dmInput', 'Salom, qabulga nima olib kelay?');
+  await page.press('#dmInput', 'Enter');
+  await page.waitForSelector('.dm--doctor', { timeout: 5000 });
+  assert((await page.locator('.dm--doctor .dm__meta').first().innerText()).includes('Avtomatik demo javob'), 'demo belgisi yoʻq');
+});
+
+await check('MEDSTOCK AI: ogohlantirishlar, kirim/chiqim validatsiyasi va tavsiyalar', async () => {
+  await page.goto(`${BASE}/#/stock`);
+  await page.waitForSelector('.stock-table');
+  assert((await page.locator('.stock-row').count()) === 14, '14 ta pozitsiya boʻlishi kerak');
+  await page.click('.chip[data-status="low"]');
+  const lowCount = await page.locator('.stock-row').count();
+  assert(lowCount >= 3, 'kam qolganlar filtri ishlamadi');
+  await page.click('.chip[data-status="all"]');
+  await page.locator('.stock-row', { hasText: 'Metformin' }).locator('[data-move]').click();
+  await page.waitForSelector('.modal.is-open #moveQty');
+  await page.fill('#moveQty', '999');
+  await page.click('.modal__footer .btn--primary');
+  await page.waitForSelector('.modal .form-error:not([hidden])');
+  await page.click('.seg__opt:has(input[value="in"])');
+  await page.fill('#moveQty', '50');
+  await page.click('.modal__footer .btn--primary');
+  await page.waitForFunction(() => document.querySelector('.stock-table')?.innerText.includes('68 quti'));
+  await page.click('.tab[data-tab="insights"]');
+  await page.waitForSelector('.insight-hero');
+  assert((await page.locator('.insight-list .insight').count()) >= 6, 'tavsiyalar yoʻq');
+  await page.screenshot({ path: `${SHOTS}/desktop-23-stock-insights.png`, fullPage: true });
+  await page.click('.tab[data-tab="moves"]');
+  await page.waitForSelector('svg.chart rect.chart__bar');
+});
+
+await check('Kirish / roʻyxatdan oʻtish (demo oyna)', async () => {
+  await page.goto(`${BASE}/#/home`);
+  await page.click('.home-hero .btn--glass');
+  await page.waitForSelector('.modal.is-open .auth');
+  await page.click('.modal__footer .btn--primary');
+  await page.waitForSelector('#authError:not([hidden])');
+  await page.fill('#authName', 'Bekzod');
+  await page.fill('#authPhone', '+998 90 123 45 67');
+  await page.click('.modal__footer .btn--primary');
+  await page.waitForFunction(() => document.querySelector('.home-hero__title')?.textContent.includes('Bekzod'));
 });
 
 await check('Sozlamalar: ism validatsiyasi va saqlash', async () => {
@@ -378,6 +483,10 @@ await check('Klaviatura: Tab bilan navigatsiya va skip-link', async () => {
 const mobile = await newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
 
 await check('12. Mobil ekran: drawer, chat va sahifalar', async () => {
+  await mobile.goto(`${BASE}/#/home`);
+  await mobile.waitForSelector('#view-home .home-hero');
+  await mobile.screenshot({ path: `${SHOTS}/mobile-00-home.png` });
+  await mobile.goto(`${BASE}/#/chat`);
   await mobile.screenshot({ path: `${SHOTS}/mobile-01-welcome.png` });
   assert(!(await mobile.locator('#sidebar').evaluate((el) => el.classList.contains('is-open'))), 'drawer boshida yopiq boʻlishi kerak');
   await mobile.click('#menuBtn');
@@ -399,6 +508,13 @@ await check('12. Mobil ekran: drawer, chat va sahifalar', async () => {
   await mobile.screenshot({ path: `${SHOTS}/mobile-05-chat.png` });
   const overflow = await mobile.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   assert(!overflow, 'gorizontal scroll paydo boʻldi');
+  for (const r of ['trace/MP-10004', 'connect', 'stock']) {
+    await mobile.goto(`${BASE}/#/${r}`);
+    await mobile.waitForTimeout(400);
+    await mobile.screenshot({ path: `${SHOTS}/mobile-1x-${r.split('/')[0]}.png` });
+    const ov = await mobile.evaluate(() => document.documentElement.scrollWidth > window.innerWidth || document.querySelector('#main').scrollWidth > document.querySelector('#main').clientWidth + 1);
+    assert(!ov, `${r}: gorizontal scroll`);
+  }
 });
 
 await check('Laptop va planshet oʻlchamlari', async () => {
@@ -426,7 +542,7 @@ await check('Statik rejim (serversiz): chat, PDF tahlil (pdf.js) va dori brauzer
     const sp = await browser.newPage({ viewport: { width: 1280, height: 860 } });
     const errs = [];
     sp.on('pageerror', (e) => errs.push(e.message));
-    await sp.goto(SBASE, { waitUntil: 'networkidle' });
+    await sp.goto(`${SBASE}/#/chat`, { waitUntil: 'networkidle' });
     await sp.waitForFunction(() => document.querySelector('#statusText').textContent === 'Demo rejim');
     const msg = await ask(sp, 'Gemoglobinim 112 g/L, meʼyor 120–160');
     assert((await msg.innerText()).includes('natijangiz haqida'), 'statik chat ishlamadi');
@@ -450,7 +566,7 @@ await check('dist/index.html ni fayl sifatida ochish (file://): ikonlar, chat, P
   const errs = [];
   fp.on('pageerror', (e) => errs.push(e.message));
   fp.on('console', (m) => m.type() === 'error' && errs.push(m.text()));
-  await fp.goto(`file://${path.resolve(here, '../../dist/index.html')}`);
+  await fp.goto(`file://${path.resolve(here, '../../dist/index.html')}#/chat`);
   await fp.waitForFunction(() => document.querySelector('#statusText').textContent === 'Demo rejim');
   assert(await fp.locator('i[data-lucide]').count() === 0 && await fp.locator('svg.lucide').count() > 40, 'ikonlar chizilmadi');
   const msg = await ask(fp, 'Kreatinin nima?');
