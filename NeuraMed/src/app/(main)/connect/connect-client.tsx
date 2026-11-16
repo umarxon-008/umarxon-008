@@ -78,7 +78,7 @@ export function ConnectClient({ initialTab, userName }: { initialTab?: string; u
             <button key={it.id} role="tab" aria-selected={tab === it.id} type="button" onClick={() => setTab(it.id)}
               className={cn("flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-semibold transition", tab === it.id ? "bg-gradient-primary text-white shadow" : "text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800")}>
               <it.icon className="h-4 w-4" />{t(it.label)}
-              {badge > 0 && <span className={cn("rounded-full px-1.5 text-[10px]", tab === it.id ? "bg-white/25" : "bg-teal-100 text-teal-700")}>{badge}</span>}
+              {badge > 0 && <span className={cn("rounded-full px-1.5 text-[10px]", tab === it.id ? "bg-white/25" : "bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400")}>{badge}</span>}
             </button>
           );
         })}
@@ -125,7 +125,7 @@ export function ConnectClient({ initialTab, userName }: { initialTab?: string; u
             <section className="grid gap-3 md:grid-cols-2">
               {clinics.map((c) => (
                 <article key={c.id} className="card-base p-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-teal-600">{t(c.type)}</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-teal-600 dark:text-teal-400">{t(c.type)}</p>
                   <p className="font-bold text-slate-900 dark:text-white">{t(c.name)}</p>
                   <p className="mt-1 text-xs text-slate-500 flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{t(c.city)}, {t(c.address)}</p>
                   <p className="text-xs text-slate-500 flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{t(c.hours)}</p>
@@ -146,7 +146,7 @@ export function ConnectClient({ initialTab, userName }: { initialTab?: string; u
                   <article key={a.id} className={cn("card-base p-4 flex flex-wrap items-center gap-3", !active && "opacity-60")}>
                     {d && <Avatar d={d} size={44} />}
                     <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-slate-900 dark:text-white">{t(d?.name ?? "")} · <span className="text-teal-700">{t(d?.specialty ?? "")}</span></p>
+                      <p className="font-semibold text-slate-900 dark:text-white">{t(d?.name ?? "")} · <span className="text-teal-700 dark:text-teal-400">{t(d?.specialty ?? "")}</span></p>
                       <p className="text-sm text-slate-600 dark:text-slate-300">{weekday(a.date)}, {formatDay(a.date)} · {a.time}</p>
                       <p className="text-xs text-slate-400">{t(d?.clinic?.name ?? "")}{a.reason ? ` · ${a.reason}` : ""}</p>
                     </div>
@@ -166,12 +166,12 @@ export function ConnectClient({ initialTab, userName }: { initialTab?: string; u
       <Modal open={!!profile} onClose={() => setProfile(null)} title={t("Shifokor profili")}>
         {profile && (
           <div className="space-y-3 text-sm">
-            <div className="flex gap-3 items-center"><Avatar d={profile} size={56} /><div><p className="text-lg font-bold text-slate-900 dark:text-white">{t(profile.name)}</p><p className="text-teal-700">{t(profile.specialty)} · {profile.experience} {t("yil tajriba")}</p></div></div>
+            <div className="flex gap-3 items-center"><Avatar d={profile} size={56} /><div><p className="text-lg font-bold text-slate-900 dark:text-white">{t(profile.name)}</p><p className="text-teal-700 dark:text-teal-400">{t(profile.specialty)} · {profile.experience} {t("yil tajriba")}</p></div></div>
             <p className="text-slate-600 dark:text-slate-300">{t(profile.about)}</p>
             <p className="flex items-center gap-1.5 text-slate-500"><Languages className="h-4 w-4" />{profile.languages.map((l) => t(l)).join(", ")}</p>
             <p className="flex items-center gap-1.5 text-slate-500"><Building2 className="h-4 w-4" />{t(profile.clinic?.name ?? "")}, {t(profile.clinic?.city ?? "")}</p>
             <p className="flex items-center gap-1.5 text-slate-500"><Clock className="h-4 w-4" />{t("Qabul:")} {profile.workDays.map((d) => fmt.weekdayName(d)).join(", ")} · {profile.hours[0]}:00–{profile.hours[1]}:00</p>
-            <p className="text-xs text-amber-700">{t("Namunaviy profil — haqiqiy shifokor emas.")}</p>
+            <p className="text-xs text-amber-700 dark:text-amber-400">{t("Namunaviy profil — haqiqiy shifokor emas.")}</p>
             <div className="flex gap-2 pt-1">
               <Button variant="outline" className="flex-1" onClick={() => openChat(profile.id)}><MessageCircle className="h-4 w-4" /> {t("Xabar yozish")}</Button>
               <Button variant="gradient" className="flex-1" onClick={() => { setBooking(profile); setProfile(null); }}>{t("Qabulga yozilish")}</Button>
@@ -243,7 +243,7 @@ function BookingModal({ doc, userName, onClose, onDone }: { doc: Doc; userName: 
             <label className="block"><span className="label-base">{t("Telefon (ixtiyoriy)")}</span><input className="input-base" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+998 90 123 45 67" inputMode="tel" /></label>
           </div>
           <label className="block"><span className="label-base">{t("Murojaat sababi (ixtiyoriy)")}</span><input className="input-base" value={reason} onChange={(e) => setReason(e.target.value)} maxLength={200} placeholder={t("Masalan: tahlil natijalarini muhokama qilish")} /></label>
-          {error && <p role="alert" className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+          {error && <p role="alert" className="rounded-xl bg-red-50 dark:bg-red-900/30 px-3 py-2 text-sm text-red-700 dark:text-red-400">{error}</p>}
           <Button variant="gradient" className="w-full" disabled={!date || !time || busy} onClick={submit}>
             {time ? `${formatDay(date)} · ${time} — ${t("tasdiqlash")}` : t("Vaqtni tanlang")}
           </Button>
@@ -317,7 +317,7 @@ function Messages({ doctors, unread, active, onPick }: { doctors: Doc[]; unread:
               <div ref={endRef} />
             </div>
             {emergency && <EmergencyBanner className="mb-2" />}
-            {error && <p role="alert" className="mb-2 text-sm text-red-600">{error}</p>}
+            {error && <p role="alert" className="mb-2 text-sm text-red-600 dark:text-red-400">{error}</p>}
             <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex gap-2">
               <input value={text} onChange={(e) => setText(e.target.value)} maxLength={500} placeholder={t("Xabar yozing…")} aria-label={t("Xabar")} className="input-base flex-1" />
               <Button type="submit" variant="gradient" size="icon" disabled={!text.trim() || busy} aria-label={t("Yuborish")}><Send className="h-4 w-4" /></Button>

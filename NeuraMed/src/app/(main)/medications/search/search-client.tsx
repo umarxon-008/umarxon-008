@@ -118,7 +118,7 @@ export function MedicationSearchClient() {
             >
               <CardContent className="p-4 flex items-center gap-3">
                 <div className="h-9 w-9 rounded-lg bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center shrink-0">
-                  <span className="text-primary-600 font-bold text-xs">
+                  <span className="text-primary-600 dark:text-primary-400 font-bold text-xs">
                     {r.name.slice(0, 2).toUpperCase()}
                   </span>
                 </div>

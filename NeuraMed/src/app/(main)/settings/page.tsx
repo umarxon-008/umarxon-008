@@ -61,7 +61,7 @@ export default function SettingsPage() {
                   )}
                 >
                   <it.icon className={cn("h-5 w-5", theme === it.value ? "text-primary-500" : "text-slate-400")} />
-                  <span className={cn("text-xs font-medium", theme === it.value ? "text-primary-600 dark:text-primary-400" : "text-slate-500")}>
+                  <span className={cn("text-xs font-medium", theme === it.value ? "text-primary-600 dark:text-primary-400" : "text-slate-500 dark:text-slate-300")}>
                     {t(it.label)}
                   </span>
                 </button>

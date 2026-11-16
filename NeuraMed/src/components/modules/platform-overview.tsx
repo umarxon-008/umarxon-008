@@ -46,7 +46,7 @@ export function PlatformOverview({ s }: { s: PlatformSummary }) {
         {modules.map((m) => (
           <Link key={m.href} href={m.href} className="group card-base relative overflow-hidden p-4 transition hover:-translate-y-0.5 hover:shadow-card">
             <span className={cn("inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow", m.grad)}><m.icon className="h-5 w-5" /></span>
-            <span className={cn("absolute right-3 top-3 rounded-full px-2 py-0.5 text-[10px] font-bold", m.tag === "AI" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800")}>{m.tag}</span>
+            <span className={cn("absolute right-3 top-3 rounded-full px-2 py-0.5 text-[10px] font-bold", m.tag === "AI" ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300" : "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300")}>{m.tag}</span>
             <p className="mt-3 text-[11px] font-bold tracking-wider text-teal-700 dark:text-teal-400">{t(m.name)}</p>
             <p className="text-sm font-semibold text-slate-800 dark:text-white leading-snug">{t(m.title)}</p>
             <p className="mt-1 flex items-center gap-1 text-xs text-slate-400">{t(m.stat)}<ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" /></p>

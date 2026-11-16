@@ -10,7 +10,7 @@ export function LogoutButton() {
     window.location.href = "/login";
   };
   return (
-    <button type="button" onClick={logout} className="card-base flex w-full items-center gap-3 px-4 py-3.5 text-sm font-medium text-red-600">
+    <button type="button" onClick={logout} className="card-base flex w-full items-center gap-3 px-4 py-3.5 text-sm font-medium text-red-600 dark:text-red-400">
       <LogOut className="h-[18px] w-[18px]" /> {t("Chiqish")}
     </button>
   );

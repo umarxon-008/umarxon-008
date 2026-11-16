@@ -33,7 +33,7 @@ export function SideNav() {
                   )}
                 >
                   {active && <span className="absolute -left-4 top-2 bottom-2 w-1 rounded-r bg-gradient-primary" />}
-                  <it.icon className={cn("h-[18px] w-[18px]", active ? "text-teal-600" : "")} />
+                  <it.icon className={cn("h-[18px] w-[18px]", active ? "text-teal-600 dark:text-teal-400" : "")} />
                   {t(it.label)}
                 </Link>
               );

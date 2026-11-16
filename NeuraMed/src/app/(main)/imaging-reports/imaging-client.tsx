@@ -90,7 +90,7 @@ export function ImagingClient({ reports: initial }: { reports: ReportItem[] }) {
       {uploading ? (
         <div className="flex flex-col items-center gap-3 p-10 rounded-2xl border-2 border-dashed border-primary-200 bg-primary-50 dark:bg-primary-900/20">
           <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
-          <p className="text-sm text-primary-600 font-medium">{t("Hisobot tahlil qilinmoqda...")}</p>
+          <p className="text-sm text-primary-600 dark:text-primary-400 font-medium">{t("Hisobot tahlil qilinmoqda...")}</p>
           <p className="text-xs text-slate-400">{t("Atamalar tushuntirilmoqda")}</p>
         </div>
       ) : (
@@ -102,8 +102,8 @@ export function ImagingClient({ reports: initial }: { reports: ReportItem[] }) {
       )}
 
       {error && (
-        <div className="p-3 rounded-xl bg-red-50 border border-red-200">
-          <p className="text-sm text-red-600">{error}</p>
+        <div className="p-3 rounded-xl bg-red-50 dark:bg-red-900/30 border border-red-200">
+          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
         </div>
       )}
 

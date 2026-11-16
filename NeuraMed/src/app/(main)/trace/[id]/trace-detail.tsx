@@ -37,7 +37,7 @@ export function TraceDetail({ p }: { p: TraceProduct }) {
       <section className="card-base p-5">
         <div className="flex flex-wrap items-start gap-3">
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-wider text-teal-600">{t(p.category)}</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-teal-600 dark:text-teal-400">{t(p.category)}</p>
             <h2 className="text-xl font-extrabold text-slate-900 dark:text-white">{t(p.name)}</h2>
             <p className="text-sm text-slate-500">{t(p.form)} {t("· Faol modda:")} {t(p.substance)}</p>
           </div>
@@ -83,7 +83,7 @@ export function TraceDetail({ p }: { p: TraceProduct }) {
                     <span className="inline-flex items-center gap-1"><CalendarClock className="h-3 w-3" />{c.date ? formatDay(c.date) : "—"}</span>
                     <span className="inline-flex items-center gap-1"><Thermometer className="h-3 w-3" />{t(c.temp)}</span>
                   </p>
-                  {c.note && <p className={cn("mt-1 text-xs", c.state === "issue" ? "text-red-600 font-medium" : "text-slate-500")}>{t(c.note)}</p>}
+                  {c.note && <p className={cn("mt-1 text-xs", c.state === "issue" ? "text-red-600 dark:text-red-400 font-medium" : "text-slate-500")}>{t(c.note)}</p>}
                 </div>
               </li>
             );
@@ -113,7 +113,7 @@ export function TraceDetail({ p }: { p: TraceProduct }) {
           </fieldset>
           <label className="block"><span className="label-base">{t("Izoh (ixtiyoriy)")}</span>
             <textarea value={note} onChange={(e) => setNote(e.target.value)} maxLength={300} rows={3} className="input-base" placeholder={t("Qayerdan sotib oldingiz, nimasi shubhali…")} /></label>
-          {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
+          {error && <p role="alert" className="text-sm text-red-600 dark:text-red-400">{error}</p>}
           <Button variant="gradient" className="w-full" disabled={!reason || busy} onClick={submit}>{t("Yuborish (demo)")}</Button>
         </div>
       </Modal>

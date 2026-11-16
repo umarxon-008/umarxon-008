@@ -105,7 +105,7 @@ export function AssistantClient({ aiEnabled }: { aiEnabled: boolean }) {
         {locale !== "uz" && !aiEnabled && <p className="mb-3 rounded-xl bg-sky-50 dark:bg-sky-900/20 px-3 py-2 text-xs text-sky-800 dark:text-sky-200">{t("Kutubxona maqolalari va demo javoblar hozircha faqat oʻzbek tilida. AI rejimida (OpenAI kaliti bilan) javob tanlangan tilda beriladi.")}</p>}
         <div className="mb-3 flex flex-wrap items-center gap-2">
           {aiEnabled ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800">{t("AI rejimi · OpenAI")}</span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800 dark:text-emerald-300">{t("AI rejimi · OpenAI")}</span>
           ) : (
             <DemoBadge>{t("Demo rejim · AI emas")}</DemoBadge>
           )}
@@ -128,7 +128,7 @@ export function AssistantClient({ aiEnabled }: { aiEnabled: boolean }) {
               <div className="mt-4 flex flex-wrap justify-center gap-2">
                 {TRY.map((it) => (
                   <button key={it.q} type="button" onClick={() => send(t(it.q))}
-                    className={cn("rounded-full border px-3 py-1.5 text-xs font-semibold", it.safety ? "border-amber-300 bg-amber-50 text-amber-800" : "border-slate-200 bg-white text-slate-700 hover:border-teal-400 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700")}>
+                    className={cn("rounded-full border px-3 py-1.5 text-xs font-semibold", it.safety ? "border-amber-300 bg-amber-50 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300" : "border-slate-200 bg-white text-slate-700 hover:border-teal-400 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700")}>
                     {it.safety && <ShieldAlert className="mr-1 inline h-3.5 w-3.5" />}{t(it.label)}
                   </button>
                 ))}
@@ -148,8 +148,8 @@ export function AssistantClient({ aiEnabled }: { aiEnabled: boolean }) {
                   {m.flags?.emergency && <EmergencyBanner />}
                   <div className="card-base p-4 text-slate-700 dark:text-slate-200">
                     <div className="mb-2 flex items-center gap-2">
-                      {m.mode === "ai" ? <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">{t("AI")}</span> : <DemoBadge>{t("Demo · AI emas")}</DemoBadge>}
-                      {m.aiFailed && <span className="text-[11px] text-amber-600">{t("AI javob bermadi — demo javob")}</span>}
+                      {m.mode === "ai" ? <span className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 text-[10px] font-bold text-emerald-800 dark:text-emerald-300">{t("AI")}</span> : <DemoBadge>{t("Demo · AI emas")}</DemoBadge>}
+                      {m.aiFailed && <span className="text-[11px] text-amber-600 dark:text-amber-400">{t("AI javob bermadi — demo javob")}</span>}
                       <button type="button" onClick={() => copy(m.content)} className="ml-auto rounded-lg p-1 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800" aria-label={t("Nusxalash")}><Copy className="h-4 w-4" /></button>
                     </div>
                     <Markdown text={m.content} />
@@ -179,7 +179,7 @@ export function AssistantClient({ aiEnabled }: { aiEnabled: boolean }) {
           <div ref={endRef} />
         </div>
 
-        {error && <p role="alert" className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+        {error && <p role="alert" className="mt-3 rounded-xl bg-red-50 dark:bg-red-900/30 px-3 py-2 text-sm text-red-700 dark:text-red-400">{error}</p>}
 
         <form onSubmit={(e) => { e.preventDefault(); send(); }} className="sticky bottom-20 lg:bottom-4 mt-4 card-base flex items-end gap-2 p-2 shadow-card">
           <textarea

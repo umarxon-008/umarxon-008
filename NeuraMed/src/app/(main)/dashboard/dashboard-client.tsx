@@ -150,7 +150,7 @@ export function DashboardClient({ userName, reminders, recentReports, platform }
             <CardContent className="p-4 flex items-center gap-4">
               <div className="h-12 w-12 rounded-xl bg-primary-50 dark:bg-primary-900/30 flex flex-col items-center justify-center shrink-0">
                 <Clock className="h-5 w-5 text-primary-500" />
-                <span className="text-[10px] text-primary-600 font-semibold mt-0.5">
+                <span className="text-[10px] text-primary-600 dark:text-primary-400 font-semibold mt-0.5">
                   {nextReminder.time}
                 </span>
               </div>

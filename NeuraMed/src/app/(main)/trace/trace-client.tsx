@@ -53,7 +53,7 @@ export function TraceClient() {
       </div>
 
       <section className="card-base p-4 space-y-3">
-        <h2 className="font-bold text-slate-900 dark:text-white flex items-center gap-2"><QrCode className="h-5 w-5 text-teal-600" /> {t("QR kod yoki partiya raqamini kiriting")}</h2>
+        <h2 className="font-bold text-slate-900 dark:text-white flex items-center gap-2"><QrCode className="h-5 w-5 text-teal-600 dark:text-teal-400" /> {t("QR kod yoki partiya raqamini kiriting")}</h2>
         <form onSubmit={(e) => { e.preventDefault(); search(); }} className="flex gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -72,7 +72,7 @@ export function TraceClient() {
             <ul className="space-y-2">{result.map((p) => <ProductRow key={p.id} p={p} />)}</ul>
           )
         )}
-        {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
+        {error && <p role="alert" className="text-sm text-red-600 dark:text-red-400">{error}</p>}
       </section>
 
       <section className="space-y-3">
@@ -94,7 +94,7 @@ function ProductRow({ p }: { p: TraceProduct }) {
   return (
     <li>
       <Link href={`/trace/${p.id}`} className="card-base flex items-center gap-3 p-3.5 hover:shadow-card transition">
-        <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700 dark:bg-teal-900/30"><Package className="h-5 w-5" /></span>
+        <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700 dark:text-teal-400 dark:bg-teal-900/30"><Package className="h-5 w-5" /></span>
         <div className="min-w-0 flex-1">
           <p className="truncate font-semibold text-slate-900 dark:text-white">{t(p.name)}</p>
           <p className="truncate text-xs text-slate-500">{t(p.form)} {t("· Partiya")} {p.batch} · {formatDay(p.expiryDate)} {t("gacha")}</p>

@@ -51,7 +51,7 @@ export default async function AboutPage() {
         </div>
 
         <section className="card-base p-4 space-y-2 text-sm text-slate-600 dark:text-slate-300">
-          <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-teal-600" /> {t("Xavfsizlik qoidalari")}</h3>
+          <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-teal-600 dark:text-teal-400" /> {t("Xavfsizlik qoidalari")}</h3>
           <ul className="list-disc pl-5 space-y-1">
             <li>{t("Tashxis qoʻyilmaydi, dori dozasi tavsiya qilinmaydi.")}</li>
             <li>{t("Xavfli belgilar aniqlansa — 103 / 112 ga qoʻngʻiroq qilish haqida ogohlantirish.")}</li>
@@ -60,7 +60,7 @@ export default async function AboutPage() {
         </section>
 
         <section className="card-base p-4 space-y-2 text-sm text-slate-600 dark:text-slate-300">
-          <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2"><FlaskConical className="h-4 w-4 text-amber-600" /> {t("Hozirgi holat (hakaton demo)")}</h3>
+          <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2"><FlaskConical className="h-4 w-4 text-amber-600 dark:text-amber-400" /> {t("Hozirgi holat (hakaton demo)")}</h3>
           <ul className="list-disc pl-5 space-y-1">
             <li>{t("AI:")} {ai ? t("OpenAI ulangan") : t("OpenAI kaliti oʻrnatilmagan — demo rejim")}.</li>
             <li>{t("Shifokorlar, muassasalar, dori partiyalari va ombor — toʻqima namunalar; real tizimlarga ulanmagan.")}</li>
@@ -69,9 +69,9 @@ export default async function AboutPage() {
         </section>
 
         <section className="card-base p-4 text-sm text-slate-600 dark:text-slate-300">
-          <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2"><Server className="h-4 w-4 text-violet-600" /> {t("Texnologiyalar")}</h3>
+          <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2"><Server className="h-4 w-4 text-violet-600 dark:text-violet-400" /> {t("Texnologiyalar")}</h3>
           <p className="mt-1">{t("Next.js 14 · TypeScript · Tailwind CSS · Prisma (PostgreSQL yoki lokal JSON baza) · JWT sessiya · OpenAI (ixtiyoriy) · PWA")}</p>
-          <p className="mt-3 flex items-center gap-2 text-xs text-slate-400"><Users className="h-3.5 w-3.5" /> {t("NeuraMed jamoasi ·")} <Link href="/dashboard" className="text-teal-700 underline">{t("Bosh sahifaga")}</Link></p>
+          <p className="mt-3 flex items-center gap-2 text-xs text-slate-400"><Users className="h-3.5 w-3.5" /> {t("NeuraMed jamoasi ·")} <Link href="/dashboard" className="text-teal-700 dark:text-teal-400 underline">{t("Bosh sahifaga")}</Link></p>
         </section>
       </div>
     </>

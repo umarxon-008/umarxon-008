@@ -36,12 +36,12 @@ export function LibraryClient({ terms, meta }: { terms: LibraryTerm[]; meta: { u
       </div>
 
       {list.length === 0 ? (
-        <p className="card-base p-6 text-center text-sm text-slate-500">“{q}{t("” boʻyicha atama topilmadi.")} <Link href="/assistant" className="text-teal-700 underline">{t("MEDAI dan soʻrang")}</Link>.</p>
+        <p className="card-base p-6 text-center text-sm text-slate-500">“{q}{t("” boʻyicha atama topilmadi.")} <Link href="/assistant" className="text-teal-700 dark:text-teal-400 underline">{t("MEDAI dan soʻrang")}</Link>.</p>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {list.map((it) => (
             <button key={it.id} type="button" onClick={() => setOpen(it)} className="card-base p-4 text-left transition hover:-translate-y-0.5 hover:shadow-card">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-teal-600">{t(it.category)}</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-teal-600 dark:text-teal-400">{t(it.category)}</span>
               <p className="mt-0.5 font-bold text-slate-900 dark:text-white">{it.term}</p>
               <p className="mt-1 line-clamp-3 text-sm text-slate-500">{it.simple}</p>
             </button>
@@ -52,10 +52,10 @@ export function LibraryClient({ terms, meta }: { terms: LibraryTerm[]; meta: { u
       <Modal open={!!open} onClose={() => setOpen(null)} title={open?.term || ""} wide>
         {open && (
           <div className="space-y-4 text-sm text-slate-700 dark:text-slate-200">
-            <span className="rounded-full bg-teal-50 px-2.5 py-0.5 text-xs font-semibold text-teal-700">{t(open.category)}</span>
+            <span className="rounded-full bg-teal-50 dark:bg-teal-900/30 px-2.5 py-0.5 text-xs font-semibold text-teal-700 dark:text-teal-400">{t(open.category)}</span>
             <section><h4 className="font-bold text-slate-900 dark:text-white">{t("Oddiy tilda")}</h4><p className="mt-1 leading-relaxed">{open.simple}</p></section>
             <section><h4 className="font-bold text-slate-900 dark:text-white">{t("Tibbiy izoh")}</h4><p className="mt-1 leading-relaxed">{open.medical}</p></section>
-            {open.warning && <p className="flex gap-2 rounded-xl bg-amber-50 p-3 text-xs text-amber-800"><AlertTriangle className="h-4 w-4 shrink-0" />{open.warning}</p>}
+            {open.warning && <p className="flex gap-2 rounded-xl bg-amber-50 dark:bg-amber-900/30 p-3 text-xs text-amber-800 dark:text-amber-300"><AlertTriangle className="h-4 w-4 shrink-0" />{open.warning}</p>}
             {!!open.doctorQuestions?.length && (
               <section><h4 className="font-bold text-slate-900 dark:text-white">{t("Shifokorga beriladigan savollar")}</h4>
                 <ul className="mt-1 list-disc pl-5 space-y-1">{open.doctorQuestions.map((d) => <li key={d}>{d}</li>)}</ul></section>
@@ -66,7 +66,7 @@ export function LibraryClient({ terms, meta }: { terms: LibraryTerm[]; meta: { u
             )}
             {!!open.sources?.length && (
               <section><h4 className="font-bold text-slate-900 dark:text-white">{t("Manbalar (qoʻshimcha oʻqish)")}</h4>
-                <ul className="mt-1 space-y-1">{open.sources.map((s) => <li key={s.url}><a href={s.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-teal-700 underline">{t(s.title)} <ExternalLink className="h-3 w-3" /></a> <span className="text-xs text-slate-400">— {t(s.org)}</span></li>)}</ul></section>
+                <ul className="mt-1 space-y-1">{open.sources.map((s) => <li key={s.url}><a href={s.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-teal-700 dark:text-teal-400 underline">{t(s.title)} <ExternalLink className="h-3 w-3" /></a> <span className="text-xs text-slate-400">— {t(s.org)}</span></li>)}</ul></section>
             )}
             <Link href="/assistant"><Button variant="gradient" className="w-full mt-2"><MessageSquare className="h-4 w-4" /> {t("MEDAI dan batafsil soʻrash")}</Button></Link>
           </div>

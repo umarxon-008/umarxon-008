@@ -78,7 +78,7 @@ export function MedicationDetailClient({ info, drugName, medicationId }: Props) 
       {/* Unverified source alert if source is missing */}
       {!isSourceVerified && (
         <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
-          <ShieldAlert className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+          <ShieldAlert className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
           <div>
             <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
               {t("Manba tasdiqlanmadi")}

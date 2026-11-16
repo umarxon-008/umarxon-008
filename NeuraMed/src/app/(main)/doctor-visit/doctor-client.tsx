@@ -252,7 +252,7 @@ export function DoctorVisitClient({ pastPreps }: { pastPreps: PastPrep[] }) {
 
       {error && (
         <div className="p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200">
-          <p className="text-sm text-red-600">{error}</p>
+          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
         </div>
       )}
 
@@ -382,7 +382,7 @@ function ResultView({ result, onReset }: { result: DoctorVisitAIResult; onReset:
             <ul className="space-y-2.5">
               {result.questions_for_doctor.map((q, i) => (
                 <li key={i} className="flex items-start gap-2.5 text-sm text-slate-600 dark:text-slate-300">
-                  <span className="flex-shrink-0 h-5 w-5 rounded-full bg-primary-100 dark:bg-primary-900/40 flex items-center justify-center text-[10px] font-bold text-primary-700">
+                  <span className="flex-shrink-0 h-5 w-5 rounded-full bg-primary-100 dark:bg-primary-900/40 flex items-center justify-center text-[10px] font-bold text-primary-700 dark:text-primary-400">
                     {i + 1}
                   </span>
                   {q}

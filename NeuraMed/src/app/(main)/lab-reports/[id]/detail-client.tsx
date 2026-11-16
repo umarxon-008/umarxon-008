@@ -72,7 +72,7 @@ export function LabReportDetailClient({ report, aiResult }: Props) {
       {/* Urgent red warning */}
       {report.hasUrgentValues && (
         <div className="flex items-start gap-2.5 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800">
-          <AlertTriangle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
+          <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
           <div>
             <p className="text-sm font-bold text-red-700 dark:text-red-400">
               {t("Bu natija shifokor bilan tezroq muhokama qilinishi kerak.")}
