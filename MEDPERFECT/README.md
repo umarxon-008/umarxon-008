@@ -1,5 +1,7 @@
 # MEDPERFECT — yagona tibbiyot va farmatsevtika platformasi
 
+> 📦 **Arxiv (eski versiya).** MEDPERFECT endi **NeuraMed** loyihasiga birlashtirilgan — asosiy, faol loyiha [`../NeuraMed`](../NeuraMed) papkasida (Next.js, backend, uch til). Bu papka tarix va taqqoslash uchun saqlanadi; yangi ishlar NeuraMed'da qilinadi.
+
 ![MEDPERFECT](public/assets/medperfect-logo-256.png)
 
 MEDPERFECT — hackathon uchun tayyorlangan MVP. U toʻrtta modulni yagona platformada birlashtiradi:

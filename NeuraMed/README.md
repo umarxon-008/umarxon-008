@@ -137,13 +137,14 @@ public/brand/              # NeuraMed logotipi (tabletkali)
 
 ---
 
-## 🌍 Ko'p tillilik (i18n)
+## 🌍 Tillar: oʻzbek, rus, ingliz
 
-Tarjima fayllari: `src/i18n/locales/`
+Tilni **Sozlamalar → Til** boʻlimida tanlang — sahifa darhol shu tilga oʻtadi (tanlov cookie'da saqlanadi).
 
-- `uz/common.json` — O'zbek tili ✅
-- `ru/common.json` — Rus tili ✅
-- `en/common.json` — Ingliz tili ✅
+- Tarjima kaliti — oʻzbekcha matnning oʻzi: koddagi `t("Saqlash")` rus tilida `src/i18n/messages/ru.ts`, ingliz tilida `en.ts` dan olinadi; tarjima topilmasa oʻzbekcha qoladi.
+- Server komponentlarida `const t = await getT()` (`@/i18n/server`), brauzer komponentlarida `const t = useT()` (`@/i18n/client`).
+- Yangi matn qoʻshsangiz, `ru.ts` va `en.ts` ga tarjimasini yozing — `npm run test:unit` tarjimasi yoʻq matnlarni koʻrsatadi.
+- MEDAI kutubxonasi maqolalari va demo javoblar hozircha faqat oʻzbekcha; OpenAI kaliti boʻlsa, AI tanlangan tilda javob beradi.
 
 ---
 
@@ -157,19 +158,18 @@ Tarjima fayllari: `src/i18n/locales/`
 
 ---
 
-## 🧪 Test
+## 🧪 Testlar
 
 ```bash
-# Test foydalanuvchi:
-# Email: test@neuramed.uz
-# Parol: Test12345!
-
-# Dori qidirish test:
-# - paracetamol
-# - ibuprofen
-# - amoxicillin
-# - metformin
+npm run test:unit   # modullar mantigʻi, MEDAI xavfsizligi, tarjimalar toʻliqligi
+npx playwright install chromium   # bir marta: E2E uchun brauzer
+npm run test:e2e    # brauzerda: barcha sahifalar, qabul, chat, ombor, TRACE, til almashtirish
+npm test            # ikkalasi
 ```
+
+E2E testlar dev serverni oʻzi ishga tushiradi (port 3100) va lokal bazaga demo yozuvlar qoʻshadi.
+
+Test hisobi: `test@neuramed.uz` / `Test12345!`
 
 ---
 
