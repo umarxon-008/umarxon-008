@@ -1,3 +1,6 @@
+"use client";
+
+import { useT } from "@/i18n/client";
 import { ShieldCheck, ShieldAlert, Clock3, Factory, Warehouse, Truck, Store, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -8,8 +11,9 @@ export const STATUS = {
 } as const;
 
 export function TraceStatusBadge({ status, className }: { status: keyof typeof STATUS; className?: string }) {
+  const t = useT();
   const s = STATUS[status];
-  return <span className={cn("inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold", s.cls, className)}><s.icon className="h-3.5 w-3.5" />{s.label}</span>;
+  return <span className={cn("inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold", s.cls, className)}><s.icon className="h-3.5 w-3.5" />{t(s.label)}</span>;
 }
 
 export const STAGE_ICON: Record<string, React.ElementType> = { manufacturer: Factory, warehouse: Warehouse, distributor: Truck, pharmacy: Store };

@@ -1,5 +1,6 @@
 "use client";
 
+import { useT, useLocale } from "@/i18n/client";
 import * as React from "react";
 import Link from "next/link";
 import { Bot, Copy, MessageSquarePlus, Send, Trash2, BookOpen, ShieldAlert, History } from "lucide-react";
@@ -24,6 +25,8 @@ const TRY = [
 ];
 
 export function AssistantClient({ aiEnabled }: { aiEnabled: boolean }) {
+  const t = useT();
+  const locale = useLocale();
   const [threads, setThreads] = React.useState<Thread[]>([]);
   const [threadId, setThreadId] = React.useState<string | null>(null);
   const [messages, setMessages] = React.useState<Msg[]>([]);
@@ -43,13 +46,13 @@ export function AssistantClient({ aiEnabled }: { aiEnabled: boolean }) {
     try {
       const r = await api<{ data: { id: string; messages: Msg[] } }>(`/api/assistant/${id}`);
       setThreadId(id); setMessages(r.data.messages);
-    } catch (e: any) { setError(e.message); }
+    } catch (e: any) { setError(t(e.message)); }
   };
 
   const newChat = () => { setThreadId(null); setMessages([]); setError(null); setShowHistory(false); };
 
   const removeThread = async (id: string) => {
-    if (!confirm("Bu suhbat oʻchirilsinmi?")) return;
+    if (!confirm(t("Bu suhbat oʻchirilsinmi?"))) return;
     await api(`/api/assistant/${id}`, { method: "DELETE" }).catch(() => {});
     if (id === threadId) newChat();
     loadThreads();
@@ -66,14 +69,14 @@ export function AssistantClient({ aiEnabled }: { aiEnabled: boolean }) {
       setMessages((m) => [...m, r.message]);
       loadThreads();
     } catch (e: any) {
-      setError(e.message);
+      setError(t(e.message));
       setMessages((m) => m.slice(0, -1));
       setInput(message);
     } finally { setBusy(false); }
   };
 
   const copy = async (text: string) => {
-    try { await navigator.clipboard.writeText(text); setToast("Javob nusxalandi"); } catch { setToast("Nusxalab boʻlmadi"); }
+    try { await navigator.clipboard.writeText(text); setToast(t("Javob nusxalandi")); } catch { setToast(t("Nusxalab boʻlmadi")); }
   };
 
   return (
@@ -81,17 +84,17 @@ export function AssistantClient({ aiEnabled }: { aiEnabled: boolean }) {
       {/* Suhbatlar tarixi */}
       <aside className={cn("mb-4 lg:mb-0 lg:block", showHistory ? "block" : "hidden")}>
         <div className="card-base p-3 lg:sticky lg:top-20">
-          <Button variant="gradient" size="sm" className="w-full mb-3" onClick={newChat}><MessageSquarePlus className="h-4 w-4" /> Yangi suhbat</Button>
-          <p className="px-1 pb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">Suhbatlar tarixi</p>
-          {threads.length === 0 && <p className="px-1 text-xs text-slate-400">Hali suhbat yoʻq.</p>}
+          <Button variant="gradient" size="sm" className="w-full mb-3" onClick={newChat}><MessageSquarePlus className="h-4 w-4" /> {t("Yangi suhbat")}</Button>
+          <p className="px-1 pb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">{t("Suhbatlar tarixi")}</p>
+          {threads.length === 0 && <p className="px-1 text-xs text-slate-400">{t("Hali suhbat yoʻq.")}</p>}
           <ul className="space-y-1 max-h-[50vh] overflow-y-auto">
-            {threads.map((t) => (
-              <li key={t.id} className={cn("group flex items-center gap-1 rounded-xl", t.id === threadId && "bg-teal-50 dark:bg-teal-900/20")}>
-                <button type="button" onClick={() => openThread(t.id)} className="flex-1 min-w-0 px-2 py-2 text-left">
-                  <p className="truncate text-sm font-medium text-slate-800 dark:text-slate-100">{t.title}</p>
-                  <p className="truncate text-[11px] text-slate-400">{t.count} ta xabar</p>
+            {threads.map((it) => (
+              <li key={it.id} className={cn("group flex items-center gap-1 rounded-xl", it.id === threadId && "bg-teal-50 dark:bg-teal-900/20")}>
+                <button type="button" onClick={() => openThread(it.id)} className="flex-1 min-w-0 px-2 py-2 text-left">
+                  <p className="truncate text-sm font-medium text-slate-800 dark:text-slate-100">{it.title}</p>
+                  <p className="truncate text-[11px] text-slate-400">{it.count} {t("ta xabar")}</p>
                 </button>
-                <button type="button" onClick={() => removeThread(t.id)} className="p-2 text-slate-300 hover:text-red-500" aria-label="Suhbatni oʻchirish"><Trash2 className="h-4 w-4" /></button>
+                <button type="button" onClick={() => removeThread(it.id)} className="p-2 text-slate-300 hover:text-red-500" aria-label={t("Suhbatni oʻchirish")}><Trash2 className="h-4 w-4" /></button>
               </li>
             ))}
           </ul>
@@ -99,16 +102,17 @@ export function AssistantClient({ aiEnabled }: { aiEnabled: boolean }) {
       </aside>
 
       <section className="flex flex-col min-h-[70vh]">
+        {locale !== "uz" && !aiEnabled && <p className="mb-3 rounded-xl bg-sky-50 dark:bg-sky-900/20 px-3 py-2 text-xs text-sky-800 dark:text-sky-200">{t("Kutubxona maqolalari va demo javoblar hozircha faqat oʻzbek tilida. AI rejimida (OpenAI kaliti bilan) javob tanlangan tilda beriladi.")}</p>}
         <div className="mb-3 flex flex-wrap items-center gap-2">
           {aiEnabled ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800">AI rejimi · OpenAI</span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800">{t("AI rejimi · OpenAI")}</span>
           ) : (
-            <DemoBadge>Demo rejim · AI emas</DemoBadge>
+            <DemoBadge>{t("Demo rejim · AI emas")}</DemoBadge>
           )}
-          <span className="text-xs text-slate-500">Tashxis qoʻymaydi · dori dozasini aytmaydi</span>
+          <span className="text-xs text-slate-500">{t("Tashxis qoʻymaydi · dori dozasini aytmaydi")}</span>
           <div className="ml-auto flex gap-2">
-            <Button variant="outline" size="sm" className="lg:hidden" onClick={() => setShowHistory((s) => !s)}><History className="h-4 w-4" /> Tarix</Button>
-            <Link href="/library"><Button variant="outline" size="sm"><BookOpen className="h-4 w-4" /> Kutubxona</Button></Link>
+            <Button variant="outline" size="sm" className="lg:hidden" onClick={() => setShowHistory((s) => !s)}><History className="h-4 w-4" /> {t("Tarix")}</Button>
+            <Link href="/library"><Button variant="outline" size="sm"><BookOpen className="h-4 w-4" /> {t("Kutubxona")}</Button></Link>
           </div>
         </div>
 
@@ -116,16 +120,16 @@ export function AssistantClient({ aiEnabled }: { aiEnabled: boolean }) {
           {messages.length === 0 && (
             <div className="card-base p-6 text-center">
               <span className="module-icon h-14 w-14 mb-3"><Bot className="h-7 w-7" /></span>
-              <h2 className="text-lg font-extrabold text-slate-900 dark:text-white">Tibbiy atama yoki tahlil haqida soʻrang</h2>
+              <h2 className="text-lg font-extrabold text-slate-900 dark:text-white">{t("Tibbiy atama yoki tahlil haqida soʻrang")}</h2>
               <p className="mx-auto mt-1 max-w-md text-sm text-slate-500">
-                MEDAI tibbiy atamalarni oddiy tilda tushuntiradi va shifokorga beriladigan savollarni tayyorlashga yordam beradi.
-                {!aiEnabled && " Hozir demo rejim: javoblar ichki kutubxona va qoidalar asosida tuziladi."}
+                {t("MEDAI tibbiy atamalarni oddiy tilda tushuntiradi va shifokorga beriladigan savollarni tayyorlashga yordam beradi.")}
+                {!aiEnabled && t(" Hozir demo rejim: javoblar ichki kutubxona va qoidalar asosida tuziladi.")}
               </p>
               <div className="mt-4 flex flex-wrap justify-center gap-2">
-                {TRY.map((t) => (
-                  <button key={t.q} type="button" onClick={() => send(t.q)}
-                    className={cn("rounded-full border px-3 py-1.5 text-xs font-semibold", t.safety ? "border-amber-300 bg-amber-50 text-amber-800" : "border-slate-200 bg-white text-slate-700 hover:border-teal-400 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700")}>
-                    {t.safety && <ShieldAlert className="mr-1 inline h-3.5 w-3.5" />}{t.label}
+                {TRY.map((it) => (
+                  <button key={it.q} type="button" onClick={() => send(t(it.q))}
+                    className={cn("rounded-full border px-3 py-1.5 text-xs font-semibold", it.safety ? "border-amber-300 bg-amber-50 text-amber-800" : "border-slate-200 bg-white text-slate-700 hover:border-teal-400 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700")}>
+                    {it.safety && <ShieldAlert className="mr-1 inline h-3.5 w-3.5" />}{t(it.label)}
                   </button>
                 ))}
               </div>
@@ -144,16 +148,16 @@ export function AssistantClient({ aiEnabled }: { aiEnabled: boolean }) {
                   {m.flags?.emergency && <EmergencyBanner />}
                   <div className="card-base p-4 text-slate-700 dark:text-slate-200">
                     <div className="mb-2 flex items-center gap-2">
-                      {m.mode === "ai" ? <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">AI</span> : <DemoBadge>Demo · AI emas</DemoBadge>}
-                      {m.aiFailed && <span className="text-[11px] text-amber-600">AI javob bermadi — demo javob</span>}
-                      <button type="button" onClick={() => copy(m.content)} className="ml-auto rounded-lg p-1 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800" aria-label="Nusxalash"><Copy className="h-4 w-4" /></button>
+                      {m.mode === "ai" ? <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">{t("AI")}</span> : <DemoBadge>{t("Demo · AI emas")}</DemoBadge>}
+                      {m.aiFailed && <span className="text-[11px] text-amber-600">{t("AI javob bermadi — demo javob")}</span>}
+                      <button type="button" onClick={() => copy(m.content)} className="ml-auto rounded-lg p-1 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800" aria-label={t("Nusxalash")}><Copy className="h-4 w-4" /></button>
                     </div>
                     <Markdown text={m.content} />
                     {(m.sources?.length || m.sourceNote) && (
                       <div className="mt-3 border-t border-slate-100 dark:border-slate-800 pt-3">
                         {!!m.sources?.length && (
                           <>
-                            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Qoʻshimcha oʻqish uchun manbalar</p>
+                            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">{t("Qoʻshimcha oʻqish uchun manbalar")}</p>
                             <ul className="mt-1 space-y-1">
                               {m.sources.map((s, j) => (
                                 <li key={j} className="text-xs"><a href={s.url} target="_blank" rel="noopener noreferrer" className="text-teal-700 dark:text-teal-400 underline">{s.title}</a> <span className="text-slate-400">— {s.org}</span></li>
@@ -161,7 +165,7 @@ export function AssistantClient({ aiEnabled }: { aiEnabled: boolean }) {
                             </ul>
                           </>
                         )}
-                        {m.sourceNote && <p className="mt-2 text-[11px] leading-relaxed text-slate-400">{m.sourceNote}{m.dataDate ? ` Kutubxona yangilangan: ${m.dataDate}.` : ""}</p>}
+                        {m.sourceNote && <p className="mt-2 text-[11px] leading-relaxed text-slate-400">{t(m.sourceNote)}{m.dataDate ? ` ${t("Kutubxona yangilangan: {date}.", { date: m.dataDate })}` : ""}</p>}
                       </div>
                     )}
                   </div>
@@ -170,7 +174,7 @@ export function AssistantClient({ aiEnabled }: { aiEnabled: boolean }) {
             )
           )}
           {busy && (
-            <div className="flex items-center gap-2 text-sm text-slate-500"><LoadingSpinner size="sm" /> MEDAI javob tayyorlamoqda…</div>
+            <div className="flex items-center gap-2 text-sm text-slate-500"><LoadingSpinner size="sm" /> {t("MEDAI javob tayyorlamoqda…")}</div>
           )}
           <div ref={endRef} />
         </div>
@@ -184,13 +188,13 @@ export function AssistantClient({ aiEnabled }: { aiEnabled: boolean }) {
             onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
             rows={1}
             maxLength={4000}
-            placeholder="Savolingizni yozing… (masalan: Gemoglobin nima?)"
-            aria-label="Savol"
+            placeholder={t("Savolingizni yozing… (masalan: Gemoglobin nima?)")}
+            aria-label={t("Savol")}
             className="flex-1 resize-none bg-transparent px-2 py-2 text-sm outline-none max-h-40 text-slate-800 dark:text-slate-100"
           />
-          <Button type="submit" variant="gradient" size="icon" disabled={busy || !input.trim()} aria-label="Yuborish">{busy ? <LoadingSpinner size="sm" /> : <Send className="h-4 w-4" />}</Button>
+          <Button type="submit" variant="gradient" size="icon" disabled={busy || !input.trim()} aria-label={t("Yuborish")}>{busy ? <LoadingSpinner size="sm" /> : <Send className="h-4 w-4" />}</Button>
         </form>
-        <p className="mt-2 text-center text-[11px] text-slate-400">MEDAI shifokor oʻrnini bosmaydi. Shoshilinch holatda — 103 yoki 112.</p>
+        <p className="mt-2 text-center text-[11px] text-slate-400">{t("MEDAI shifokor oʻrnini bosmaydi. Shoshilinch holatda — 103 yoki 112.")}</p>
       </section>
       <Toast text={toast} onDone={() => setToast(null)} />
     </div>

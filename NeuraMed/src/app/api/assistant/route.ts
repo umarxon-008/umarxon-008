@@ -9,6 +9,7 @@ import { requireAuth } from "@/lib/auth";
 import { chatAssistant, isAIEnabled } from "@/lib/ai";
 import { demoReply, assessMessage, libraryMeta } from "@/lib/medai";
 import { apiError, HttpError, readJson } from "@/lib/modules/http";
+import { getLocale, getT } from "@/i18n/server";
 
 const MAX_CHARS = 4000;
 const AI_SOURCE_NOTE = "Javob AI modelining umumiy bilimiga asoslangan. Ishonchli hujjatlar bazasi ulanmagan — rasmiy manba bilan tasdiqlanmagan.";
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
     const body = await readJson(req);
     const message = typeof body?.message === "string" ? body.message.trim() : "";
     if (!message) throw new HttpError(400, "Xabar boʻsh boʻlmasligi kerak");
-    if (message.length > MAX_CHARS) throw new HttpError(400, `Xabar ${MAX_CHARS} belgidan oshmasligi kerak`);
+    if (message.length > MAX_CHARS) throw new HttpError(400, (await getT())("Xabar {n} belgidan oshmasligi kerak", { n: MAX_CHARS }));
 
     let thread: any = null;
     if (body?.threadId) {
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
     const flags = assessMessage(message);
     let reply: any;
     const history = messages.filter((m) => !m.error).map((m) => ({ role: m.role, content: m.content }));
-    const aiText = isAIEnabled() ? await chatAssistant(history) : null;
+    const aiText = isAIEnabled() ? await chatAssistant(history, getLocale()) : null;
     if (aiText) {
       reply = { role: "assistant", content: aiText, mode: "ai", sources: [], sourceNote: AI_SOURCE_NOTE, flags, createdAt: new Date().toISOString() };
     } else {

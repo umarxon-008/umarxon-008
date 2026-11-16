@@ -1,11 +1,19 @@
 import type { Metadata, Viewport } from "next";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
+import { getLocale, getT } from "@/i18n/server";
+import { loadMessages } from "@/i18n/translate";
+import { I18nProvider } from "@/i18n/client";
 
-export const metadata: Metadata = {
-  title: "NeuraMed — Yagona tibbiy platforma",
-  description:
-    "NeuraMed sizga dori, laboratoriya tahlili va rentgen hisobotini oddiy tilda tushuntiradi. Dori eslatmasi va shifokor qabuliga tayyorlov.",
+const TITLE = "NeuraMed — Yagona tibbiy platforma";
+const DESCRIPTION = "NeuraMed sizga dori, laboratoriya tahlili va rentgen hisobotini oddiy tilda tushuntiradi. Dori eslatmasi va shifokor qabuliga tayyorlov.";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { ...baseMetadata, title: { default: t(TITLE), template: "%s · NeuraMed" }, description: t(DESCRIPTION) };
+}
+
+const baseMetadata: Metadata = {
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -35,13 +43,15 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const locale = getLocale();
+  const messages = await loadMessages(locale);
   return (
-    <html lang="uz" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -61,7 +71,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <I18nProvider locale={locale} messages={messages}>
+            {children}
+          </I18nProvider>
         </ThemeProvider>
       </body>
     </html>

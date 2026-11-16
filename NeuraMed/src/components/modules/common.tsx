@@ -3,6 +3,7 @@
 import * as React from "react";
 import { FlaskConical, PhoneCall, X } from "lucide-react";
 import { cn, uzDate } from "@/lib/utils";
+import { useLocale, useT } from "@/i18n/client";
 
 /** API so'rovi: xatolikda server xabarini Error sifatida qaytaradi. */
 export async function api<T = any>(url: string, init?: RequestInit & { json?: unknown }): Promise<T> {
@@ -20,25 +21,28 @@ export async function api<T = any>(url: string, init?: RequestInit & { json?: un
 
 /** "DEMO" belgisi: namunaviy ma'lumot ekanini doim ko'rsatadi. */
 export function DemoBadge({ children = "DEMO", className }: { children?: React.ReactNode; className?: string }) {
+  const t = useT();
   return (
     <span className={cn("inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-900/40 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300", className)}>
       <FlaskConical className="h-3 w-3" />
-      {children}
+      {typeof children === "string" ? t(children) : children}
     </span>
   );
 }
 
 export function DemoNote({ children, className }: { children: React.ReactNode; className?: string }) {
+  const t = useT();
   return (
     <div className={cn("demo-note", className)}>
       <FlaskConical className="h-4 w-4 shrink-0 mt-0.5" />
-      <p>{children}</p>
+      <p>{typeof children === "string" ? t(children) : children}</p>
     </div>
   );
 }
 
 /** Modul sarlavhasi (gradient fon, ikona, tavsif). */
 export function ModuleHero({ icon: Icon, name, title, text, right }: { icon: React.ElementType; name: string; title: string; text: string; right?: React.ReactNode }) {
+  const t = useT();
   return (
     <section className="relative overflow-hidden rounded-3xl bg-gradient-brand-deep p-5 text-white shadow-card">
       <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-emerald-400/20 blur-2xl" />
@@ -48,9 +52,9 @@ export function ModuleHero({ icon: Icon, name, title, text, right }: { icon: Rea
           <Icon className="h-6 w-6" />
         </span>
         <div className="flex-1 min-w-0">
-          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-200">{name}</p>
-          <h2 className="mt-0.5 text-lg font-extrabold leading-snug">{title}</h2>
-          <p className="mt-1 text-sm text-white/75 leading-relaxed">{text}</p>
+          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-200">{t(name)}</p>
+          <h2 className="mt-0.5 text-lg font-extrabold leading-snug">{t(title)}</h2>
+          <p className="mt-1 text-sm text-white/75 leading-relaxed">{t(text)}</p>
         </div>
         {right}
       </div>
@@ -80,12 +84,13 @@ export function Kpi({ label, value, hint, tone = "slate", icon: Icon }: { label:
 }
 
 export function EmergencyBanner({ className }: { className?: string }) {
+  const t = useT();
   return (
     <div role="alert" className={cn("flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 p-3.5", className)}>
       <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-600 text-white"><PhoneCall className="h-4 w-4" /></span>
       <div className="text-sm text-red-800 dark:text-red-200">
-        <p className="font-bold">Shoshilinch holat belgilari boʻlishi mumkin</p>
-        <p className="mt-0.5 text-xs leading-relaxed">Hayot uchun xavfli belgilar boʻlsa, kutmang — darhol <a href="tel:103" className="font-bold underline">103</a> (tez yordam) yoki <a href="tel:112" className="font-bold underline">112</a> ga qoʻngʻiroq qiling.</p>
+        <p className="font-bold">{t("Shoshilinch holat belgilari boʻlishi mumkin")}</p>
+        <p className="mt-0.5 text-xs leading-relaxed">{t("Hayot uchun xavfli belgilar boʻlsa, kutmang — darhol")} <a href="tel:103" className="font-bold underline">103</a> {t("(tez yordam) yoki")} <a href="tel:112" className="font-bold underline">112</a> {t("ga qoʻngʻiroq qiling.")}</p>
       </div>
     </div>
   );
@@ -93,6 +98,7 @@ export function EmergencyBanner({ className }: { className?: string }) {
 
 /** Oddiy modal oyna. */
 export function Modal({ open, onClose, title, children, wide }: { open: boolean; onClose: () => void; title: string; children: React.ReactNode; wide?: boolean }) {
+  const t = useT();
   React.useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -111,7 +117,7 @@ export function Modal({ open, onClose, title, children, wide }: { open: boolean;
       >
         <div className="mb-4 flex items-center justify-between gap-3">
           <h3 className="text-base font-bold text-slate-900 dark:text-white">{title}</h3>
-          <button type="button" onClick={onClose} className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800" aria-label="Yopish"><X className="h-5 w-5" /></button>
+          <button type="button" onClick={onClose} className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800" aria-label={t("Yopish")}><X className="h-5 w-5" /></button>
         </div>
         {children}
       </div>
@@ -139,14 +145,34 @@ export function Chip({ active, onClick, children, className }: { active?: boolea
 export function Toast({ text, onDone }: { text: string | null; onDone: () => void }) {
   React.useEffect(() => {
     if (!text) return;
-    const t = setTimeout(onDone, 3200);
-    return () => clearTimeout(t);
+    const timer = setTimeout(onDone, 3200);
+    return () => clearTimeout(timer);
   }, [text, onDone]);
   if (!text) return null;
   return <div role="status" className="fixed bottom-24 lg:bottom-8 left-1/2 z-[70] -translate-x-1/2 rounded-2xl bg-slate-900 px-4 py-2.5 text-sm text-white shadow-xl">{text}</div>;
 }
 
-export const formatDay = (d: string | Date | null | undefined) => (d ? uzDate(d, { short: true }) : "—");
+export const formatDay = (d: string | Date | null | undefined, locale = "uz") => (d ? uzDate(d, { short: true, locale }) : "—");
 export const formatSum = (n: number) => `${String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} soʻm`;
-const WEEK = ["Yak", "Du", "Se", "Ch", "Pa", "Ju", "Sh"];
-export const weekday = (iso: string) => WEEK[new Date(`${iso.slice(0, 10)}T12:00:00Z`).getUTCDay()];
+const WEEK: Record<string, string[]> = {
+  uz: ["Yak", "Du", "Se", "Ch", "Pa", "Ju", "Sh"],
+  ru: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
+  en: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+};
+export const weekdayName = (day: number, locale = "uz") => (WEEK[locale] || WEEK.uz)[day];
+export const weekday = (iso: string, locale = "uz") => weekdayName(new Date(`${iso.slice(0, 10)}T12:00:00Z`).getUTCDay(), locale);
+
+/** Tanlangan tilga bog'langan formatlash yordamchilari. */
+export function useFormat() {
+  const locale = useLocale();
+  const t = useT();
+  return React.useMemo(() => ({
+    locale,
+    day: (d: string | Date | null | undefined) => formatDay(d, locale),
+    date: (d: string | Date) => uzDate(d, { locale }),
+    dayNoYear: (d: string | Date) => uzDate(d, { locale, year: false, short: true }),
+    weekday: (iso: string) => weekday(iso, locale),
+    weekdayName: (n: number) => weekdayName(n, locale),
+    sum: (n: number) => `${String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ${t("soʻm")}`,
+  }), [locale, t]);
+}

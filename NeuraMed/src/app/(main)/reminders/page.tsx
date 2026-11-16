@@ -1,3 +1,4 @@
+import { getT } from "@/i18n/server";
 import { TopBar } from "@/components/layout/top-bar";
 import { RemindersClient } from "./reminders-client";
 import { getSession } from "@/lib/auth";
@@ -10,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
 export default async function RemindersPage() {
+  const t = await getT();
   const user = await getSession();
   if (!user) redirect("/login");
 
@@ -35,7 +37,7 @@ export default async function RemindersPage() {
   return (
     <>
       <TopBar
-        title="Dori eslatmalari"
+        title={t("Dori eslatmalari")}
         rightSlot={
           <Link href="/reminders/add">
             <Button size="icon" variant="ghost">

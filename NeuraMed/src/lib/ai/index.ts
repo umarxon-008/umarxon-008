@@ -482,7 +482,13 @@ ${input.pregnancyNote ? `Homiladorlik/emizish: ${input.pregnancyNote}` : ""}`.tr
 export interface ChatTurn { role: "user" | "assistant"; content: string }
 
 /** OpenAI orqali chat javobi. Kalit bo'lmasa yoki xato bo'lsa — null (chaqiruvchi demo javobga o'tadi). */
-export async function chatAssistant(history: ChatTurn[]): Promise<string | null> {
+const LANG_LINE: Record<string, string> = {
+  uz: "",
+  ru: "\n\nОтвечай на русском языке, соблюдая все правила выше.",
+  en: "\n\nAnswer in English, following all the rules above.",
+};
+
+export async function chatAssistant(history: ChatTurn[], locale = "uz"): Promise<string | null> {
   const c = getClient();
   if (!c) return null;
   try {
@@ -490,7 +496,7 @@ export async function chatAssistant(history: ChatTurn[]): Promise<string | null>
       model: MODEL,
       temperature: 0.2,
       max_tokens: 900,
-      messages: [{ role: "system", content: CHAT_SYSTEM }, ...history.slice(-20)],
+      messages: [{ role: "system", content: CHAT_SYSTEM + (LANG_LINE[locale] || "") }, ...history.slice(-20)],
     });
     const text = completion.choices[0]?.message?.content?.trim();
     return text ? sanitizeString(text) : null;

@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/i18n/client";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Search, Clock, ArrowRight, Loader2, AlertCircle } from "lucide-react";
@@ -36,6 +37,7 @@ const popularDrugs = [
 ];
 
 export function MedicationSearchClient() {
+  const t = useT();
   const router = useRouter();
   const { recentSearches, addSearch } = useMedSearchStore();
   const [query, setQuery] = useState("");
@@ -67,7 +69,7 @@ export function MedicationSearchClient() {
       })
       .catch((e) => {
         if (e.name !== "AbortError") {
-          setError("Qidirishda xatolik yuz berdi");
+          setError(t("Qidirishda xatolik yuz berdi"));
           setLoading(false);
         }
       });
@@ -90,7 +92,7 @@ export function MedicationSearchClient() {
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Masalan: paracetamol, ibuprofen..."
+          placeholder={t("Masalan: paracetamol, ibuprofen...")}
           leftIcon={loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
           className="text-base py-4"
           autoFocus
@@ -107,7 +109,7 @@ export function MedicationSearchClient() {
       {/* Search results */}
       {results.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs text-slate-500 font-medium">Qidiruv natijalari</p>
+          <p className="text-xs text-slate-500 font-medium">{t("Qidiruv natijalari")}</p>
           {results.map((r) => (
             <Card
               key={r.rxcui}
@@ -126,7 +128,7 @@ export function MedicationSearchClient() {
                   </p>
                   {ttyLabel[r.tty] && (
                     <Badge variant="outline" className="mt-0.5 text-[10px]">
-                      {ttyLabel[r.tty]}
+                      {t(ttyLabel[r.tty])}
                     </Badge>
                   )}
                 </div>
@@ -142,10 +144,10 @@ export function MedicationSearchClient() {
         <Card>
           <CardContent className="p-6 text-center">
             <p className="text-sm text-slate-500">
-              &quot;{query}&quot; bo&apos;yicha natija topilmadi
+              {t("\"")}{query}{t("\" bo'yicha natija topilmadi")}
             </p>
             <p className="text-xs text-slate-400 mt-1">
-              Inglizcha nom bilan ham qidirib ko&apos;ring
+              {t("Inglizcha nom bilan ham qidirib ko'ring")}
             </p>
           </CardContent>
         </Card>
@@ -154,7 +156,7 @@ export function MedicationSearchClient() {
       {/* Recent searches */}
       {query.length < 2 && recentSearches.length > 0 && (
         <div>
-          <p className="text-xs text-slate-500 font-medium mb-2">So&apos;nggi qidiruvlar</p>
+          <p className="text-xs text-slate-500 font-medium mb-2">{t("So'nggi qidiruvlar")}</p>
           <div className="space-y-1.5">
             {recentSearches.slice(0, 5).map((s) => (
               <button
@@ -176,7 +178,7 @@ export function MedicationSearchClient() {
       {/* Popular drugs */}
       {query.length < 2 && (
         <div>
-          <p className="text-xs text-slate-500 font-medium mb-2">Ko&apos;p qidiriladigan dorilar</p>
+          <p className="text-xs text-slate-500 font-medium mb-2">{t("Ko'p qidiriladigan dorilar")}</p>
           <div className="flex flex-wrap gap-2">
             {popularDrugs.map((drug) => (
               <button

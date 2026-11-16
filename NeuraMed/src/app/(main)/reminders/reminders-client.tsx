@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/i18n/client";
 import Link from "next/link";
 import { useState } from "react";
 import { Bell, Plus, Clock, ChevronRight, Pause, Play, Trash2 } from "lucide-react";
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export function RemindersClient({ reminders: initial }: Props) {
+  const t = useT();
   const [reminders, setReminders] = useState(initial);
   const router = useRouter();
 
@@ -44,16 +46,16 @@ export function RemindersClient({ reminders: initial }: Props) {
         </div>
         <div>
           <p className="text-base font-semibold text-slate-700 dark:text-slate-300">
-            Hozircha eslatma yo&apos;q
+            {t("Hozircha eslatma yo'q")}
           </p>
           <p className="text-sm text-slate-400 mt-1">
-            Dori eslatmasi qo&apos;shing, vaqtida ichishni unutmang
+            {t("Dori eslatmasi qo'shing, vaqtida ichishni unutmang")}
           </p>
         </div>
         <Link href="/reminders/add">
           <Button variant="gradient" className="mt-2">
             <Plus className="h-4 w-4" />
-            Eslatma qo&apos;shish
+            {t("Eslatma qo'shish")}
           </Button>
         </Link>
       </div>
@@ -64,19 +66,19 @@ export function RemindersClient({ reminders: initial }: Props) {
     <div className="px-4 py-5 space-y-5">
       <div className="flex items-center justify-between">
         <p className="text-xs text-slate-500">
-          {active.length} ta faol eslatma
+          {active.length} {t("ta faol eslatma")}
         </p>
         <Link href="/reminders/add">
           <Button size="sm" variant="outline">
             <Plus className="h-3.5 w-3.5" />
-            Qo&apos;shish
+            {t("Qo'shish")}
           </Button>
         </Link>
       </div>
 
       {active.length > 0 && (
         <div>
-          <p className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">Faol</p>
+          <p className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">{t("Faol")}</p>
           <div className="space-y-3">
             {active.map((r) => (
               <ReminderCard
@@ -92,7 +94,7 @@ export function RemindersClient({ reminders: initial }: Props) {
 
       {paused.length > 0 && (
         <div>
-          <p className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">To&apos;xtatilgan</p>
+          <p className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">{t("To'xtatilgan")}</p>
           <div className="space-y-3">
             {paused.map((r) => (
               <ReminderCard
@@ -123,6 +125,7 @@ function ReminderCard({
   onResume?: () => void;
   onDelete: () => void;
 }) {
+  const t = useT();
   const [showActions, setShowActions] = useState(false);
 
   return (
@@ -146,10 +149,10 @@ function ReminderCard({
               <p className="text-sm font-semibold text-slate-800 dark:text-white truncate">
                 {r.medicationName}
               </p>
-              {isPaused && <Badge variant="outline" className="text-[10px]">To&apos;xtatilgan</Badge>}
+              {isPaused && <Badge variant="outline" className="text-[10px]">{t("To'xtatilgan")}</Badge>}
             </div>
             <p className="text-xs text-slate-500 mt-0.5">
-              {r.dose} · {foodRuleLabel(r.foodRule)}
+              {r.dose} · {t(foodRuleLabel(r.foodRule))}
             </p>
             <div className="flex items-center gap-1.5 mt-2 flex-wrap">
               {r.schedule.map((s, i) => (
@@ -175,17 +178,17 @@ function ReminderCard({
         {showActions && (
           <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100 dark:border-slate-700">
             <Link href={`/reminders/${r.id}`} className="flex-1">
-              <Button variant="secondary" size="sm" className="w-full">Batafsil</Button>
+              <Button variant="secondary" size="sm" className="w-full">{t("Batafsil")}</Button>
             </Link>
             {isPaused ? (
               <Button variant="outline" size="sm" onClick={onResume} className="flex-1">
                 <Play className="h-3.5 w-3.5" />
-                Davom
+                {t("Davom")}
               </Button>
             ) : (
               <Button variant="outline" size="sm" onClick={onPause} className="flex-1">
                 <Pause className="h-3.5 w-3.5" />
-                To&apos;xtat
+                {t("To'xtat")}
               </Button>
             )}
             <Button variant="destructive" size="icon" onClick={onDelete}>

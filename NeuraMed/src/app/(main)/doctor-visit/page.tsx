@@ -1,3 +1,4 @@
+import { getT } from "@/i18n/server";
 import { TopBar } from "@/components/layout/top-bar";
 import { DoctorVisitClient } from "./doctor-client";
 import { getSession } from "@/lib/auth";
@@ -6,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { parseJsonSafe } from "@/lib/utils";
 
 export default async function DoctorVisitPage() {
+  const t = await getT();
   const user = await getSession();
   if (!user) redirect("/login");
 
@@ -23,7 +25,7 @@ export default async function DoctorVisitPage() {
 
   return (
     <>
-      <TopBar title="Shifokor qabuliga tayyorlanish" />
+      <TopBar title={t("Shifokor qabuliga tayyorlanish")} />
       <DoctorVisitClient
         pastPreps={preps.map((p) => ({
           id: p.id,

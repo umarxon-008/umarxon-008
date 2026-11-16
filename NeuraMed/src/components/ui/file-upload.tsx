@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/i18n/client";
 import { useRef, useState } from "react";
 import { Upload, FileText, Image, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -22,6 +23,7 @@ export function FileUpload({
   label = "Fayl yuklash",
   sublabel = "PDF, JPG, PNG — maksimal 10 MB",
 }: FileUploadProps) {
+  const t = useT();
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
   const [selected, setSelected] = useState<File | null>(null);
@@ -30,7 +32,7 @@ export function FileUpload({
   const validateAndSelect = (file: File) => {
     setError(null);
     if (file.size > maxSizeMB * 1024 * 1024) {
-      setError(`Fayl hajmi ${maxSizeMB} MB dan oshmasin`);
+      setError(t("Fayl hajmi {n} MB dan oshmasin", { n: maxSizeMB }));
       return;
     }
     setSelected(file);
@@ -66,7 +68,7 @@ export function FileUpload({
         )}
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-slate-800 dark:text-white truncate">{selected.name}</p>
-          <p className="text-xs text-slate-500">{(selected.size / 1024 / 1024).toFixed(2)} MB</p>
+          <p className="text-xs text-slate-500">{(selected.size / 1024 / 1024).toFixed(2)} {t("MB")}</p>
         </div>
         <Button variant="ghost" size="icon-sm" onClick={clear}>
           <X className="h-4 w-4" />
@@ -94,8 +96,8 @@ export function FileUpload({
             <Upload className="h-7 w-7 text-primary-500" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{label}</p>
-            <p className="text-xs text-slate-400 mt-0.5">{sublabel}</p>
+            <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t(label)}</p>
+            <p className="text-xs text-slate-400 mt-0.5">{t(sublabel)}</p>
           </div>
         </div>
         <input

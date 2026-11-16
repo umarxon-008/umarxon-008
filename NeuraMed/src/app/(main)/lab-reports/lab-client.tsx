@@ -1,5 +1,6 @@
 "use client";
 
+import { useT, useLocale } from "@/i18n/client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -19,6 +20,8 @@ interface ReportItem {
 }
 
 export function LabReportsClient({ reports: initial }: { reports: ReportItem[] }) {
+  const locale = useLocale();
+  const t = useT();
   const [reports, setReports] = useState(initial);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +43,7 @@ export function LabReportsClient({ reports: initial }: { reports: ReportItem[] }
       if (!res.ok) throw new Error(data.error || "Yuklashda xatolik");
       router.push(`/lab-reports/${data.data.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Xatolik yuz berdi");
+      setError(t(err instanceof Error ? err.message : "Xatolik yuz berdi"));
     } finally {
       setUploading(false);
     }
@@ -53,18 +56,18 @@ export function LabReportsClient({ reports: initial }: { reports: ReportItem[] }
       {/* Upload area */}
       <div>
         <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
-          Yangi tahlil yuklash
+          {t("Yangi tahlil yuklash")}
         </p>
         {uploading ? (
           <div className="flex flex-col items-center justify-center gap-3 p-10 rounded-2xl border-2 border-dashed border-primary-200 bg-primary-50 dark:bg-primary-900/20">
             <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
-            <p className="text-sm text-primary-600 font-medium">Tahlil tahlil qilinmoqda...</p>
-            <p className="text-xs text-slate-400">Bu bir necha daqiqa olishi mumkin</p>
+            <p className="text-sm text-primary-600 font-medium">{t("Tahlil tahlil qilinmoqda...")}</p>
+            <p className="text-xs text-slate-400">{t("Bu bir necha daqiqa olishi mumkin")}</p>
           </div>
         ) : (
           <FileUpload
             onFileSelect={handleUpload}
-            label="Tahlil natijasini yuklang"
+            label={t("Tahlil natijasini yuklang")}
             sublabel="PDF, JPG, PNG — Laboratoriya hisoboti"
           />
         )}
@@ -79,7 +82,7 @@ export function LabReportsClient({ reports: initial }: { reports: ReportItem[] }
       {reports.length > 0 ? (
         <div>
           <p className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">
-            O&apos;tgan tahlillar
+            {t("O'tgan tahlillar")}
           </p>
           <div className="space-y-2">
             {reports.map((r) => (
@@ -91,18 +94,18 @@ export function LabReportsClient({ reports: initial }: { reports: ReportItem[] }
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-slate-800 dark:text-white truncate">
-                        {r.fileName || "Laboratoriya tahlili"}
+                        {r.fileName || t("Laboratoriya tahlili")}
                       </p>
                       <p className="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
                         <Calendar className="h-3 w-3" />
-                        {formatDate(r.createdAt)}
+                        {formatDate(r.createdAt, locale)}
                       </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       {r.hasUrgentValues && (
                         <Badge variant="high">
                           <AlertTriangle className="h-3 w-3" />
-                          Urgent
+                          {t("Urgent")}
                         </Badge>
                       )}
                       <ChevronRight className="h-4 w-4 text-slate-300" />
@@ -116,7 +119,7 @@ export function LabReportsClient({ reports: initial }: { reports: ReportItem[] }
       ) : (
         <div className="text-center py-8 space-y-3">
           <FlaskConical className="h-12 w-12 text-slate-200 mx-auto" />
-          <p className="text-sm text-slate-400">Hozircha tahlil yo&apos;q</p>
+          <p className="text-sm text-slate-400">{t("Hozircha tahlil yo'q")}</p>
         </div>
       )}
     </div>

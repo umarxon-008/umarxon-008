@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/i18n/client";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -9,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store";
 
 export default function RegisterPage() {
+  const t = useT();
   const router = useRouter();
   const { setUser } = useAuthStore();
   const [form, setForm] = useState({
@@ -27,11 +29,11 @@ export default function RegisterPage() {
     setError(null);
 
     if (form.password !== form.confirmPassword) {
-      setError("Parollar mos kelmadi");
+      setError(t("Parollar mos kelmadi"));
       return;
     }
     if (form.password.length < 8) {
-      setError("Parol kamida 8 ta belgi bo'lishi kerak");
+      setError(t("Parol kamida 8 ta belgi bo'lishi kerak"));
       return;
     }
 
@@ -52,7 +54,7 @@ export default function RegisterPage() {
       setUser(data.user);
       router.push("/onboarding");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Xatolik yuz berdi");
+      setError(t(err instanceof Error ? err.message : "Xatolik yuz berdi"));
     } finally {
       setLoading(false);
     }
@@ -61,29 +63,29 @@ export default function RegisterPage() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white">Ro&apos;yxatdan o&apos;tish</h2>
-        <p className="text-sm text-slate-500 mt-1">Yangi hisob yarating</p>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-white">{t("Ro'yxatdan o'tish")}</h2>
+        <p className="text-sm text-slate-500 mt-1">{t("Yangi hisob yarating")}</p>
       </div>
 
       <Input
-        label="Ism *"
+        label={t("Ism *")}
         value={form.name}
         onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-        placeholder="Ism Familiya"
+        placeholder={t("Ism Familiya")}
         leftIcon={<User className="h-4 w-4" />}
         required
       />
       <Input
-        label="Email *"
+        label={t("Email *")}
         type="email"
         value={form.email}
         onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
-        placeholder="sizning@email.uz"
+        placeholder={t("sizning@email.uz")}
         leftIcon={<Mail className="h-4 w-4" />}
         required
       />
       <Input
-        label="Telefon (ixtiyoriy)"
+        label={t("Telefon (ixtiyoriy)")}
         type="tel"
         value={form.phone}
         onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
@@ -91,11 +93,11 @@ export default function RegisterPage() {
         leftIcon={<Phone className="h-4 w-4" />}
       />
       <Input
-        label="Parol *"
+        label={t("Parol *")}
         type={showPass ? "text" : "password"}
         value={form.password}
         onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
-        placeholder="Kamida 8 ta belgi"
+        placeholder={t("Kamida 8 ta belgi")}
         leftIcon={<Lock className="h-4 w-4" />}
         rightIcon={
           <button type="button" onClick={() => setShowPass((v) => !v)}>
@@ -105,11 +107,11 @@ export default function RegisterPage() {
         required
       />
       <Input
-        label="Parolni tasdiqlang *"
+        label={t("Parolni tasdiqlang *")}
         type={showPass ? "text" : "password"}
         value={form.confirmPassword}
         onChange={(e) => setForm((p) => ({ ...p, confirmPassword: e.target.value }))}
-        placeholder="Parolni qayta kiriting"
+        placeholder={t("Parolni qayta kiriting")}
         leftIcon={<Lock className="h-4 w-4" />}
         required
       />
@@ -121,19 +123,19 @@ export default function RegisterPage() {
       )}
 
       <Button type="submit" className="w-full" size="lg" loading={loading}>
-        Hisob yaratish
+        {t("Hisob yaratish")}
       </Button>
 
       <p className="text-center text-sm text-slate-500">
-        Hisobingiz bormi?{" "}
+        {t("Hisobingiz bormi?")}{" "}
         <Link href="/login" className="text-primary-500 font-semibold hover:underline">
-          Kirish
+          {t("Kirish")}
         </Link>
       </p>
 
       <p className="text-xs text-slate-400 text-center leading-relaxed">
-        Ro&apos;yxatdan o&apos;tish orqali siz{" "}
-        <span className="text-primary-500">foydalanish shartlari</span>ga rozilik bildirasiz
+        {t("Ro'yxatdan o'tish orqali siz")}{" "}
+        <span className="text-primary-500">{t("foydalanish shartlari")}</span>{t("ga rozilik bildirasiz")}
       </p>
     </form>
   );

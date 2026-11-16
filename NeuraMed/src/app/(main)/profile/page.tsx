@@ -1,3 +1,4 @@
+import { getT } from "@/i18n/server";
 import { TopBar } from "@/components/layout/top-bar";
 import { ProfileClient } from "./profile-client";
 import { getSession } from "@/lib/auth";
@@ -7,6 +8,7 @@ import { decryptJson } from "@/lib/encryption";
 import { parseJsonSafe } from "@/lib/utils";
 
 export default async function ProfilePage() {
+  const t = await getT();
   const user = await getSession();
   if (!user) redirect("/login");
 
@@ -36,7 +38,7 @@ export default async function ProfilePage() {
 
   return (
     <>
-      <TopBar title="Profil" />
+      <TopBar title={t("Profil")} />
       <ProfileClient
         profile={{
           id: dbUser.id,

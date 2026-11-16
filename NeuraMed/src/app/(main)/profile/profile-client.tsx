@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/i18n/client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -25,6 +26,7 @@ const pregnancyLabels: Record<string, string> = {
 };
 
 export function ProfileClient({ profile: initial }: Props) {
+  const t = useT();
   const router = useRouter();
   const { clearUser } = useAuthStore();
   const [profile, setProfile] = useState(initial);
@@ -102,7 +104,7 @@ export function ProfileClient({ profile: initial }: Props) {
         </div>
         <div className="flex-1 min-w-0">
           <h2 className="text-lg font-bold text-slate-900 dark:text-white truncate">
-            {profile.name || "Foydalanuvchi"}
+            {profile.name || t("Foydalanuvchi")}
           </h2>
           <p className="text-sm text-slate-400 truncate">{profile.email || profile.phone}</p>
         </div>
@@ -120,38 +122,38 @@ export function ProfileClient({ profile: initial }: Props) {
         <CardHeader>
           <CardTitle className="text-sm flex items-center gap-2">
             <User className="h-4 w-4 text-primary-500" />
-            Shaxsiy ma&apos;lumot
+            {t("Shaxsiy ma'lumot")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {editing ? (
             <>
-              <Input label="Ism" value={form.name || ""} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} />
+              <Input label={t("Ism")} value={form.name || ""} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} />
               <div className="grid grid-cols-2 gap-3">
-                <Input label="Yosh" type="number" value={form.age?.toString() || ""} onChange={(e) => setForm((p) => ({ ...p, age: parseInt(e.target.value) || undefined }))} />
+                <Input label={t("Yosh")} type="number" value={form.age?.toString() || ""} onChange={(e) => setForm((p) => ({ ...p, age: parseInt(e.target.value) || undefined }))} />
                 <div>
-                  <label className="label-base">Jins</label>
+                  <label className="label-base">{t("Jins")}</label>
                   <select
                     className="input-base"
                     value={form.gender || ""}
                     onChange={(e) => setForm((p) => ({ ...p, gender: e.target.value as UserProfile["gender"] }))}
                   >
-                    <option value="">Tanlang</option>
-                    {Object.entries(genderLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                    <option value="">{t("Tanlang")}</option>
+                    {Object.entries(genderLabels).map(([v, l]) => <option key={v} value={v}>{t(l)}</option>)}
                   </select>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <Input label="Bo'y (sm)" type="number" value={form.heightCm?.toString() || ""} onChange={(e) => setForm((p) => ({ ...p, heightCm: parseFloat(e.target.value) || undefined }))} />
-                <Input label="Vazn (kg)" type="number" value={form.weightKg?.toString() || ""} onChange={(e) => setForm((p) => ({ ...p, weightKg: parseFloat(e.target.value) || undefined }))} />
+                <Input label={t("Bo'y (sm)")} type="number" value={form.heightCm?.toString() || ""} onChange={(e) => setForm((p) => ({ ...p, heightCm: parseFloat(e.target.value) || undefined }))} />
+                <Input label={t("Vazn (kg)")} type="number" value={form.weightKg?.toString() || ""} onChange={(e) => setForm((p) => ({ ...p, weightKg: parseFloat(e.target.value) || undefined }))} />
               </div>
             </>
           ) : (
             <div className="grid grid-cols-2 gap-3">
-              <InfoItem label="Yosh" value={profile.age ? `${profile.age} yosh` : "—"} />
-              <InfoItem label="Jins" value={profile.gender ? genderLabels[profile.gender] : "—"} />
-              <InfoItem label="Bo'y" value={profile.heightCm ? `${profile.heightCm} sm` : "—"} />
-              <InfoItem label="Vazn" value={profile.weightKg ? `${profile.weightKg} kg` : "—"} />
+              <InfoItem label={t("Yosh")} value={profile.age ? `${profile.age} yosh` : "—"} />
+              <InfoItem label={t("Jins")} value={profile.gender ? t(genderLabels[profile.gender]) : "—"} />
+              <InfoItem label={t("Bo'y")} value={profile.heightCm ? `${profile.heightCm} sm` : "—"} />
+              <InfoItem label={t("Vazn")} value={profile.weightKg ? `${profile.weightKg} kg` : "—"} />
             </div>
           )}
         </CardContent>
@@ -162,13 +164,13 @@ export function ProfileClient({ profile: initial }: Props) {
         <CardHeader>
           <CardTitle className="text-sm flex items-center gap-2">
             <Mail className="h-4 w-4 text-blue-500" />
-            Kontakt
+            {t("Kontakt")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            <InfoItem label="Email" value={profile.email || "—"} />
-            <InfoItem label="Telefon" value={profile.phone || "—"} />
+            <InfoItem label={t("Email")} value={profile.email || "—"} />
+            <InfoItem label={t("Telefon")} value={profile.phone || "—"} />
           </div>
         </CardContent>
       </Card>
@@ -178,13 +180,13 @@ export function ProfileClient({ profile: initial }: Props) {
         <CardHeader>
           <CardTitle className="text-sm flex items-center gap-2">
             <Shield className="h-4 w-4 text-emerald-500" />
-            Sog&apos;liq ma&apos;lumoti
+            {t("Sog'liq ma'lumoti")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Allergies */}
           <div>
-            <p className="text-xs font-semibold text-slate-500 mb-1.5">Allergiyalar</p>
+            <p className="text-xs font-semibold text-slate-500 mb-1.5">{t("Allergiyalar")}</p>
             {editing ? (
               <div className="space-y-2">
                 {form.allergies.map((a, i) => (
@@ -197,21 +199,21 @@ export function ProfileClient({ profile: initial }: Props) {
                   </div>
                 ))}
                 <button type="button" onClick={() => addToArr("allergies")} className="text-xs text-primary-500 font-medium flex items-center gap-1">
-                  <Plus className="h-3 w-3" /> Qo&apos;shish
+                  <Plus className="h-3 w-3" /> {t("Qo'shish")}
                 </button>
               </div>
             ) : (
               <div className="flex flex-wrap gap-1.5">
                 {profile.allergies.length > 0
                   ? profile.allergies.map((a, i) => <Badge key={i} variant="warning">{a}</Badge>)
-                  : <span className="text-xs text-slate-400">Yo&apos;q</span>}
+                  : <span className="text-xs text-slate-400">{t("Yo'q")}</span>}
               </div>
             )}
           </div>
 
           {/* Chronic conditions */}
           <div>
-            <p className="text-xs font-semibold text-slate-500 mb-1.5">Surunkali kasalliklar</p>
+            <p className="text-xs font-semibold text-slate-500 mb-1.5">{t("Surunkali kasalliklar")}</p>
             {editing ? (
               <div className="space-y-2">
                 {form.chronicConditions.map((c, i) => (
@@ -224,29 +226,29 @@ export function ProfileClient({ profile: initial }: Props) {
                   </div>
                 ))}
                 <button type="button" onClick={() => addToArr("chronicConditions")} className="text-xs text-primary-500 font-medium flex items-center gap-1">
-                  <Plus className="h-3 w-3" /> Qo&apos;shish
+                  <Plus className="h-3 w-3" /> {t("Qo'shish")}
                 </button>
               </div>
             ) : (
               <div className="flex flex-wrap gap-1.5">
                 {profile.chronicConditions.length > 0
                   ? profile.chronicConditions.map((c, i) => <Badge key={i} variant="violet">{c}</Badge>)
-                  : <span className="text-xs text-slate-400">Yo&apos;q</span>}
+                  : <span className="text-xs text-slate-400">{t("Yo'q")}</span>}
               </div>
             )}
           </div>
 
           {/* Pregnancy */}
           <div>
-            <p className="text-xs font-semibold text-slate-500 mb-1.5">Homiladorlik holati</p>
+            <p className="text-xs font-semibold text-slate-500 mb-1.5">{t("Homiladorlik holati")}</p>
             {editing ? (
               <select className="input-base" value={form.pregnancyStatus}
                 onChange={(e) => setForm((p) => ({ ...p, pregnancyStatus: e.target.value as UserProfile["pregnancyStatus"] }))}>
-                {Object.entries(pregnancyLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                {Object.entries(pregnancyLabels).map(([v, l]) => <option key={v} value={v}>{t(l)}</option>)}
               </select>
             ) : (
               <span className="text-sm text-slate-700 dark:text-slate-300">
-                {pregnancyLabels[profile.pregnancyStatus]}
+                {t(pregnancyLabels[profile.pregnancyStatus])}
               </span>
             )}
           </div>
@@ -257,7 +259,7 @@ export function ProfileClient({ profile: initial }: Props) {
       {editing && (
         <Button variant="gradient" className="w-full" onClick={handleSave} loading={loading}>
           <Save className="h-4 w-4" />
-          Saqlash
+          {t("Saqlash")}
         </Button>
       )}
 
@@ -266,7 +268,7 @@ export function ProfileClient({ profile: initial }: Props) {
         <div className="space-y-2 pt-2">
           <Button variant="secondary" className="w-full" onClick={handleLogout}>
             <LogOut className="h-4 w-4" />
-            Chiqish
+            {t("Chiqish")}
           </Button>
           <Button
             variant="destructive"
@@ -274,7 +276,7 @@ export function ProfileClient({ profile: initial }: Props) {
             onClick={() => setShowDelete(true)}
           >
             <Trash2 className="h-4 w-4" />
-            Hisobni o&apos;chirish
+            {t("Hisobni o'chirish")}
           </Button>
         </div>
       )}
@@ -284,19 +286,18 @@ export function ProfileClient({ profile: initial }: Props) {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end p-4">
           <div className="w-full max-w-sm mx-auto bg-white dark:bg-slate-900 rounded-3xl p-6 space-y-4">
             <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-              Hisobni o&apos;chirish
+              {t("Hisobni o'chirish")}
             </h3>
             <p className="text-sm text-slate-500">
-              Barcha ma&apos;lumotlaringiz (tahlillar, eslatmalar, profil) o&apos;chib ketadi.
-              Bu amal qaytarib bo&apos;lmaydi.
+              {t("Barcha ma'lumotlaringiz (tahlillar, eslatmalar, profil) o'chib ketadi. Bu amal qaytarib bo'lmaydi.")}
             </p>
             <div className="flex gap-3">
               <Button variant="secondary" className="flex-1" onClick={() => setShowDelete(false)}>
-                Bekor
+                {t("Bekor")}
               </Button>
               <Button variant="destructive" className="flex-1 bg-red-600 text-white hover:bg-red-700"
                 onClick={handleDelete} loading={loading}>
-                O&apos;chirish
+                {t("O'chirish")}
               </Button>
             </div>
           </div>

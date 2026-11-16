@@ -1,5 +1,6 @@
 "use client";
 
+import { useT, useLocale } from "@/i18n/client";
 import { BookOpen, MessageSquare, ArrowRight, HelpCircle, Info } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Disclaimer } from "@/components/ui/disclaimer";
@@ -12,13 +13,15 @@ interface Props {
 }
 
 export function ImagingDetailClient({ report, aiResult }: Props) {
+  const locale = useLocale();
+  const t = useT();
   const hasData = aiResult?.summary || aiResult?.terms_explained?.length > 0;
 
   if (!hasData) {
     return (
       <div className="px-4 py-8 text-center space-y-3">
         <HelpCircle className="h-12 w-12 text-slate-200 mx-auto" />
-        <p className="text-sm text-slate-500">Hisobot ma&apos;lumotlari yuklanmadi</p>
+        <p className="text-sm text-slate-500">{t("Hisobot ma'lumotlari yuklanmadi")}</p>
       </div>
     );
   }
@@ -34,7 +37,7 @@ export function ImagingDetailClient({ report, aiResult }: Props) {
           <h2 className="text-base font-semibold text-slate-800 dark:text-white mt-1">
             {report.fileName}
           </h2>
-          <p className="text-xs text-slate-400">{formatDate(report.createdAt)}</p>
+          <p className="text-xs text-slate-400">{formatDate(report.createdAt, locale)}</p>
         </div>
       </div>
 
@@ -42,8 +45,7 @@ export function ImagingDetailClient({ report, aiResult }: Props) {
       <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
         <Info className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />
         <p className="text-xs text-blue-800 dark:text-blue-300">
-          Bu tushuntirish faqat atamalar haqida umumiy ma&apos;lumot. Hisobotni mutaxassis
-          radiolog yoki shifokor bilan muhokama qiling.
+          {t("Bu tushuntirish faqat atamalar haqida umumiy ma'lumot. Hisobotni mutaxassis radiolog yoki shifokor bilan muhokama qiling.")}
         </p>
       </div>
 
@@ -55,7 +57,7 @@ export function ImagingDetailClient({ report, aiResult }: Props) {
           <CardHeader>
             <CardTitle className="text-sm flex items-center gap-2">
               <BookOpen className="h-4 w-4 text-violet-500" />
-              Hisobot xulosasi
+              {t("Hisobot xulosasi")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -70,7 +72,7 @@ export function ImagingDetailClient({ report, aiResult }: Props) {
       {aiResult.terms_explained?.length > 0 && (
         <div>
           <p className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">
-            Tushuntirilgan atamalar
+            {t("Tushuntirilgan atamalar")}
           </p>
           <div className="space-y-2.5">
             {aiResult.terms_explained.map((item, i) => (
@@ -99,7 +101,7 @@ export function ImagingDetailClient({ report, aiResult }: Props) {
       {aiResult.key_findings?.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm">Asosiy topilmalar</CardTitle>
+            <CardTitle className="text-sm">{t("Asosiy topilmalar")}</CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
@@ -120,7 +122,7 @@ export function ImagingDetailClient({ report, aiResult }: Props) {
           <CardHeader>
             <CardTitle className="text-sm flex items-center gap-2 text-primary-700 dark:text-primary-400">
               <MessageSquare className="h-4 w-4" />
-              Shifokorga savollar
+              {t("Shifokorga savollar")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -142,7 +144,7 @@ export function ImagingDetailClient({ report, aiResult }: Props) {
       {aiResult.next_steps?.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm">Keyingi qadamlar</CardTitle>
+            <CardTitle className="text-sm">{t("Keyingi qadamlar")}</CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">

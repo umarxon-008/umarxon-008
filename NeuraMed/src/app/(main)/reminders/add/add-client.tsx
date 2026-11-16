@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/i18n/client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Minus, Bell, Clock } from "lucide-react";
@@ -27,6 +28,7 @@ const notifOptions = [
 ];
 
 export function AddReminderClient({ defaultMedName, defaultMedId }: Props) {
+  const t = useT();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,17 +59,17 @@ export function AddReminderClient({ defaultMedName, defaultMedId }: Props) {
     setError(null);
 
     if (!form.medicationName.trim()) {
-      setError("Dori nomini kiriting");
+      setError(t("Dori nomini kiriting"));
       return;
     }
     if (!form.dose.trim()) {
-      setError("Dozani kiriting");
+      setError(t("Dozani kiriting"));
       return;
     }
 
     const schedule: ReminderSchedule[] = times.map((time) => ({
       time,
-      label: getTimeLabel(time),
+      label: t(getTimeLabel(time)),
     }));
 
     setLoading(true);
@@ -96,7 +98,7 @@ export function AddReminderClient({ defaultMedName, defaultMedId }: Props) {
 
       router.push("/reminders");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Xatolik yuz berdi");
+      setError(t(err instanceof Error ? err.message : "Xatolik yuz berdi"));
     } finally {
       setLoading(false);
     }
@@ -108,16 +110,16 @@ export function AddReminderClient({ defaultMedName, defaultMedId }: Props) {
       <Card>
         <CardContent className="p-4 space-y-4">
           <Input
-            label="Dori nomi *"
+            label={t("Dori nomi *")}
             value={form.medicationName}
             onChange={(e) => setForm((p) => ({ ...p, medicationName: e.target.value }))}
-            placeholder="Masalan: Paracetamol"
+            placeholder={t("Masalan: Paracetamol")}
           />
           <Input
-            label="Doza *"
+            label={t("Doza *")}
             value={form.dose}
             onChange={(e) => setForm((p) => ({ ...p, dose: e.target.value }))}
-            placeholder="Masalan: 500 mg"
+            placeholder={t("Masalan: 500 mg")}
           />
         </CardContent>
       </Card>
@@ -127,7 +129,7 @@ export function AddReminderClient({ defaultMedName, defaultMedId }: Props) {
         <CardContent className="p-4 space-y-4">
           <div>
             <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Kuniga necha marta
+              {t("Kuniga necha marta")}
             </p>
             <div className="flex items-center gap-4">
               <Button
@@ -162,16 +164,16 @@ export function AddReminderClient({ defaultMedName, defaultMedId }: Props) {
 
           <div>
             <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Vaqtlar
+              {t("Vaqtlar")}
             </p>
             <div className="space-y-2">
-              {times.map((t, i) => (
+              {times.map((it, i) => (
                 <div key={i} className="flex items-center gap-3">
                   <div className="flex items-center gap-2 flex-1">
                     <Clock className="h-4 w-4 text-slate-400 shrink-0" />
                     <input
                       type="time"
-                      value={t}
+                      value={it}
                       onChange={(e) => {
                         const newTimes = [...times];
                         newTimes[i] = e.target.value;
@@ -181,7 +183,7 @@ export function AddReminderClient({ defaultMedName, defaultMedId }: Props) {
                     />
                   </div>
                   <span className="text-xs text-slate-400 w-16 shrink-0">
-                    {getTimeLabel(t)}
+                    {t(getTimeLabel(it))}
                   </span>
                 </div>
               ))}
@@ -194,7 +196,7 @@ export function AddReminderClient({ defaultMedName, defaultMedId }: Props) {
       <Card>
         <CardContent className="p-4">
           <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
-            Ovqat bilan yoki bo&apos;sh qorin
+            {t("Ovqat bilan yoki bo'sh qorin")}
           </p>
           <div className="space-y-2">
             {foodOptions.map((opt) => (
@@ -211,9 +213,9 @@ export function AddReminderClient({ defaultMedName, defaultMedId }: Props) {
                 <span className="text-base">{opt.label.split(" ")[0]}</span>
                 <div>
                   <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                    {opt.label.split(" ").slice(1).join(" ")}
+                    {t(opt.label.split(" ").slice(1).join(" "))}
                   </p>
-                  <p className="text-xs text-slate-400">{opt.desc}</p>
+                  <p className="text-xs text-slate-400">{t(opt.desc)}</p>
                 </div>
               </button>
             ))}
@@ -225,13 +227,13 @@ export function AddReminderClient({ defaultMedName, defaultMedId }: Props) {
       <Card>
         <CardContent className="p-4 space-y-3">
           <Input
-            label="Boshlash sanasi"
+            label={t("Boshlash sanasi")}
             type="date"
             value={form.startDate}
             onChange={(e) => setForm((p) => ({ ...p, startDate: e.target.value }))}
           />
           <Input
-            label="Tugash sanasi (ixtiyoriy)"
+            label={t("Tugash sanasi (ixtiyoriy)")}
             type="date"
             value={form.endDate}
             onChange={(e) => setForm((p) => ({ ...p, endDate: e.target.value }))}
@@ -243,7 +245,7 @@ export function AddReminderClient({ defaultMedName, defaultMedId }: Props) {
       <Card>
         <CardContent className="p-4">
           <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
-            Eslatma turi
+            {t("Eslatma turi")}
           </p>
           <div className="grid grid-cols-3 gap-2">
             {notifOptions.map((opt) => (
@@ -259,7 +261,7 @@ export function AddReminderClient({ defaultMedName, defaultMedId }: Props) {
               >
                 <div className="text-lg mb-1">{opt.label.split(" ")[0]}</div>
                 <p className="text-[10px] text-slate-500 leading-tight">
-                  {opt.label.split(" ").slice(1).join(" ")}
+                  {t(opt.label.split(" ").slice(1).join(" "))}
                 </p>
               </button>
             ))}
@@ -269,11 +271,11 @@ export function AddReminderClient({ defaultMedName, defaultMedId }: Props) {
 
       {/* Notes */}
       <div>
-        <label className="label-base">Izoh (ixtiyoriy)</label>
+        <label className="label-base">{t("Izoh (ixtiyoriy)")}</label>
         <textarea
           value={form.notes}
           onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))}
-          placeholder="Qo'shimcha eslatmalar..."
+          placeholder={t("Qo'shimcha eslatmalar...")}
           rows={2}
           className="input-base resize-none"
         />
@@ -287,7 +289,7 @@ export function AddReminderClient({ defaultMedName, defaultMedId }: Props) {
 
       <Button type="submit" variant="gradient" size="xl" className="w-full" loading={loading}>
         <Bell className="h-5 w-5" />
-        Eslatma saqlash
+        {t("Eslatma saqlash")}
       </Button>
     </form>
   );

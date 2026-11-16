@@ -1,5 +1,6 @@
 "use client";
 
+import { useT, useLocale } from "@/i18n/client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
@@ -34,6 +35,8 @@ interface Props {
 }
 
 export function DashboardClient({ userName, reminders, recentReports, platform }: Props) {
+  const locale = useLocale();
+  const t = useT();
   // Vaqtga bog'liq qiymatlar faqat brauzerda hisoblanadi (server va brauzer HTML'i mos kelishi uchun).
   const [now, setNow] = useState<Date | null>(null);
   useEffect(() => {
@@ -49,9 +52,9 @@ export function DashboardClient({ userName, reminders, recentReports, platform }
     )
     .find((s) => {
       const [h, m] = s.time.split(":").map(Number);
-      const t = new Date();
-      t.setHours(h, m, 0, 0);
-      return t > now;
+      const at = new Date();
+      at.setHours(h, m, 0, 0);
+      return at > now;
     });
 
   const firstName = userName.split(" ")[0];
@@ -61,7 +64,7 @@ export function DashboardClient({ userName, reminders, recentReports, platform }
       {/* Greeting */}
       <div>
         <p className="text-sm text-slate-500 dark:text-slate-400">
-          {now ? getGreeting(now) : "Salom,"}
+          {now ? t(getGreeting(now)) : t("Salom,")}
         </p>
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white mt-0.5">
           {firstName} 👋
@@ -75,7 +78,7 @@ export function DashboardClient({ userName, reminders, recentReports, platform }
       <PlatformOverview s={platform} />
 
       {/* Quick actions */}
-      <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300 -mb-2">Shaxsiy yordamchi</h2>
+      <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300 -mb-2">{t("Shaxsiy yordamchi")}</h2>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Link href="/medications/search">
           <Card className="h-full hover:shadow-md transition-shadow cursor-pointer">
@@ -84,8 +87,8 @@ export function DashboardClient({ userName, reminders, recentReports, platform }
                 <Search className="h-5 w-5 text-primary-500" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-slate-800 dark:text-white">Dori qidirish</p>
-                <p className="text-xs text-slate-400 mt-0.5">Ma&apos;lumot oling</p>
+                <p className="text-sm font-semibold text-slate-800 dark:text-white">{t("Dori qidirish")}</p>
+                <p className="text-xs text-slate-400 mt-0.5">{t("Ma'lumot oling")}</p>
               </div>
             </CardContent>
           </Card>
@@ -98,8 +101,8 @@ export function DashboardClient({ userName, reminders, recentReports, platform }
                 <Upload className="h-5 w-5 text-violet-500" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-slate-800 dark:text-white">Tahlil yuklash</p>
-                <p className="text-xs text-slate-400 mt-0.5">Lab natijasi</p>
+                <p className="text-sm font-semibold text-slate-800 dark:text-white">{t("Tahlil yuklash")}</p>
+                <p className="text-xs text-slate-400 mt-0.5">{t("Lab natijasi")}</p>
               </div>
             </CardContent>
           </Card>
@@ -112,8 +115,8 @@ export function DashboardClient({ userName, reminders, recentReports, platform }
                 <Scan className="h-5 w-5 text-blue-500" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-slate-800 dark:text-white">Rentgen</p>
-                <p className="text-xs text-slate-400 mt-0.5">Hisobot</p>
+                <p className="text-sm font-semibold text-slate-800 dark:text-white">{t("Rentgen")}</p>
+                <p className="text-xs text-slate-400 mt-0.5">{t("Hisobot")}</p>
               </div>
             </CardContent>
           </Card>
@@ -126,8 +129,8 @@ export function DashboardClient({ userName, reminders, recentReports, platform }
                 <Stethoscope className="h-5 w-5 text-emerald-500" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-slate-800 dark:text-white">Shifokorga</p>
-                <p className="text-xs text-slate-400 mt-0.5">Tayyorlanish</p>
+                <p className="text-sm font-semibold text-slate-800 dark:text-white">{t("Shifokorga")}</p>
+                <p className="text-xs text-slate-400 mt-0.5">{t("Tayyorlanish")}</p>
               </div>
             </CardContent>
           </Card>
@@ -138,9 +141,9 @@ export function DashboardClient({ userName, reminders, recentReports, platform }
       {nextReminder ? (
         <div>
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Keyingi eslatma</h2>
+            <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">{t("Keyingi eslatma")}</h2>
             <Link href="/reminders" className="text-xs text-primary-500 font-medium">
-              Hammasini ko&apos;rish
+              {t("Hammasini ko'rish")}
             </Link>
           </div>
           <Card>
@@ -156,7 +159,7 @@ export function DashboardClient({ userName, reminders, recentReports, platform }
                   {nextReminder.reminder.medicationName}
                 </p>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  {nextReminder.reminder.dose} · {foodRuleLabel(nextReminder.reminder.foodRule)}
+                  {nextReminder.reminder.dose} · {t(foodRuleLabel(nextReminder.reminder.foodRule))}
                 </p>
               </div>
               <Bell className="h-4 w-4 text-slate-300 shrink-0" />
@@ -168,10 +171,10 @@ export function DashboardClient({ userName, reminders, recentReports, platform }
           <CardContent className="p-4 flex items-center gap-3">
             <Bell className="h-5 w-5 text-slate-300" />
             <div className="flex-1">
-              <p className="text-sm text-slate-500">Bugun eslatma yo&apos;q</p>
+              <p className="text-sm text-slate-500">{t("Bugun eslatma yo'q")}</p>
             </div>
             <Link href="/reminders/add">
-              <Button variant="outline" size="sm">Qo&apos;shish</Button>
+              <Button variant="outline" size="sm">{t("Qo'shish")}</Button>
             </Link>
           </CardContent>
         </Card>
@@ -182,10 +185,10 @@ export function DashboardClient({ userName, reminders, recentReports, platform }
         <div>
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-              Faol eslatmalar
+              {t("Faol eslatmalar")}
             </h2>
             <Link href="/reminders" className="text-xs text-primary-500 font-medium flex items-center gap-0.5">
-              Barchasi <ChevronRight className="h-3 w-3" />
+              {t("Barchasi")} <ChevronRight className="h-3 w-3" />
             </Link>
           </div>
           <div className="space-y-2">
@@ -203,7 +206,7 @@ export function DashboardClient({ userName, reminders, recentReports, platform }
                         {r.medicationName}
                       </p>
                       <p className="text-xs text-slate-400">
-                        {r.dose} · {r.timesPerDay}x kuniga
+                        {r.dose} · {r.timesPerDay}{t("x kuniga")}
                       </p>
                     </div>
                     <div className="text-right shrink-0">
@@ -226,10 +229,10 @@ export function DashboardClient({ userName, reminders, recentReports, platform }
         <div>
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-              So&apos;nggi tahlillar
+              {t("So'nggi tahlillar")}
             </h2>
             <Link href="/lab-reports" className="text-xs text-primary-500 font-medium flex items-center gap-0.5">
-              Barchasi <ChevronRight className="h-3 w-3" />
+              {t("Barchasi")} <ChevronRight className="h-3 w-3" />
             </Link>
           </div>
           <div className="space-y-2">
@@ -244,12 +247,12 @@ export function DashboardClient({ userName, reminders, recentReports, platform }
                       <p className="text-sm font-medium text-slate-800 dark:text-white truncate">
                         {r.fileName}
                       </p>
-                      <p className="text-xs text-slate-400">{formatDate(r.createdAt)}</p>
+                      <p className="text-xs text-slate-400">{formatDate(r.createdAt, locale)}</p>
                     </div>
                     {r.hasUrgentValues && (
                       <Badge variant="high" className="shrink-0">
                         <AlertTriangle className="h-3 w-3" />
-                        Urgent
+                        {t("Urgent")}
                       </Badge>
                     )}
                   </CardContent>

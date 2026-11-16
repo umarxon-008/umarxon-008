@@ -1,3 +1,4 @@
+import { getT } from "@/i18n/server";
 import { HomeTopBar } from "@/components/layout/top-bar";
 import { DashboardClient } from "./dashboard-client";
 import { getSession } from "@/lib/auth";
@@ -12,6 +13,7 @@ import { loadStock } from "@/lib/modules/stock-db";
 import type { PlatformSummary } from "@/components/modules/platform-overview";
 
 export default async function DashboardPage() {
+  const t = await getT();
   const user = await getSession();
   if (!user) redirect("/login");
 
@@ -79,7 +81,7 @@ export default async function DashboardPage() {
         platform={platform}
         recentReports={labReports.map((r) => ({
           id: r.id,
-          fileName: r.fileName ?? "Noma'lum fayl",
+          fileName: r.fileName ?? t("Noma'lum fayl"),
           hasUrgentValues: r.hasUrgentValues,
           createdAt: r.createdAt.toISOString(),
         }))}

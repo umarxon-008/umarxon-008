@@ -1,3 +1,4 @@
+import { getT } from "@/i18n/server";
 import { TopBar } from "@/components/layout/top-bar";
 import { AddReminderClient } from "./add-client";
 import { getSession } from "@/lib/auth";
@@ -8,12 +9,13 @@ interface Props {
 }
 
 export default async function AddReminderPage({ searchParams }: Props) {
+  const t = await getT();
   const user = await getSession();
   if (!user) redirect("/login");
 
   return (
     <>
-      <TopBar title="Eslatma qo'shish" showBack backHref="/reminders" />
+      <TopBar title={t("Eslatma qo'shish")} showBack backHref="/reminders" />
       <AddReminderClient
         defaultMedName={searchParams.medName}
         defaultMedId={searchParams.medId}

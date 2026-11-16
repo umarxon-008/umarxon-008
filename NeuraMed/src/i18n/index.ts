@@ -1,7 +1,7 @@
 // Simple i18n utility — no extra library needed
 // Supports uz, ru, en. Defaults to uz.
 
-type Locale = "uz" | "ru" | "en";
+import type { Locale } from "./config";
 
 const localeCache: Partial<Record<Locale, Record<string, unknown>>> = {};
 

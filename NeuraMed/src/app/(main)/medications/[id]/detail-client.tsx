@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/i18n/client";
 import Link from "next/link";
 import {
   Pill,
@@ -28,10 +29,11 @@ interface Props {
 }
 
 function CardSourceLink({ source }: { source?: MedicationSource }) {
+  const t = useT();
   if (!source?.url) {
     return (
       <span className="text-[10px] font-medium text-amber-600 dark:text-amber-400">
-        Manba tasdiqlanmadi
+        {t("Manba tasdiqlanmadi")}
       </span>
     );
   }
@@ -50,6 +52,7 @@ function CardSourceLink({ source }: { source?: MedicationSource }) {
 }
 
 export function MedicationDetailClient({ info, drugName, medicationId }: Props) {
+  const t = useT();
   if (!info) {
     return (
       <div className="px-4 py-8 text-center space-y-3">
@@ -57,10 +60,10 @@ export function MedicationDetailClient({ info, drugName, medicationId }: Props) 
           <Pill className="h-8 w-8 text-slate-300" />
         </div>
         <p className="text-base font-semibold text-slate-700 dark:text-slate-300">
-          Bu dori bo&apos;yicha ishonchli ma&apos;lumot topilmadi
+          {t("Bu dori bo'yicha ishonchli ma'lumot topilmadi")}
         </p>
         <p className="text-sm text-slate-500 max-w-xs mx-auto">
-          &quot;{drugName}&quot; bo&apos;yicha rasmiy DailyMed va openFDA bazalaridan tasdiqlangan ma&apos;lumot topilmadi.
+          {t("\"")}{drugName}{t("\" bo'yicha rasmiy DailyMed va openFDA bazalaridan tasdiqlangan ma'lumot topilmadi.")}
         </p>
         <Disclaimer className="mt-4 text-left" />
       </div>
@@ -78,10 +81,10 @@ export function MedicationDetailClient({ info, drugName, medicationId }: Props) 
           <ShieldAlert className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
           <div>
             <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
-              Manba tasdiqlanmadi
+              {t("Manba tasdiqlanmadi")}
             </p>
             <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
-              Ushbu dori bo&apos;yicha rasmiy manba havolasi to&apos;liq tasdiqlanmagan. Shifokor yoki farmatsevt bilan maslahatlashing.
+              {t("Ushbu dori bo'yicha rasmiy manba havolasi to'liq tasdiqlanmagan. Shifokor yoki farmatsevt bilan maslahatlashing.")}
             </p>
           </div>
         </div>
@@ -98,7 +101,7 @@ export function MedicationDetailClient({ info, drugName, medicationId }: Props) 
               <h2 className="text-xl font-bold text-white">{info.drug_name}</h2>
               {info.generic_name && info.generic_name !== info.drug_name && (
                 <p className="text-sm text-white/80 mt-0.5">
-                  Generik nom: {info.generic_name}
+                  {t("Generik nom:")} {info.generic_name}
                 </p>
               )}
               <div className="flex flex-wrap gap-2 mt-2">
@@ -117,7 +120,7 @@ export function MedicationDetailClient({ info, drugName, medicationId }: Props) 
           </div>
           {info.purpose && (
             <div className="mt-4 p-3 rounded-xl bg-white/10 backdrop-blur-sm">
-              <p className="text-xs text-white/70 mb-0.5">Nima uchun ishlatiladi</p>
+              <p className="text-xs text-white/70 mb-0.5">{t("Nima uchun ishlatiladi")}</p>
               <p className="text-sm text-white leading-relaxed">{info.purpose}</p>
             </div>
           )}
@@ -132,7 +135,7 @@ export function MedicationDetailClient({ info, drugName, medicationId }: Props) 
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="flex items-center gap-2 text-sm">
               <Info className="h-4 w-4 text-primary-500" />
-              Qanday ichiladi
+              {t("Qanday ichiladi")}
             </CardTitle>
             <CardSourceLink source={info.source} />
           </CardHeader>
@@ -150,7 +153,7 @@ export function MedicationDetailClient({ info, drugName, medicationId }: Props) 
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="flex items-center gap-2 text-sm">
               <Clock className="h-4 w-4 text-violet-500" />
-              Qachon ichiladi va doza o&apos;lchovi
+              {t("Qachon ichiladi va doza o'lchovi")}
             </CardTitle>
             <CardSourceLink source={info.source} />
           </CardHeader>
@@ -162,14 +165,14 @@ export function MedicationDetailClient({ info, drugName, medicationId }: Props) 
               {info.frequency && (
                 <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-50 dark:bg-violet-900/20">
                   <span className="text-xs font-medium text-violet-700 dark:text-violet-400">
-                    Kuniga: {info.frequency}
+                    {t("Kuniga:")} {info.frequency}
                   </span>
                 </div>
               )}
               {info.dosage && (
                 <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-50 dark:bg-primary-900/20">
                   <span className="text-xs font-medium text-primary-700 dark:text-primary-400">
-                    Doza: {info.dosage}
+                    {t("Doza:")} {info.dosage}
                   </span>
                 </div>
               )}
@@ -183,7 +186,7 @@ export function MedicationDetailClient({ info, drugName, medicationId }: Props) 
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="flex items-center gap-2 text-sm">
             <Utensils className="h-4 w-4 text-emerald-500" />
-            Ovqat bilan yoki bo&apos;sh qorin
+            {t("Ovqat bilan yoki bo'sh qorin")}
           </CardTitle>
           <CardSourceLink source={info.source} />
         </CardHeader>
@@ -207,10 +210,10 @@ export function MedicationDetailClient({ info, drugName, medicationId }: Props) 
             <div>
               <p className="text-sm font-medium text-slate-800 dark:text-white">
                 {info.food_rule === "ovqat_bilan"
-                  ? "Ovqat bilan iching"
+                  ? t("Ovqat bilan iching")
                   : info.food_rule === "bosh_qorin"
-                    ? "Bo'sh qorinda iching"
-                    : "Ovqat bilan yoki bo'sh qorinda"}
+                    ? t("Bo'sh qorinda iching")
+                    : t("Ovqat bilan yoki bo'sh qorinda")}
               </p>
               {info.food_rule_note && (
                 <p className="text-xs text-slate-500 mt-0.5">{info.food_rule_note}</p>
@@ -226,7 +229,7 @@ export function MedicationDetailClient({ info, drugName, medicationId }: Props) 
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="flex items-center gap-2 text-sm">
               <Clock className="h-4 w-4 text-amber-500" />
-              Dozani o&apos;tkazib yuborsangiz
+              {t("Dozani o'tkazib yuborsangiz")}
             </CardTitle>
             <CardSourceLink source={info.source} />
           </CardHeader>
@@ -244,7 +247,7 @@ export function MedicationDetailClient({ info, drugName, medicationId }: Props) 
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="flex items-center gap-2 text-sm">
               <Heart className="h-4 w-4 text-pink-500" />
-              Umumiy nojo&apos;ya ta&apos;sirlar
+              {t("Umumiy nojo'ya ta'sirlar")}
             </CardTitle>
             <CardSourceLink source={info.source} />
           </CardHeader>
@@ -270,7 +273,7 @@ export function MedicationDetailClient({ info, drugName, medicationId }: Props) 
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="flex items-center gap-2 text-sm text-amber-700 dark:text-amber-400">
               <AlertTriangle className="h-4 w-4" />
-              Ehtiyot bo&apos;ling (Jadval ogohlantirishlari)
+              {t("Ehtiyot bo'ling (Jadval ogohlantirishlari)")}
             </CardTitle>
             <CardSourceLink source={info.source} />
           </CardHeader>
@@ -297,7 +300,7 @@ export function MedicationDetailClient({ info, drugName, medicationId }: Props) 
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <CardTitle className="flex items-center gap-2 text-sm">
                 <AlertTriangle className="h-4 w-4 text-orange-500" />
-                Maxsus holatlarda ehtiyot bo&apos;ling
+                {t("Maxsus holatlarda ehtiyot bo'ling")}
               </CardTitle>
               <CardSourceLink source={info.source} />
             </CardHeader>
@@ -305,42 +308,42 @@ export function MedicationDetailClient({ info, drugName, medicationId }: Props) 
               {info.lifestyle_warnings.alcohol && (
                 <LifestyleItem
                   icon="🍷"
-                  label="Spirt"
+                  label={t("Spirt")}
                   value={info.lifestyle_warnings.alcohol}
                 />
               )}
               {info.lifestyle_warnings.pregnancy && (
                 <LifestyleItem
                   icon="🤰"
-                  label="Homiladorlik"
+                  label={t("Homiladorlik")}
                   value={info.lifestyle_warnings.pregnancy}
                 />
               )}
               {info.lifestyle_warnings.breastfeeding && (
                 <LifestyleItem
                   icon="🤱"
-                  label="Emizish"
+                  label={t("Emizish")}
                   value={info.lifestyle_warnings.breastfeeding}
                 />
               )}
               {info.lifestyle_warnings.driving && (
                 <LifestyleItem
                   icon="🚗"
-                  label="Haydash"
+                  label={t("Haydash")}
                   value={info.lifestyle_warnings.driving}
                 />
               )}
               {info.lifestyle_warnings.liver && (
                 <LifestyleItem
                   icon="🫀"
-                  label="Jigar"
+                  label={t("Jigar")}
                   value={info.lifestyle_warnings.liver}
                 />
               )}
               {info.lifestyle_warnings.kidney && (
                 <LifestyleItem
                   icon="🫘"
-                  label="Buyrak"
+                  label={t("Buyrak")}
                   value={info.lifestyle_warnings.kidney}
                 />
               )}
@@ -354,7 +357,7 @@ export function MedicationDetailClient({ info, drugName, medicationId }: Props) 
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="flex items-center gap-2 text-sm">
               <XCircle className="h-4 w-4 text-red-500" />
-              Boshqa dorilar bilan ehtiyot bo&apos;ling
+              {t("Boshqa dorilar bilan ehtiyot bo'ling")}
             </CardTitle>
             <CardSourceLink source={info.source} />
           </CardHeader>
@@ -380,7 +383,7 @@ export function MedicationDetailClient({ info, drugName, medicationId }: Props) 
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
               <Phone className="h-4 w-4" />
-              Qachon darhol shifokorga murojaat qilish kerak
+              {t("Qachon darhol shifokorga murojaat qilish kerak")}
             </CardTitle>
             <CardSourceLink source={info.source} />
           </CardHeader>
@@ -404,14 +407,14 @@ export function MedicationDetailClient({ info, drugName, medicationId }: Props) 
       {info.source && info.source.url ? (
         <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
           <div>
-            <p className="text-xs text-slate-500">Rasmiy manba</p>
+            <p className="text-xs text-slate-500">{t("Rasmiy manba")}</p>
             <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
               {info.source.provider}{" "}
               {info.source.setid ? `(SPL SetID: ${info.source.setid})` : ""}
             </p>
             {info.source.last_updated && (
               <p className="text-[11px] text-slate-400">
-                Oxirgi yangilanish sanasi: {info.source.last_updated}
+                {t("Oxirgi yangilanish sanasi:")} {info.source.last_updated}
               </p>
             )}
           </div>
@@ -421,13 +424,13 @@ export function MedicationDetailClient({ info, drugName, medicationId }: Props) 
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 text-xs font-medium text-primary-600 dark:text-primary-400 hover:underline"
           >
-            Manbani ochish
+            {t("Manbani ochish")}
             <ExternalLink className="h-4 w-4" />
           </a>
         </div>
       ) : (
         <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-xs font-medium text-amber-700 dark:text-amber-300">
-          Manba tasdiqlanmadi
+          {t("Manba tasdiqlanmadi")}
         </div>
       )}
 
@@ -440,7 +443,7 @@ export function MedicationDetailClient({ info, drugName, medicationId }: Props) 
         >
           <Button variant="gradient" size="xl" className="w-full">
             <Bell className="h-5 w-5" />
-            Eslatma qo&apos;shish
+            {t("Eslatma qo'shish")}
           </Button>
         </Link>
       </div>

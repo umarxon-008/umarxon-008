@@ -1,17 +1,22 @@
+import { getT } from "@/i18n/server";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { TopBar } from "@/components/layout/top-bar";
 import { isAIEnabled } from "@/lib/ai";
 import { AssistantClient } from "./assistant-client";
 
-export const metadata = { title: "MEDAI yordamchi" };
+export async function generateMetadata() {
+  const t = await getT();
+  return { title: t("MEDAI yordamchi") };
+}
 
 export default async function AssistantPage() {
+  const t = await getT();
   const user = await getSession();
   if (!user) redirect("/login");
   return (
     <>
-      <TopBar title="MEDAI — AI yordamchi" />
+      <TopBar title={t("MEDAI — AI yordamchi")} />
       <AssistantClient aiEnabled={isAIEnabled()} />
     </>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/i18n/client";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -9,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store";
 
 export default function LoginPage() {
+  const t = useT();
   const router = useRouter();
   const { setUser } = useAuthStore();
   const [form, setForm] = useState({ email: "", password: "" });
@@ -32,7 +34,7 @@ export default function LoginPage() {
       setUser(data.user);
       router.push("/dashboard");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Xatolik yuz berdi");
+      setError(t(err instanceof Error ? err.message : "Xatolik yuz berdi"));
     } finally {
       setLoading(false);
     }
@@ -41,22 +43,22 @@ export default function LoginPage() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white">Kirish</h2>
-        <p className="text-sm text-slate-500 mt-1">Hisobingizga kiring</p>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-white">{t("Kirish")}</h2>
+        <p className="text-sm text-slate-500 mt-1">{t("Hisobingizga kiring")}</p>
       </div>
 
       <Input
-        label="Email"
+        label={t("Email")}
         type="email"
         value={form.email}
         onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
-        placeholder="sizning@email.uz"
+        placeholder={t("sizning@email.uz")}
         leftIcon={<Mail className="h-4 w-4" />}
         required
       />
 
       <Input
-        label="Parol"
+        label={t("Parol")}
         type={showPass ? "text" : "password"}
         value={form.password}
         onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
@@ -77,13 +79,13 @@ export default function LoginPage() {
       )}
 
       <Button type="submit" className="w-full" size="lg" loading={loading}>
-        Kirish
+        {t("Kirish")}
       </Button>
 
       <p className="text-center text-sm text-slate-500">
-        Hisobingiz yo&apos;qmi?{" "}
+        {t("Hisobingiz yo'qmi?")}{" "}
         <Link href="/register" className="text-primary-500 font-semibold hover:underline">
-          Ro&apos;yxatdan o&apos;ting
+          {t("Ro'yxatdan o'ting")}
         </Link>
       </p>
     </form>

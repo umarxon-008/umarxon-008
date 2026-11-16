@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Pill, Bell, MessageSquare, LayoutGrid } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useT } from "@/i18n/client";
 
 const navItems = [
   { href: "/dashboard", icon: Home, label: "Bosh sahifa" },
@@ -14,6 +15,7 @@ const navItems = [
 ];
 
 export function BottomNav() {
+  const t = useT();
   const pathname = usePathname();
 
   return (
@@ -43,7 +45,7 @@ export function BottomNav() {
                   isActive ? "text-primary-500" : "text-slate-400"
                 )}
               >
-                {item.label}
+                {t(item.label)}
               </span>
               {isActive && (
                 <span className="absolute bottom-0 h-0.5 w-8 bg-primary-500 rounded-full" />

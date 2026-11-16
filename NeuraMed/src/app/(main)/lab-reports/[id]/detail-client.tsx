@@ -1,5 +1,6 @@
 "use client";
 
+import { useT, useLocale } from "@/i18n/client";
 import {
   AlertTriangle,
   TrendingDown,
@@ -29,6 +30,8 @@ interface Props {
 }
 
 export function LabReportDetailClient({ report, aiResult }: Props) {
+  const locale = useLocale();
+  const t = useT();
   const hasData = aiResult?.markers?.length > 0 || aiResult?.summary;
 
   if (!hasData) {
@@ -36,7 +39,7 @@ export function LabReportDetailClient({ report, aiResult }: Props) {
       <div className="px-4 py-8 text-center space-y-3">
         <HelpCircle className="h-12 w-12 text-slate-200 mx-auto" />
         <p className="text-sm text-slate-500">
-          Tahlil natijalari yuklanmadi yoki xatolik yuz berdi
+          {t("Tahlil natijalari yuklanmadi yoki xatolik yuz berdi")}
         </p>
       </div>
     );
@@ -47,7 +50,7 @@ export function LabReportDetailClient({ report, aiResult }: Props) {
       {/* Header + Download button */}
       <div className="flex items-start justify-between gap-2">
         <div>
-          <p className="text-xs text-slate-400">{formatDate(report.createdAt)}</p>
+          <p className="text-xs text-slate-400">{formatDate(report.createdAt, locale)}</p>
           <h2 className="text-base font-semibold text-slate-800 dark:text-white mt-0.5">
             {report.fileName}
           </h2>
@@ -60,7 +63,7 @@ export function LabReportDetailClient({ report, aiResult }: Props) {
           >
             <Button variant="outline" size="sm">
               <Download className="h-3.5 w-3.5" />
-              Yuklab olish
+              {t("Yuklab olish")}
             </Button>
           </a>
         </div>
@@ -72,10 +75,10 @@ export function LabReportDetailClient({ report, aiResult }: Props) {
           <AlertTriangle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
           <div>
             <p className="text-sm font-bold text-red-700 dark:text-red-400">
-              Bu natija shifokor bilan tezroq muhokama qilinishi kerak.
+              {t("Bu natija shifokor bilan tezroq muhokama qilinishi kerak.")}
             </p>
             <p className="text-xs text-red-600 dark:text-red-400/80 mt-0.5">
-              Ba&apos;zi ko&apos;rsatkichlar normal diapazondan sezilarli darajada farq qilmoqda.
+              {t("Ba'zi ko'rsatkichlar normal diapazondan sezilarli darajada farq qilmoqda.")}
             </p>
           </div>
         </div>
@@ -87,7 +90,7 @@ export function LabReportDetailClient({ report, aiResult }: Props) {
           <CardHeader>
             <CardTitle className="text-sm flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-primary-500" />
-              AI izohi (Umumiy xulosa)
+              {t("AI izohi (Umumiy xulosa)")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -104,7 +107,7 @@ export function LabReportDetailClient({ report, aiResult }: Props) {
       {aiResult.markers?.length > 0 && (
         <div>
           <p className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">
-            Ko&apos;rsatkichlar ({aiResult.markers.length})
+            {t("Ko'rsatkichlar (")}{aiResult.markers.length})
           </p>
           <div className="space-y-2.5">
             {aiResult.markers.map((marker, i) => (
@@ -118,7 +121,7 @@ export function LabReportDetailClient({ report, aiResult }: Props) {
       {aiResult.key_points?.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm">Muhim nuqtalar</CardTitle>
+            <CardTitle className="text-sm">{t("Muhim nuqtalar")}</CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
@@ -142,7 +145,7 @@ export function LabReportDetailClient({ report, aiResult }: Props) {
           <CardHeader>
             <CardTitle className="text-sm flex items-center gap-2 text-primary-700 dark:text-primary-400">
               <MessageSquare className="h-4 w-4" />
-              Shifokorga beriladigan savollar
+              {t("Shifokorga beriladigan savollar")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -167,7 +170,7 @@ export function LabReportDetailClient({ report, aiResult }: Props) {
       {aiResult.source && (
         <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800">
           <div>
-            <p className="text-xs text-slate-400">Tahlil manbasi</p>
+            <p className="text-xs text-slate-400">{t("Tahlil manbasi")}</p>
             <p className="text-xs font-medium text-slate-600 dark:text-slate-300">
               {aiResult.source.provider}
             </p>
@@ -190,25 +193,26 @@ export function LabReportDetailClient({ report, aiResult }: Props) {
 }
 
 function MarkerCard({ marker }: { marker: LabMarker }) {
+  const t = useT();
   const statusConfig = {
     normal: {
       icon: <Minus className="h-4 w-4 text-green-500" />,
-      badge: <Badge variant="normal">Normal</Badge>,
+      badge: <Badge variant="normal">{t("Normal")}</Badge>,
       bg: "bg-green-50 dark:bg-green-900/10",
     },
     low: {
       icon: <TrendingDown className="h-4 w-4 text-blue-500" />,
-      badge: <Badge variant="low">Past</Badge>,
+      badge: <Badge variant="low">{t("Past")}</Badge>,
       bg: "bg-blue-50 dark:bg-blue-900/10",
     },
     high: {
       icon: <TrendingUp className="h-4 w-4 text-red-500" />,
-      badge: <Badge variant="high">Yuqori</Badge>,
+      badge: <Badge variant="high">{t("Yuqori")}</Badge>,
       bg: "bg-red-50 dark:bg-red-900/10",
     },
     unknown: {
       icon: <HelpCircle className="h-4 w-4 text-slate-400" />,
-      badge: <Badge variant="outline">Noma&apos;lum</Badge>,
+      badge: <Badge variant="outline">{t("Noma'lum")}</Badge>,
       bg: "bg-slate-50 dark:bg-slate-800",
     },
   };
@@ -229,7 +233,7 @@ function MarkerCard({ marker }: { marker: LabMarker }) {
               {marker.uzbekName || marker.name}
             </p>
             {marker.uzbekName && marker.name !== marker.uzbekName && (
-              <p className="text-[10px] text-slate-400">{marker.name}</p>
+              <p className="text-[10px] text-slate-400">{t(marker.name)}</p>
             )}
           </div>
         </div>
@@ -245,9 +249,9 @@ function MarkerCard({ marker }: { marker: LabMarker }) {
       </div>
 
       <div className="mt-2 flex items-center gap-2">
-        <span className="text-xs text-slate-400">Normal diapazon:</span>
+        <span className="text-xs text-slate-400">{t("Normal diapazon:")}</span>
         <span className="text-xs text-slate-600 dark:text-slate-300">
-          {marker.normalRange.text}
+          {t(marker.normalRange.text)}
         </span>
       </div>
 
@@ -260,7 +264,7 @@ function MarkerCard({ marker }: { marker: LabMarker }) {
       {marker.doctorQuestion && (
         <div className="mt-2 p-2.5 rounded-lg bg-white/70 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-700">
           <p className="text-[11px] font-medium text-primary-700 dark:text-primary-400">
-            Shifokorga savol: &ldquo;{marker.doctorQuestion}&rdquo;
+            {t("Shifokorga savol: “")}{marker.doctorQuestion}{t("”")}
           </p>
         </div>
       )}
@@ -268,7 +272,7 @@ function MarkerCard({ marker }: { marker: LabMarker }) {
       {marker.isUrgent && (
         <div className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-red-600 dark:text-red-400">
           <AlertTriangle className="h-3.5 w-3.5" />
-          Bu natija shifokor bilan tezroq muhokama qilinishi kerak.
+          {t("Bu natija shifokor bilan tezroq muhokama qilinishi kerak.")}
         </div>
       )}
     </div>

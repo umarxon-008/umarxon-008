@@ -1,5 +1,6 @@
 "use client";
 
+import { useT, useLocale } from "@/i18n/client";
 import { useState } from "react";
 import {
   Stethoscope, Plus, AlertTriangle, MessageSquare,
@@ -21,6 +22,8 @@ interface PastPrep {
 }
 
 export function DoctorVisitClient({ pastPreps }: { pastPreps: PastPrep[] }) {
+  const locale = useLocale();
+  const t = useT();
   const [step, setStep] = useState<"form" | "result">("form");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -63,8 +66,8 @@ export function DoctorVisitClient({ pastPreps }: { pastPreps: PastPrep[] }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const filled = form.symptoms.filter(Boolean);
-    if (!filled.length) { setError("Kamida bitta belgi kiriting"); return; }
-    if (!form.duration) { setError("Belgilar qancha davom etayotganini kiriting"); return; }
+    if (!filled.length) { setError(t("Kamida bitta belgi kiriting")); return; }
+    if (!form.duration) { setError(t("Belgilar qancha davom etayotganini kiriting")); return; }
 
     setError(null);
     setLoading(true);
@@ -88,7 +91,7 @@ export function DoctorVisitClient({ pastPreps }: { pastPreps: PastPrep[] }) {
       setResult(data.data.aiResult);
       setStep("result");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Xatolik yuz berdi");
+      setError(t(err instanceof Error ? err.message : "Xatolik yuz berdi"));
     } finally {
       setLoading(false);
     }
@@ -107,7 +110,7 @@ export function DoctorVisitClient({ pastPreps }: { pastPreps: PastPrep[] }) {
         <CardHeader>
           <CardTitle className="text-sm flex items-center gap-2">
             <Stethoscope className="h-4 w-4 text-primary-500" />
-            Belgilaringiz *
+            {t("Belgilaringiz *")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
@@ -117,7 +120,7 @@ export function DoctorVisitClient({ pastPreps }: { pastPreps: PastPrep[] }) {
                 className="input-base flex-1"
                 value={s}
                 onChange={(e) => updateItem("symptoms", i, e.target.value)}
-                placeholder="Masalan: bosh og'riq, harorat, yo'tal..."
+                placeholder={t("Masalan: bosh og'riq, harorat, yo'tal...")}
               />
               {form.symptoms.length > 1 && (
                 <button type="button" onClick={() => removeItem("symptoms", i)}
@@ -127,17 +130,17 @@ export function DoctorVisitClient({ pastPreps }: { pastPreps: PastPrep[] }) {
           ))}
           <button type="button" onClick={() => addItem("symptoms")}
             className="text-xs text-primary-500 font-medium hover:underline flex items-center gap-1">
-            <Plus className="h-3 w-3" /> Belgi qo&apos;shish
+            <Plus className="h-3 w-3" /> {t("Belgi qo'shish")}
           </button>
         </CardContent>
       </Card>
 
       {/* Duration */}
       <Input
-        label="Belgilar qancha davom etmoqda? *"
+        label={t("Belgilar qancha davom etmoqda? *")}
         value={form.duration}
         onChange={(e) => setForm((p) => ({ ...p, duration: e.target.value }))}
-        placeholder="Masalan: 3 kun, 1 hafta..."
+        placeholder={t("Masalan: 3 kun, 1 hafta...")}
       />
 
       {/* Temperature */}
@@ -145,7 +148,7 @@ export function DoctorVisitClient({ pastPreps }: { pastPreps: PastPrep[] }) {
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-3">
             <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Harorat bormi?
+              {t("Harorat bormi?")}
             </p>
             <button
               type="button"
@@ -159,7 +162,7 @@ export function DoctorVisitClient({ pastPreps }: { pastPreps: PastPrep[] }) {
             <Input
               value={form.temperatureValue}
               onChange={(e) => setForm((p) => ({ ...p, temperatureValue: e.target.value }))}
-              placeholder="Masalan: 38.5"
+              placeholder={t("Masalan: 38.5")}
               type="number"
               step="0.1"
             />
@@ -170,14 +173,14 @@ export function DoctorVisitClient({ pastPreps }: { pastPreps: PastPrep[] }) {
       {/* Allergies */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm">Allergiyalar</CardTitle>
+          <CardTitle className="text-sm">{t("Allergiyalar")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           {form.allergies.map((a, i) => (
             <div key={i} className="flex gap-2">
               <input className="input-base flex-1" value={a}
                 onChange={(e) => updateItem("allergies", i, e.target.value)}
-                placeholder="Masalan: penitsillin..." />
+                placeholder={t("Masalan: penitsillin...")} />
               {form.allergies.length > 1 && (
                 <button type="button" onClick={() => removeItem("allergies", i)}
                   className="text-red-400 px-2">✕</button>
@@ -186,7 +189,7 @@ export function DoctorVisitClient({ pastPreps }: { pastPreps: PastPrep[] }) {
           ))}
           <button type="button" onClick={() => addItem("allergies")}
             className="text-xs text-primary-500 font-medium hover:underline flex items-center gap-1">
-            <Plus className="h-3 w-3" /> Qo&apos;shish
+            <Plus className="h-3 w-3" /> {t("Qo'shish")}
           </button>
         </CardContent>
       </Card>
@@ -194,14 +197,14 @@ export function DoctorVisitClient({ pastPreps }: { pastPreps: PastPrep[] }) {
       {/* Current meds */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm">Hozir qanday dorilar ichyapsiz?</CardTitle>
+          <CardTitle className="text-sm">{t("Hozir qanday dorilar ichyapsiz?")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           {form.currentMedications.map((m, i) => (
             <div key={i} className="flex gap-2">
               <input className="input-base flex-1" value={m}
                 onChange={(e) => updateItem("currentMedications", i, e.target.value)}
-                placeholder="Dori nomi va dozasi" />
+                placeholder={t("Dori nomi va dozasi")} />
               {form.currentMedications.length > 1 && (
                 <button type="button" onClick={() => removeItem("currentMedications", i)}
                   className="text-red-400 px-2">✕</button>
@@ -210,7 +213,7 @@ export function DoctorVisitClient({ pastPreps }: { pastPreps: PastPrep[] }) {
           ))}
           <button type="button" onClick={() => addItem("currentMedications")}
             className="text-xs text-primary-500 font-medium hover:underline flex items-center gap-1">
-            <Plus className="h-3 w-3" /> Qo&apos;shish
+            <Plus className="h-3 w-3" /> {t("Qo'shish")}
           </button>
         </CardContent>
       </Card>
@@ -218,14 +221,14 @@ export function DoctorVisitClient({ pastPreps }: { pastPreps: PastPrep[] }) {
       {/* Chronic conditions */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm">Surunkali kasalliklar</CardTitle>
+          <CardTitle className="text-sm">{t("Surunkali kasalliklar")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           {form.chronicConditions.map((c, i) => (
             <div key={i} className="flex gap-2">
               <input className="input-base flex-1" value={c}
                 onChange={(e) => updateItem("chronicConditions", i, e.target.value)}
-                placeholder="Masalan: diabet, gipertoniya..." />
+                placeholder={t("Masalan: diabet, gipertoniya...")} />
               {form.chronicConditions.length > 1 && (
                 <button type="button" onClick={() => removeItem("chronicConditions", i)}
                   className="text-red-400 px-2">✕</button>
@@ -234,17 +237,17 @@ export function DoctorVisitClient({ pastPreps }: { pastPreps: PastPrep[] }) {
           ))}
           <button type="button" onClick={() => addItem("chronicConditions")}
             className="text-xs text-primary-500 font-medium hover:underline flex items-center gap-1">
-            <Plus className="h-3 w-3" /> Qo&apos;shish
+            <Plus className="h-3 w-3" /> {t("Qo'shish")}
           </button>
         </CardContent>
       </Card>
 
       {/* Pregnancy note */}
       <Input
-        label="Homiladorlik / emizish holati (ixtiyoriy)"
+        label={t("Homiladorlik / emizish holati (ixtiyoriy)")}
         value={form.pregnancyNote}
         onChange={(e) => setForm((p) => ({ ...p, pregnancyNote: e.target.value }))}
-        placeholder="Masalan: 2 oylik homilador"
+        placeholder={t("Masalan: 2 oylik homilador")}
       />
 
       {error && (
@@ -255,9 +258,9 @@ export function DoctorVisitClient({ pastPreps }: { pastPreps: PastPrep[] }) {
 
       <Button type="submit" variant="gradient" size="xl" className="w-full" loading={loading}>
         {loading ? (
-          <><Loader2 className="h-5 w-5 animate-spin" /> Tayyorlanmoqda...</>
+          <><Loader2 className="h-5 w-5 animate-spin" /> {t("Tayyorlanmoqda...")}</>
         ) : (
-          <><Stethoscope className="h-5 w-5" /> Qabulga tayyorlanish</>
+          <><Stethoscope className="h-5 w-5" /> {t("Qabulga tayyorlanish")}</>
         )}
       </Button>
 
@@ -265,7 +268,7 @@ export function DoctorVisitClient({ pastPreps }: { pastPreps: PastPrep[] }) {
       {pastPreps.length > 0 && (
         <div>
           <p className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">
-            O&apos;tgan tayyorlovlar
+            {t("O'tgan tayyorlovlar")}
           </p>
           <div className="space-y-2">
             {pastPreps.map((p) => (
@@ -274,7 +277,7 @@ export function DoctorVisitClient({ pastPreps }: { pastPreps: PastPrep[] }) {
                   <p className="text-sm text-slate-700 dark:text-slate-200 truncate">
                     {p.symptoms.slice(0, 2).join(", ")}
                   </p>
-                  <p className="text-xs text-slate-400">{formatDate(p.createdAt)}</p>
+                  <p className="text-xs text-slate-400">{formatDate(p.createdAt, locale)}</p>
                 </div>
                 <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${urgencyColor(p.urgencyLevel.toLowerCase())}`}>
                   {p.urgencyLevel}
@@ -289,6 +292,7 @@ export function DoctorVisitClient({ pastPreps }: { pastPreps: PastPrep[] }) {
 }
 
 function ResultView({ result, onReset }: { result: DoctorVisitAIResult; onReset: () => void }) {
+  const t = useT();
   const isEmergency = result.urgency_level === "emergency";
 
   return (
@@ -298,7 +302,7 @@ function ResultView({ result, onReset }: { result: DoctorVisitAIResult; onReset:
         <div className="flex items-start gap-3 p-4 rounded-xl bg-red-600 text-white">
           <AlertTriangle className="h-6 w-6 shrink-0 mt-0.5" />
           <div>
-            <p className="font-bold text-base">DARHOL tibbiy yordam so&apos;rang!</p>
+            <p className="font-bold text-base">{t("DARHOL tibbiy yordam so'rang!")}</p>
             <p className="text-sm text-red-100 mt-0.5">{result.urgency_note}</p>
           </div>
         </div>
@@ -309,7 +313,7 @@ function ResultView({ result, onReset }: { result: DoctorVisitAIResult; onReset:
         <CardHeader>
           <CardTitle className="text-sm flex items-center gap-2">
             <Stethoscope className="h-4 w-4 text-primary-500" />
-            Vaziyat xulosasi
+            {t("Vaziyat xulosasi")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -328,7 +332,7 @@ function ResultView({ result, onReset }: { result: DoctorVisitAIResult; onReset:
       {result.symptoms_list?.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm">Belgilar ro&apos;yxati</CardTitle>
+            <CardTitle className="text-sm">{t("Belgilar ro'yxati")}</CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="space-y-1.5">
@@ -349,7 +353,7 @@ function ResultView({ result, onReset }: { result: DoctorVisitAIResult; onReset:
           <CardHeader>
             <CardTitle className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
               <AlertTriangle className="h-4 w-4" />
-              Quyidagi belgilar bo&apos;lsa darhol yordam so&apos;rang
+              {t("Quyidagi belgilar bo'lsa darhol yordam so'rang")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -371,7 +375,7 @@ function ResultView({ result, onReset }: { result: DoctorVisitAIResult; onReset:
           <CardHeader>
             <CardTitle className="text-sm flex items-center gap-2 text-primary-700 dark:text-primary-400">
               <MessageSquare className="h-4 w-4" />
-              Shifokorga savollar
+              {t("Shifokorga savollar")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -395,7 +399,7 @@ function ResultView({ result, onReset }: { result: DoctorVisitAIResult; onReset:
           <CardHeader>
             <CardTitle className="text-sm flex items-center gap-2">
               <FileText className="h-4 w-4 text-emerald-500" />
-              Olib borish kerak bo&apos;lgan hujjatlar
+              {t("Olib borish kerak bo'lgan hujjatlar")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -414,7 +418,7 @@ function ResultView({ result, onReset }: { result: DoctorVisitAIResult; onReset:
       <Disclaimer />
 
       <Button variant="secondary" className="w-full" onClick={onReset}>
-        Yangi tayyorlov
+        {t("Yangi tayyorlov")}
       </Button>
     </div>
   );

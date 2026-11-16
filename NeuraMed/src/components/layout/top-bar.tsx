@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/i18n/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, User, Settings } from "lucide-react";
@@ -57,12 +58,13 @@ export function TopBar({
 }
 
 export function HomeTopBar({ name }: { name?: string }) {
+  const t = useT();
   return (
     <header className="lg:hidden sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 safe-top">
       <div className="flex items-center justify-between px-4 h-14">
         <div className="flex items-center gap-2">
           <BrandLogo size={34} />
-          <span className="font-extrabold gradient-text">NeuraMed</span>
+          <span className="font-extrabold gradient-text">{t("NeuraMed")}</span>
         </div>
         <div className="flex items-center gap-1">
           <Link href="/settings">

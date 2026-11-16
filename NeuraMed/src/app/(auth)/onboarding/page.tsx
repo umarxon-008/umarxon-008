@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/i18n/client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronRight, ChevronLeft, Check } from "lucide-react";
@@ -22,6 +23,7 @@ const genderOptions = [
 ];
 
 export default function OnboardingPage() {
+  const t = useT();
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -89,9 +91,9 @@ export default function OnboardingPage() {
       {/* Step content */}
       <div className="mb-6">
         <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-          {steps[step - 1].title}
+          {t(steps[step - 1].title)}
         </h2>
-        <p className="text-sm text-slate-500 mt-1">{steps[step - 1].subtitle}</p>
+        <p className="text-sm text-slate-500 mt-1">{t(steps[step - 1].subtitle)}</p>
       </div>
 
       {step === 1 && (
@@ -104,14 +106,14 @@ export default function OnboardingPage() {
             ].map((f) => (
               <div key={f.title} className="p-3 rounded-xl bg-primary-50 dark:bg-primary-900/20">
                 <div className="text-2xl mb-1">{f.icon}</div>
-                <p className="text-xs font-semibold text-slate-700 dark:text-slate-200">{f.title}</p>
-                <p className="text-[10px] text-slate-400 mt-0.5">{f.desc}</p>
+                <p className="text-xs font-semibold text-slate-700 dark:text-slate-200">{t(f.title)}</p>
+                <p className="text-[10px] text-slate-400 mt-0.5">{t(f.desc)}</p>
               </div>
             ))}
           </div>
           <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200">
             <p className="text-xs text-amber-800 dark:text-amber-300">
-              ⚠️ NeuraMed tashxis qo&apos;ymaydi va dori buyurmaydi. Faqat ma&apos;lumot beradi.
+              {t("⚠️ NeuraMed tashxis qo'ymaydi va dori buyurmaydi. Faqat ma'lumot beradi.")}
             </p>
           </div>
         </div>
@@ -120,16 +122,16 @@ export default function OnboardingPage() {
       {step === 2 && (
         <div className="space-y-4">
           <Input
-            label="Yosh"
+            label={t("Yosh")}
             type="number"
             value={form.age}
             onChange={(e) => setForm((p) => ({ ...p, age: e.target.value }))}
-            placeholder="Masalan: 25"
+            placeholder={t("Masalan: 25")}
             min="1"
             max="150"
           />
           <div>
-            <label className="label-base">Jins</label>
+            <label className="label-base">{t("Jins")}</label>
             <div className="grid grid-cols-2 gap-2">
               {genderOptions.map((opt) => (
                 <button
@@ -145,7 +147,7 @@ export default function OnboardingPage() {
                 >
                   <span>{opt.icon}</span>
                   <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                    {opt.label}
+                    {t(opt.label)}
                   </span>
                 </button>
               ))}
@@ -153,14 +155,14 @@ export default function OnboardingPage() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <Input
-              label="Bo'y (sm)"
+              label={t("Bo'y (sm)")}
               type="number"
               value={form.heightCm}
               onChange={(e) => setForm((p) => ({ ...p, heightCm: e.target.value }))}
               placeholder="170"
             />
             <Input
-              label="Vazn (kg)"
+              label={t("Vazn (kg)")}
               type="number"
               value={form.weightKg}
               onChange={(e) => setForm((p) => ({ ...p, weightKg: e.target.value }))}
@@ -173,7 +175,7 @@ export default function OnboardingPage() {
       {step === 3 && (
         <div className="space-y-5">
           <div>
-            <label className="label-base">Allergiyalar</label>
+            <label className="label-base">{t("Allergiyalar")}</label>
             <div className="space-y-2 mt-1">
               {form.allergies.map((a, i) => (
                 <div key={i} className="flex gap-2">
@@ -181,7 +183,7 @@ export default function OnboardingPage() {
                     className="input-base flex-1"
                     value={a}
                     onChange={(e) => updateItem("allergies", i, e.target.value)}
-                    placeholder="Masalan: Penitsillin, chang..."
+                    placeholder={t("Masalan: Penitsillin, chang...")}
                   />
                   {form.allergies.length > 1 && (
                     <button
@@ -199,13 +201,13 @@ export default function OnboardingPage() {
                 onClick={() => addItem("allergies")}
                 className="text-xs text-primary-500 font-medium hover:underline"
               >
-                + Qo&apos;shish
+                {t("+ Qo'shish")}
               </button>
             </div>
           </div>
 
           <div>
-            <label className="label-base">Surunkali kasalliklar</label>
+            <label className="label-base">{t("Surunkali kasalliklar")}</label>
             <div className="space-y-2 mt-1">
               {form.chronicConditions.map((c, i) => (
                 <div key={i} className="flex gap-2">
@@ -213,7 +215,7 @@ export default function OnboardingPage() {
                     className="input-base flex-1"
                     value={c}
                     onChange={(e) => updateItem("chronicConditions", i, e.target.value)}
-                    placeholder="Masalan: Diabet, gipertoniya..."
+                    placeholder={t("Masalan: Diabet, gipertoniya...")}
                   />
                   {form.chronicConditions.length > 1 && (
                     <button
@@ -231,7 +233,7 @@ export default function OnboardingPage() {
                 onClick={() => addItem("chronicConditions")}
                 className="text-xs text-primary-500 font-medium hover:underline"
               >
-                + Qo&apos;shish
+                {t("+ Qo'shish")}
               </button>
             </div>
           </div>
@@ -245,15 +247,15 @@ export default function OnboardingPage() {
           </div>
           <div>
             <p className="text-lg font-bold text-slate-800 dark:text-white">
-              Hammasi tayyor!
+              {t("Hammasi tayyor!")}
             </p>
             <p className="text-sm text-slate-500 mt-1">
-              NeuraMed siz bilan ishlashga tayyor. Dori qidiring, tahlil yuklang yoki eslatma qo&apos;shing.
+              {t("NeuraMed siz bilan ishlashga tayyor. Dori qidiring, tahlil yuklang yoki eslatma qo'shing.")}
             </p>
           </div>
           <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 text-left">
             <p className="text-xs text-amber-700 dark:text-amber-400">
-              ⚠️ Eslatma: NeuraMed tibbiy maslahat bermaydi. Shifokor ko&apos;rsatmasiz dori ichmang.
+              {t("⚠️ Eslatma: NeuraMed tibbiy maslahat bermaydi. Shifokor ko'rsatmasiz dori ichmang.")}
             </p>
           </div>
         </div>
@@ -269,7 +271,7 @@ export default function OnboardingPage() {
             className="flex-1"
           >
             <ChevronLeft className="h-4 w-4" />
-            Orqaga
+            {t("Orqaga")}
           </Button>
         )}
 
@@ -279,7 +281,7 @@ export default function OnboardingPage() {
             onClick={() => setStep((s) => s + 1)}
             className="flex-1"
           >
-            Keyingi
+            {t("Keyingi")}
             <ChevronRight className="h-4 w-4" />
           </Button>
         )}
@@ -290,7 +292,7 @@ export default function OnboardingPage() {
             onClick={() => setStep(4)}
             className="flex-1"
           >
-            Keyingi
+            {t("Keyingi")}
             <ChevronRight className="h-4 w-4" />
           </Button>
         )}
@@ -303,7 +305,7 @@ export default function OnboardingPage() {
             variant="gradient"
             loading={loading}
           >
-            Boshlash
+            {t("Boshlash")}
             <ChevronRight className="h-4 w-4" />
           </Button>
         )}
@@ -315,7 +317,7 @@ export default function OnboardingPage() {
           onClick={() => router.push("/dashboard")}
           className="w-full text-center text-xs text-slate-400 mt-4 hover:text-slate-600"
         >
-          O&apos;tkazib yuborish
+          {t("O'tkazib yuborish")}
         </button>
       )}
     </div>

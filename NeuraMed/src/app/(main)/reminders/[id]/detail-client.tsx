@@ -1,5 +1,6 @@
 "use client";
 
+import { useT, useLocale } from "@/i18n/client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -25,6 +26,8 @@ const statusIcons = {
 const statusLabels = { TAKEN: "Qabul qilindi", SKIPPED: "O'tkazib yuborildi", POSTPONED: "Keyinga qoldirildi" };
 
 export function ReminderDetailClient({ reminder: initial, logs: initialLogs }: Props) {
+  const locale = useLocale();
+  const t = useT();
   const router = useRouter();
   const [reminder, setReminder] = useState(initial);
   const [logs, setLogs] = useState(initialLogs);
@@ -89,10 +92,10 @@ export function ReminderDetailClient({ reminder: initial, logs: initialLogs }: P
               <p className="text-sm text-white/80 mt-0.5">{reminder.dose}</p>
               <div className="flex gap-2 mt-2">
                 <Badge className="bg-white/20 text-white border-0 text-xs">
-                  {reminder.timesPerDay}x kuniga
+                  {reminder.timesPerDay}{t("x kuniga")}
                 </Badge>
                 <Badge className="bg-white/20 text-white border-0 text-xs">
-                  {foodRuleLabel(reminder.foodRule)}
+                  {t(foodRuleLabel(reminder.foodRule))}
                 </Badge>
               </div>
             </div>
@@ -104,7 +107,7 @@ export function ReminderDetailClient({ reminder: initial, logs: initialLogs }: P
               <div key={i} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/15 backdrop-blur-sm">
                 <Clock className="h-3.5 w-3.5 text-white/70" />
                 <span className="text-sm font-semibold text-white">{s.time}</span>
-                <span className="text-xs text-white/60">{s.label}</span>
+                <span className="text-xs text-white/60">{t(s.label)}</span>
               </div>
             ))}
           </div>
@@ -115,7 +118,7 @@ export function ReminderDetailClient({ reminder: initial, logs: initialLogs }: P
       {reminder.status === "ACTIVE" && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm">Bugungi doza</CardTitle>
+            <CardTitle className="text-sm">{t("Bugungi doza")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-3 gap-2">
@@ -126,7 +129,7 @@ export function ReminderDetailClient({ reminder: initial, logs: initialLogs }: P
                 loading={loading}
               >
                 <CheckCircle2 className="h-5 w-5" />
-                Qabul qildim
+                {t("Qabul qildim")}
               </Button>
               <Button
                 variant="secondary"
@@ -135,7 +138,7 @@ export function ReminderDetailClient({ reminder: initial, logs: initialLogs }: P
                 loading={loading}
               >
                 <XCircle className="h-5 w-5" />
-                O&apos;tkazib yubordim
+                {t("O'tkazib yubordim")}
               </Button>
               <Button
                 variant="secondary"
@@ -144,7 +147,7 @@ export function ReminderDetailClient({ reminder: initial, logs: initialLogs }: P
                 loading={loading}
               >
                 <AlarmClock className="h-5 w-5" />
-                Keyinga
+                {t("Keyinga")}
               </Button>
             </div>
           </CardContent>
@@ -154,26 +157,26 @@ export function ReminderDetailClient({ reminder: initial, logs: initialLogs }: P
       {/* Info */}
       <Card>
         <CardContent className="p-4 space-y-3">
-          <InfoRow label="Boshlash sanasi" value={formatDate(reminder.startDate)} />
+          <InfoRow label={t("Boshlash sanasi")} value={formatDate(reminder.startDate, locale)} />
           {reminder.endDate && (
-            <InfoRow label="Tugash sanasi" value={formatDate(reminder.endDate)} />
+            <InfoRow label={t("Tugash sanasi")} value={formatDate(reminder.endDate, locale)} />
           )}
           <InfoRow
-            label="Bildirishnoma"
+            label={t("Bildirishnoma")}
             value={
-              reminder.notificationType === "push" ? "Push bildirishnoma" :
-              reminder.notificationType === "alarm" ? "Budilnik" : "Ikkalasi"
+              reminder.notificationType === "push" ? t("Push bildirishnoma") :
+              reminder.notificationType === "alarm" ? t("Budilnik") : t("Ikkalasi")
             }
           />
           <InfoRow
-            label="Holat"
+            label={t("Holat")}
             value={
-              reminder.status === "ACTIVE" ? "Faol" :
-              reminder.status === "PAUSED" ? "To'xtatilgan" :
-              reminder.status === "COMPLETED" ? "Tugallangan" : "Bekor qilingan"
+              reminder.status === "ACTIVE" ? t("Faol") :
+              reminder.status === "PAUSED" ? t("To'xtatilgan") :
+              reminder.status === "COMPLETED" ? t("Tugallangan") : t("Bekor qilingan")
             }
           />
-          {reminder.notes && <InfoRow label="Izoh" value={reminder.notes} />}
+          {reminder.notes && <InfoRow label={t("Izoh")} value={reminder.notes} />}
         </CardContent>
       </Card>
 
@@ -185,29 +188,29 @@ export function ReminderDetailClient({ reminder: initial, logs: initialLogs }: P
           loading={loading}
         >
           {reminder.status === "ACTIVE" ? (
-            <><Pause className="h-4 w-4" /> To&apos;xtatish</>
+            <><Pause className="h-4 w-4" /> {t("To'xtatish")}</>
           ) : (
-            <><Play className="h-4 w-4" /> Davom ettirish</>
+            <><Play className="h-4 w-4" /> {t("Davom ettirish")}</>
           )}
         </Button>
         <Button variant="destructive" onClick={handleDelete} loading={loading}>
-          <Trash2 className="h-4 w-4" /> O&apos;chirish
+          <Trash2 className="h-4 w-4" /> {t("O'chirish")}
         </Button>
       </div>
 
       {/* History */}
       {logs.length > 0 && (
         <div>
-          <p className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">Tarix</p>
+          <p className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">{t("Tarix")}</p>
           <div className="space-y-2">
             {logs.map((log) => (
               <div key={log.id} className="flex items-center gap-3 p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
                 {statusIcons[log.status]}
                 <div className="flex-1">
                   <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                    {statusLabels[log.status]}
+                    {t(statusLabels[log.status])}
                   </p>
-                  <p className="text-xs text-slate-400">{formatDate(log.scheduledAt)}</p>
+                  <p className="text-xs text-slate-400">{formatDate(log.scheduledAt, locale)}</p>
                 </div>
               </div>
             ))}

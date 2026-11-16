@@ -1,3 +1,4 @@
+import { getT } from "@/i18n/server";
 import { TopBar } from "@/components/layout/top-bar";
 import { LabReportDetailClient } from "./detail-client";
 import { getSession } from "@/lib/auth";
@@ -11,6 +12,7 @@ export default async function LabReportDetailPage({
 }: {
   params: { id: string };
 }) {
+  const t = await getT();
   const user = await getSession();
   if (!user) redirect("/login");
 
@@ -28,7 +30,7 @@ export default async function LabReportDetailPage({
   return (
     <>
       <TopBar
-        title={report.fileName || "Tahlil natijasi"}
+        title={report.fileName || t("Tahlil natijasi")}
         showBack
         backHref="/lab-reports"
       />
