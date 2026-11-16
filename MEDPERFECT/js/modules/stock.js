@@ -6,7 +6,7 @@
 import { $, el, icon, icons, normalize } from '../utils.js';
 import { toast, openModal, confirmDialog, emptyState } from '../ui.js';
 import { STOCK_ITEMS, LEAD_TIME_DAYS, EXPIRY_WARN_DAYS } from '../data/stock-data.js';
-import { moduleHero, demoNotice, kpi, loadState, saveState, dayOffset, daysUntil, fmtDate, isoDay, fmtNum, fmtSom, fmtSomShort, weekdayShort } from './common.js';
+import { moduleHero, demoNotice, kpi, loadState, saveState, dayOffset, daysUntil, fmtDate, isoDay, fmtNum, fmtSom, weekdayShort } from './common.js';
 
 const KEY = 'stock.v1';
 let tab = 'stock';
@@ -96,7 +96,7 @@ function render() {
       kpi({ label: 'Kam qolgan', value: a.counts.low, iconName: 'trending-down', tone: 'warning', hint: 'minimal zaxiradan past' }),
       kpi({ label: 'Muddati yaqin', value: a.counts.expiring, iconName: 'calendar-clock', tone: 'purple', hint: `${EXPIRY_WARN_DAYS} kundan kam` }),
       kpi({ label: 'Muddati oʻtgan', value: a.counts.expired, iconName: 'circle-x', tone: 'danger' }),
-      kpi({ label: 'Zaxira qiymati', value: fmtSomShort(a.value), iconName: 'wallet', tone: 'success', hint: 'namunaviy narxlarda' }),
+      kpi({ label: 'Zaxira qiymati', value: a.value >= 1e6 ? `${(a.value / 1e6).toFixed(1).replace('.', ',')} mln` : fmtNum(a.value), iconName: 'wallet', tone: 'success', hint: 'soʻm, namunaviy narxlarda' }),
     ]),
     bar,
     { stock: stockTab, moves: movesTab, insights: insightsTab }[tab](a),
