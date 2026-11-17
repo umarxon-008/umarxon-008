@@ -1,6 +1,6 @@
 import { getT } from "@/i18n/server";
 import Link from "next/link";
-import { MessageSquare, ScanSearch, CalendarDays, Boxes, Pill, ShieldCheck, FlaskConical, Server, Users } from "lucide-react";
+import { MessageSquare, ScanSearch, CalendarDays, Boxes, Pill, ShieldCheck, FlaskConical, Server, Users, HeartPulse } from "lucide-react";
 import { TopBar } from "@/components/layout/top-bar";
 import { BrandLogo } from "@/components/layout/brand-logo";
 import { isAIEnabled } from "@/lib/ai";
@@ -11,6 +11,7 @@ export async function generateMetadata() {
 }
 
 const MODULES = [
+  { icon: HeartPulse, name: "Salomatligim", text: "QR tibbiy karta, koʻrsatkichlar va grafiklar, 1 daqiqalik chekap, dorilar mosligi va SOS sahifasi.", status: "Ishlaydi" },
   { icon: Pill, name: "Shaxsiy yordamchi", text: "Dori maʼlumoti, eslatmalar, tahlil va rentgen hisobotlarini oddiy tilda tushuntirish, shifokorga tayyorlanish.", status: "Ishlaydi" },
   { icon: MessageSquare, name: "MEDAI", text: "AI yordamchi va 26 atamali tibbiy kutubxona. OpenAI kaliti boʻlmasa — qoidaga asoslangan demo javob.", status: "Ishlaydi · demo/AI" },
   { icon: ScanSearch, name: "PHARMA TRACE", text: "QR kod/partiya orqali dorining ishlab chiqaruvchidan dorixonagacha yoʻli va shubhali holat haqida xabar.", status: "Demo maʼlumot" },

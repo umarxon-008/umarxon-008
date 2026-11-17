@@ -1,10 +1,21 @@
 import {
   Home, Pill, Bell, FlaskConical, Scan, Stethoscope, MessageSquare, BookOpen, ScanSearch, CalendarDays, Boxes, User, Settings, Rocket,
+  IdCard, Activity, HeartPulse, ShieldPlus, Siren,
 } from "lucide-react";
 
 /** Platformaning barcha bo'limlari — yon menyu va "Menyu" sahifasi uchun yagona ro'yxat. */
 export const NAV_GROUPS = [
   { title: null, items: [{ href: "/dashboard", icon: Home, label: "Bosh sahifa" }] },
+  {
+    title: "Salomatligim",
+    items: [
+      { href: "/medcard", icon: IdCard, label: "Tibbiy karta (QR)" },
+      { href: "/vitals", icon: Activity, label: "Koʻrsatkichlar" },
+      { href: "/checkup", icon: HeartPulse, label: "Chekap" },
+      { href: "/interactions", icon: ShieldPlus, label: "Dorilar mosligi" },
+      { href: "/sos", icon: Siren, label: "SOS — shoshilinch yordam" },
+    ],
+  },
   {
     title: "Shaxsiy yordamchi",
     items: [

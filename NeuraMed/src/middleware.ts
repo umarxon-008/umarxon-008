@@ -8,7 +8,7 @@ import { getJwtSecret } from "@/lib/auth/secret";
 const COOKIE_NAME = "neuramed_session";
 
 const PUBLIC_API = ["/api/auth", "/api/notifications/cron", "/api/health"];
-const PUBLIC_PAGES = ["/login", "/register", "/onboarding"];
+const PUBLIC_PAGES = ["/login", "/register", "/onboarding", "/c/"];
 
 async function isValid(token?: string) {
   if (!token) return false;

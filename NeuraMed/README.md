@@ -11,10 +11,11 @@ NeuraMed — ikki loyihaning birlashmasi:
 
 | Modul | Sahifa | Nima qiladi | Holat |
 |-------|--------|-------------|-------|
+| Salomatligim | `/medcard`, `/vitals`, `/checkup`, `/interactions`, `/sos` | QR tibbiy karta (ochiq havola `/c/<token>`, istalgan vaqtda oʻchiriladi), koʻrsatkichlar va grafiklar (shaxsiy normaga nisbatan ogohlantirish), 12 savollik chekap (0–100 ball), dorilar oʻzaro taʼsiri (namunaviy roʻyxat), SOS (103/112, joylashuvni ulashish) | Ishlaydi; chegaralar umumqabul qilingan, tashxis emas |
 | Shaxsiy yordamchi | `/dashboard`, `/medications`, `/reminders`, `/lab-reports`, `/imaging-reports`, `/doctor-visit` | Dori, eslatma, tahlil, rentgen, qabulga tayyorlanish | Ishlaydi |
 | MEDAI | `/assistant`, `/library` | AI yordamchi (suhbatlar tarixi, manbalar, xavf ogohlantirishi) va 26 atamali tibbiy kutubxona | Ishlaydi: OpenAI kaliti boʻlsa AI, boʻlmasa qoidaga asoslangan demo |
 | PHARMA TRACE | `/trace` | QR/partiya boʻyicha dori kelib chiqishi, 4 bosqichli taʼminot zanjiri, shubhali holat haqida xabar | Demo maʼlumot |
-| MEDCONNECT | `/connect` | Shifokor va muassasalar, boʻsh vaqtlar, qabulga yozilish, shifokor bilan chat | Demo maʼlumot, avtomatik javob |
+| MEDCONNECT | `/connect` | Shifokor va muassasalar, belgilar boʻyicha mutaxassis tavsiyasi, boʻsh vaqtlar, qabulga yozilish, shifokor bilan chat | Demo maʼlumot, avtomatik javob |
 | MEDSTOCK AI | `/stock` | Dorixona zaxirasi, kam qolgan/muddati yaqin dorilar, chiqim grafigi, buyurtma tavsiyasi | Demo ombor, qoidaga asoslangan tahlil |
 
 Namunaviy maʼlumotlar har doim **DEMO** yoki **(namuna)** belgisi bilan koʻrsatiladi. Shifokorlar, klinikalar, dori partiyalari va ombor toʻqima; real tizimlarga ulanmagan.

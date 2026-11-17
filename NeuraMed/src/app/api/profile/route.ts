@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
 
   const decryptContact = (val: string | null) => {
     if (!val) return undefined;
-    try { return decryptJson<{ name: string; phone: string }>(val); } catch { return undefined; }
+    try { return decryptJson<{ name: string; phone: string }>(val); } catch { return parseJsonSafe<{ name: string; phone: string } | undefined>(val, undefined); }
   };
 
   const profileData = {

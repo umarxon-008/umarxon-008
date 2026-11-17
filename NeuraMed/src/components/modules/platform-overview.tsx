@@ -2,7 +2,7 @@
 
 import { useT } from "@/i18n/client";
 import Link from "next/link";
-import { MessageSquare, ScanSearch, CalendarDays, Boxes, ArrowRight, AlertTriangle, ShieldAlert, CalendarCheck, Sparkles } from "lucide-react";
+import { MessageSquare, ScanSearch, CalendarDays, Boxes, ArrowRight, AlertTriangle, ShieldAlert, CalendarCheck, Sparkles, Activity, HeartPulse, IdCard, Siren, ShieldPlus } from "lucide-react";
 import { cn, uzDate } from "@/lib/utils";
 import { useLocale } from "@/i18n/client";
 
@@ -12,6 +12,12 @@ export interface PlatformSummary {
   stock: { total: number; low: number; expiring: number; expired: number; reorder: number };
   connect: { doctors: number; upcoming: { id: string; doctor: string; specialty: string; date: string; time: string } | null; upcomingCount: number };
   threads: number;
+  health: {
+    bp: { value: number; value2: number | null; level: string; title: { text: string; vars?: Record<string, string | number> } } | null;
+    alerts: { label: string; level: string; title: { text: string; vars?: Record<string, string | number> } }[];
+    score: number | null;
+    cardShared: boolean;
+  };
 }
 
 
@@ -64,6 +70,41 @@ export function PlatformOverview({ s }: { s: PlatformSummary }) {
           ))}
         </ul>
       )}
+    </section>
+  );
+}
+
+/** Bosh sahifadagi "Salomatligim" bloki: bosim, chekap balli, tibbiy karta, SOS. */
+export function HealthOverview({ s }: { s: PlatformSummary }) {
+  const t = useT();
+  const h = s.health;
+  const tone = (lvl?: string) => (lvl === "danger" ? "text-red-600 dark:text-red-400" : lvl === "warn" ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400");
+  const tiles = [
+    { href: "/vitals", icon: Activity, label: "Qon bosimi", value: h.bp ? `${Math.round(h.bp.value)}/${Math.round(h.bp.value2 ?? 0)}` : "—", hint: h.bp ? t(h.bp.title.text, h.bp.title.vars) : t("Oʻlchov qoʻshing"), cls: tone(h.bp?.level) },
+    { href: "/checkup", icon: HeartPulse, label: "Salomatlik balli", value: h.score != null ? `${h.score}/100` : "—", hint: h.score != null ? t("Oxirgi chekap") : t("1 daqiqalik chekap"), cls: h.score == null ? "" : h.score >= 80 ? tone("ok") : h.score >= 60 ? tone("warn") : tone("danger") },
+    { href: "/medcard", icon: IdCard, label: "Tibbiy karta (QR)", value: h.cardShared ? t("Faol") : t("Oʻchiq"), hint: t("Qon guruhi, allergiyalar, dorilar"), cls: h.cardShared ? tone("ok") : "" },
+    { href: "/interactions", icon: ShieldPlus, label: "Dorilar mosligi", value: t("Tekshirish"), hint: t("Xavfli birikmalar"), cls: "" },
+  ];
+  return (
+    <section className="space-y-3">
+      <div className="flex items-center justify-between">
+        <h2 className="flex items-center gap-1.5 text-sm font-semibold text-slate-700 dark:text-slate-300"><HeartPulse className="h-4 w-4 text-red-500" /> {t("Salomatligim")}</h2>
+        <Link href="/sos" className="inline-flex items-center gap-1 rounded-full bg-red-600 px-3 py-1 text-xs font-black tracking-wider text-white"><Siren className="h-3.5 w-3.5" /> SOS</Link>
+      </div>
+      {h.alerts.filter((a) => a.level === "danger" || a.level === "warn").slice(0, 2).map((a) => (
+        <Link key={a.label} href="/vitals" className={cn("flex items-center gap-3 rounded-2xl border p-3 text-sm", a.level === "danger" ? "border-red-100 bg-red-50 text-red-800 dark:border-red-900 dark:bg-red-900/20 dark:text-red-200" : "border-amber-100 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-900/20 dark:text-amber-200")}>
+          <Activity className="h-4 w-4 shrink-0" /><span className="flex-1">{t(a.label)}: {t(a.title.text, a.title.vars)}</span><ArrowRight className="h-4 w-4 opacity-60" />
+        </Link>
+      ))}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {tiles.map((x) => (
+          <Link key={x.href} href={x.href} className="card-base p-4 transition hover:-translate-y-0.5 hover:shadow-card">
+            <p className="flex items-center gap-1.5 text-xs font-semibold text-slate-500"><x.icon className="h-4 w-4 text-teal-600 dark:text-teal-400" />{t(x.label)}</p>
+            <p className={cn("mt-1 text-xl font-extrabold text-slate-900 dark:text-white", x.cls)}>{x.value}</p>
+            <p className="mt-0.5 line-clamp-2 text-[11px] text-slate-400">{x.hint}</p>
+          </Link>
+        ))}
+      </div>
     </section>
   );
 }

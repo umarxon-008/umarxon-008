@@ -2,7 +2,7 @@
 
 import { useT } from "@/i18n/client";
 import * as React from "react";
-import { CalendarDays, Stethoscope, Building2, MessageCircle, Star, Clock, Languages, MapPin, Send, CalendarCheck, XCircle, Search } from "lucide-react";
+import { CalendarDays, Stethoscope, Building2, MessageCircle, Star, Clock, Languages, MapPin, Send, CalendarCheck, XCircle, Search, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { LoadingCard, LoadingSpinner } from "@/components/ui/loading";
@@ -88,6 +88,7 @@ export function ConnectClient({ initialTab, userName }: { initialTab?: string; u
         <>
           {tab === "doctors" && (
             <section className="space-y-3">
+              <SymptomRouter onBook={(id) => { const d = doctors.find((x) => x.id === id); if (d) setBooking(d); }} />
               <div className="relative">
                 <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("Shifokor, mutaxassislik yoki muassasa")} aria-label={t("Shifokor qidirish")} className="input-base pl-10" />
@@ -251,6 +252,57 @@ function BookingModal({ doc, userName, onClose, onDone }: { doc: Doc; userName: 
         </div>
       )}
     </Modal>
+  );
+}
+
+interface RouteResult { specialty: string; matched: string[]; alternatives: string[]; fallback: boolean; emergency: boolean; doctors: { id: string; name: string; specialty: string; nextFree: { date: string; time: string } | null }[] }
+
+/** Belgilar bo'yicha qaysi mutaxassisdan boshlashni taklif qiladi (tashxis emas). */
+function SymptomRouter({ onBook }: { onBook: (doctorId: string) => void }) {
+  const t = useT();
+  const { day, weekday } = useFormat();
+  const [text, setText] = React.useState("");
+  const [r, setR] = React.useState<RouteResult | null>(null);
+  const [busy, setBusy] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+  const go = async (value?: string) => {
+    const v = (value ?? text).trim();
+    if (value) setText(value);
+    setBusy(true); setError(null);
+    try { setR(await api<RouteResult>("/api/connect/route-symptoms", { method: "POST", json: { text: v } })); }
+    catch (e: any) { setError(t(e.message)); } finally { setBusy(false); }
+  };
+  return (
+    <div className="card-base p-4 space-y-3">
+      <h3 className="flex items-center gap-2 font-bold text-slate-900 dark:text-white"><Sparkles className="h-4 w-4 text-teal-600 dark:text-teal-400" />{t("Qaysi shifokorga borishni bilmayapsizmi?")}</h3>
+      <form onSubmit={(e) => { e.preventDefault(); go(); }} className="flex gap-2">
+        <input className="input-base flex-1" value={text} maxLength={500} onChange={(e) => setText(e.target.value)} placeholder={t("Belgilaringizni yozing: masalan, bosim tez-tez koʻtariladi")} aria-label={t("Belgilaringiz")} />
+        <Button type="submit" variant="gradient" disabled={busy || text.trim().length < 3}>{t("Tavsiya")}</Button>
+      </form>
+      <div className="flex flex-wrap gap-2">
+        {["Bosim koʻtariladi, yurak tez uradi", "Bosh ogʻrigʻi va uyqusizlik", "Bolam tez-tez shamollaydi"].map((x) => <Chip key={x} onClick={() => go(t(x))}>{t(x)}</Chip>)}
+      </div>
+      {error && <p role="alert" className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+      {r && (
+        <div className="space-y-2">
+          {r.emergency && <EmergencyBanner />}
+          <p className="text-sm text-slate-700 dark:text-slate-200">
+            {r.fallback ? t("Aniq belgi topilmadi — avval terapevtdan boshlash tavsiya etiladi.") : t("Tavsiya: avval {s} bilan maslahatlashing.", { s: t(r.specialty) })}
+            {r.alternatives.length > 0 && <span className="text-slate-500"> {t("Muqobil:")} {r.alternatives.map((a) => t(a)).join(", ")}</span>}
+          </p>
+          <ul className="grid gap-2 sm:grid-cols-2">
+            {r.doctors.map((d) => (
+              <li key={d.id} className="flex items-center gap-3 rounded-2xl bg-slate-50 dark:bg-slate-800 p-3">
+                <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-slate-900 dark:text-white">{t(d.name)}</p>
+                  <p className="text-xs text-slate-500">{d.nextFree ? `${weekday(d.nextFree.date)}, ${day(d.nextFree.date)} · ${d.nextFree.time}` : t("Yaqin kunlarda boʻsh vaqt yoʻq")}</p></div>
+                <Button size="sm" variant="gradient" disabled={!d.nextFree} onClick={() => onBook(d.id)}>{t("Qabulga yozilish")}</Button>
+              </li>
+            ))}
+          </ul>
+          <p className="text-[11px] text-slate-400">{t("Bu tashxis emas — faqat qaysi mutaxassisdan boshlash qulayligi boʻyicha yoʻnaltirish.")}</p>
+        </div>
+      )}
+    </div>
   );
 }
 

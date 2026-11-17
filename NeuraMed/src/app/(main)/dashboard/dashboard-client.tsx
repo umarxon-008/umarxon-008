@@ -20,7 +20,7 @@ import { Disclaimer } from "@/components/ui/disclaimer";
 import { formatDate, getTimeLabel, foodRuleLabel } from "@/lib/utils";
 import type { ReminderWithMed } from "@/types";
 import { registerServiceWorker } from "@/hooks/use-push-notifications";
-import { PlatformOverview, type PlatformSummary } from "@/components/modules/platform-overview";
+import { PlatformOverview, HealthOverview, type PlatformSummary } from "@/components/modules/platform-overview";
 
 interface Props {
   userName: string;
@@ -75,6 +75,8 @@ export function DashboardClient({ userName, reminders, recentReports, platform }
       <Disclaimer compact />
 
       {/* NeuraMed modullari (MEDAI, PHARMA TRACE, MEDCONNECT, MEDSTOCK AI) */}
+      <HealthOverview s={platform} />
+
       <PlatformOverview s={platform} />
 
       {/* Quick actions */}

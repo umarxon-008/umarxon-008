@@ -41,7 +41,8 @@ export function SideNav() {
           </div>
         ))}
       </nav>
-      <p className="mt-auto px-3 text-[11px] leading-relaxed text-slate-400">{t("NeuraMed tashxis qoʻymaydi va dori buyurmaydi. Shoshilinch holatda — 103.")}</p>
+      <Link href="/sos" className="mt-auto mx-1 flex items-center justify-center gap-2 rounded-xl bg-red-600 py-2.5 text-sm font-black tracking-wider text-white shadow hover:bg-red-700">SOS · 103</Link>
+      <p className="px-3 text-[11px] leading-relaxed text-slate-400">{t("NeuraMed tashxis qoʻymaydi va dori buyurmaydi. Shoshilinch holatda — 103.")}</p>
     </aside>
   );
 }

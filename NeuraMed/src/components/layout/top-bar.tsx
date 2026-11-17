@@ -67,6 +67,7 @@ export function HomeTopBar({ name }: { name?: string }) {
           <span className="font-extrabold gradient-text">{t("NeuraMed")}</span>
         </div>
         <div className="flex items-center gap-1">
+          <Link href="/sos" aria-label={t("SOS — shoshilinch yordam")} className="mr-1 rounded-full bg-red-600 px-3 py-1.5 text-xs font-black tracking-wider text-white shadow">SOS</Link>
           <Link href="/settings">
             <Button variant="ghost" size="icon">
               <Settings className="h-5 w-5" />
