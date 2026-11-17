@@ -27,7 +27,7 @@ export function PlatformOverview({ s }: { s: PlatformSummary }) {
   const locale = useLocale();
   const modules = [
     { href: "/assistant", icon: MessageSquare, name: "MEDAI", title: "AI yordamchi va kutubxona", stat: s.threads ? t("{n} ta suhbat", { n: s.threads }) : t("Savol bering"), tag: s.aiEnabled ? "AI" : "Demo", grad: "from-emerald-500 to-teal-500" },
-    { href: "/trace", icon: ScanSearch, name: "PHARMA TRACE", title: "Dori kelib chiqishini tekshirish", stat: t("{a}/{b} tasdiqlangan", { a: s.trace.verified, b: s.trace.total }), tag: "Demo", grad: "from-teal-500 to-cyan-600" },
+    { href: "/trace", icon: ScanSearch, name: "PHARMA TRACE", title: "Mahalliy dorilarga ishonch", stat: t("{a}/{b} tasdiqlangan", { a: s.trace.verified, b: s.trace.total }), tag: "Demo", grad: "from-teal-500 to-cyan-600" },
     { href: "/connect", icon: CalendarDays, name: "MEDCONNECT", title: "Shifokor va qabul", stat: s.connect.upcomingCount ? t("{n} ta qabul", { n: s.connect.upcomingCount }) : t("{n} ta shifokor", { n: s.connect.doctors }), tag: "Demo", grad: "from-cyan-600 to-violet-600" },
     { href: "/stock", icon: Boxes, name: "MEDSTOCK AI", title: "Dorixona zaxirasi", stat: t("{n} ta diqqat talab", { n: s.stock.low + s.stock.expired }), tag: "Demo", grad: "from-violet-600 to-purple-700" },
   ];

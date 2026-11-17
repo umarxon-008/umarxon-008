@@ -108,4 +108,41 @@ export const TRACE_PRODUCTS = [
       { stage: 'pharmacy', org: 'Shifo-Demo dorixonasi №5 (namuna)', place: 'Toshkent sh.', day: -7, temp: '18–24 °C', state: 'done', note: 'Sotuvda' },
     ],
   },
+  // ── Mahalliy analoglar (namuna) — import dorilar uchun "O'zbekistonda ishlab chiqarilgan" muqobil ──
+  {
+    id: 'MP-10009', qr: 'QR-MP-4M9B-1009', name: 'Metformin', form: 'Tabletka, 850 mg, №60', substance: 'Metformin gidroxlorid', category: 'Qand miqdorini pasaytiruvchi',
+    manufacturer: { name: 'Toshkent Farm Demo (namuna)', country: 'Oʻzbekiston', license: 'DEMO-LIC-2022-0311' },
+    batch: 'TF-2408-064', mfg: -90, expiry: 640, status: 'verified',
+    statusNote: 'Mahalliy ishlab chiqarilgan. Partiya maʼlumotlari, sertifikatlar va mustaqil laboratoriya natijalari mos keldi.',
+    chain: [
+      { stage: 'manufacturer', org: 'Toshkent Farm Demo (namuna)', place: 'Toshkent viloyati', day: -90, temp: '18–22 °C', state: 'done', note: 'Partiya ishlab chiqarildi va sifat nazoratidan oʻtdi' },
+      { stage: 'warehouse', org: 'Markaziy farm-ombor (namuna)', place: 'Toshkent sh.', day: -80, temp: '15–25 °C', state: 'done', note: 'Qabul qilindi, saqlash sharoiti meʼyorda' },
+      { stage: 'distributor', org: 'MedLogistik Demo', place: 'Toshkent sh.', day: -70, temp: '15–25 °C', state: 'done', note: 'Shahar distribyutoriga yetkazildi' },
+      { stage: 'pharmacy', org: 'Shifo-Demo dorixonasi №5 (namuna)', place: 'Toshkent sh.', day: -60, temp: '18–24 °C', state: 'done', note: 'Sotuvda' },
+    ],
+  },
+  {
+    id: 'MP-10010', qr: 'QR-MP-7L2R-1010', name: 'Loratadin', form: 'Tabletka, 10 mg, №10', substance: 'Loratadin', category: 'Allergiyaga qarshi',
+    manufacturer: { name: 'Sharq Farm Demo (namuna)', country: 'Oʻzbekiston', license: 'DEMO-LIC-2023-0452' },
+    batch: 'SF-2409-118', mfg: -55, expiry: 1040, status: 'verified',
+    statusNote: 'Mahalliy ishlab chiqarilgan. Partiya maʼlumotlari, sertifikatlar va mustaqil laboratoriya natijalari mos keldi.',
+    chain: [
+      { stage: 'manufacturer', org: 'Sharq Farm Demo (namuna)', place: 'Andijon viloyati', day: -55, temp: '18–22 °C', state: 'done', note: 'Partiya ishlab chiqarildi va sifat nazoratidan oʻtdi' },
+      { stage: 'warehouse', org: 'Fargʻona vodiysi ombori (namuna)', place: 'Andijon sh.', day: -48, temp: '15–25 °C', state: 'done', note: 'Omborga qabul qilindi' },
+      { stage: 'distributor', org: 'VodiyMed Distribyutsiya (namuna)', place: 'Fargʻona', day: -40, temp: '15–25 °C', state: 'done', note: 'Distribyutorga topshirildi' },
+      { stage: 'pharmacy', org: 'Salomatlik-Demo dorixonasi (namuna)', place: 'Fargʻona sh.', day: -33, temp: '18–24 °C', state: 'done', note: 'Dorixonaga yetkazildi' },
+    ],
+  },
+  {
+    id: 'MP-10011', qr: 'QR-MP-2D3V-1011', name: 'Vitamin D3', form: 'Tomchi, 2000 XB, 10 ml', substance: 'Xolekalsiferol', category: 'Vitamin',
+    manufacturer: { name: 'NamunaFarm MChJ (namuna)', country: 'Oʻzbekiston', license: 'DEMO-LIC-2024-0117' },
+    batch: 'NF-2409-722', mfg: -35, expiry: 700, status: 'verified',
+    statusNote: 'Mahalliy ishlab chiqarilgan. Partiya maʼlumotlari, sertifikatlar va mustaqil laboratoriya natijalari mos keldi.',
+    chain: [
+      { stage: 'manufacturer', org: 'NamunaFarm MChJ (namuna)', place: 'Toshkent viloyati', day: -35, temp: '18–22 °C', state: 'done', note: 'Partiya ishlab chiqarildi va sifat nazoratidan oʻtdi' },
+      { stage: 'warehouse', org: 'Markaziy farm-ombor (namuna)', place: 'Toshkent sh.', day: -28, temp: '15–25 °C', state: 'done', note: 'Qabul qilindi, saqlash sharoiti meʼyorda' },
+      { stage: 'distributor', org: 'MedLogistik Demo', place: 'Samarqand', day: -20, temp: '15–25 °C', state: 'done', note: 'Viloyat distribyutoriga yetkazildi' },
+      { stage: 'pharmacy', org: 'Shifo-Demo dorixonasi №12 (namuna)', place: 'Samarqand sh.', day: -12, temp: '18–24 °C', state: 'done', note: 'Dorixonaga qabul qilindi, sotuvda' },
+    ],
+  },
 ];

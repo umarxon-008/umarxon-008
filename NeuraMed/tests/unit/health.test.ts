@@ -51,3 +51,23 @@ test("Belgilar bo'yicha mutaxassis (bir necha tilda)", () => {
   assert.equal(routeSymptoms("Қант деңгейі жоғары").specialty, "Endokrinolog");
   assert.equal(routeSymptoms("charchoq").fallback, true);
 });
+
+import { qualityOf, localAnalogs, localSummary, findProduct } from "@/lib/modules/trace";
+
+test("№17: ishonch indeksi, sertifikatlar va mahalliy muqobil", () => {
+  const good = qualityOf("MP-10009")!;
+  assert.ok(good.local);
+  assert.ok(good.trust.score >= 90, "tasdiqlangan mahalliy dori yuqori ball oladi");
+  assert.equal(good.trust.parts.reduce((s, p) => s + p.max, 0), 100);
+  const fake = qualityOf("MP-10004")!;
+  assert.ok(fake.trust.score < 50, "shubhali partiya past ball oladi");
+  assert.ok(fake.lab.tests.some((t) => !t.pass));
+  assert.ok(fake.certificates.some((c) => c.status === "missing"));
+  const analogs = localAnalogs("MP-10005");
+  assert.equal(analogs[0]?.id, "MP-10009");
+  assert.ok((analogs[0]?.cheaperPct ?? 0) > 0);
+  assert.equal(localAnalogs("MP-10003").length, 0, "mahalliy analogi yo'q dori uchun bo'sh");
+  assert.equal(findProduct("MP-10005")!.local, false);
+  const s = localSummary();
+  assert.ok(s.total >= 7 && (s.avgTrust ?? 0) > 50);
+});

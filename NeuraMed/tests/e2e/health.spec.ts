@@ -43,3 +43,13 @@ test("SOS va belgilar boʻyicha mutaxassis", async ({ page }) => {
   await page.getByRole("button", { name: "Bosim koʻtariladi, yurak tez uradi" }).click();
   await expect(page.getByText(/Tavsiya: avval/)).toBeVisible();
 });
+
+test("№17: import dori — ishonch indeksi, laboratoriya va mahalliy muqobil", async ({ page }) => {
+  await page.goto("/trace");
+  await page.getByRole("button", { name: "Import → mahalliy muqobil" }).click();
+  await page.getByRole("link", { name: /Metformin/ }).first().click();
+  await expect(page.getByText("Ishonch indeksi").first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Mahalliy muqobil bor" })).toBeVisible();
+  await expect(page.getByText("Mustaqil laboratoriya natijalari")).toBeVisible();
+  await expect(page.getByText(/arzonroq/).first()).toBeVisible();
+});

@@ -508,3 +508,34 @@ export async function chatAssistant(history: ChatTurn[], locale = "uz"): Promise
     return null;
   }
 }
+
+const QUALITY_SYSTEM = `Siz NeuraMed platformasining farmatsevtika sifati boʻyicha yordamchisisiz.
+Vazifa: berilgan JSON (dori partiyasi, sertifikatlar, laboratoriya natijalari, taʼminot zanjiri, mahalliy muqobillar) asosida bemorga 4–6 ta qisqa band bilan oddiy tilda tushuntirish.
+Qoidalar:
+- Faqat JSON'dagi faktlardan foydalaning, hech narsa toʻqimang. Maʼlumotlar namunaviy ekanini bir marta eslating.
+- Tashxis qoʻymang, doza aytmang, dorini almashtirishni buyurmang: almashtirishni shifokor yoki farmatsevt bilan kelishishni tavsiya qiling.
+- Me'yordan tashqari laboratoriya natijasi yoki shubhali zanjir boʻlsa, buni aniq ayting va dorixonaga yoki vakolatli idoraga murojaat qilishni tavsiya qiling.
+- Mahalliy dori boʻlsa yoki mahalliy muqobil boʻlsa, sifat dalillarini (sertifikat, laboratoriya) xolis koʻrsating.
+- Markdown roʻyxat ishlating, sarlavhasiz.`;
+
+/** №17: sertifikat va laboratoriya natijalarini oddiy tilda tushuntirish (AI). Kalit bo'lmasa null. */
+export async function explainQuality(data: unknown, locale = "uz"): Promise<string | null> {
+  const c = getClient();
+  if (!c) return null;
+  try {
+    const completion = await c.chat.completions.create({
+      model: MODEL,
+      temperature: 0.2,
+      max_tokens: 500,
+      messages: [
+        { role: "system", content: QUALITY_SYSTEM + (LANG_LINE[locale] || "") },
+        { role: "user", content: JSON.stringify(data).slice(0, 6000) },
+      ],
+    });
+    const text = completion.choices[0]?.message?.content?.trim();
+    return text ? sanitizeString(text) : null;
+  } catch (error) {
+    console.error("[ai] explainQuality failed", error instanceof Error ? error.name : "Error");
+    return null;
+  }
+}

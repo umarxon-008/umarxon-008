@@ -5,7 +5,7 @@ const PAGES: [string, RegExp][] = [
   ["/dashboard", /NeuraMed modullari/],
   ["/assistant", /Tibbiy atama yoki tahlil haqida soʻrang/],
   ["/library", /tibbiy atama oddiy tilda/],
-  ["/trace", /Dori qayerdan kelganini tekshiring/],
+  ["/trace", /Mahalliy dorilarga ishonch/],
   ["/trace/MP-10004", /Taʼminot zanjiri/],
   ["/connect", /Shifokor topish, qabulga yozilish/],
   ["/stock", /Dorixona zaxirasi nazorat ostida/],

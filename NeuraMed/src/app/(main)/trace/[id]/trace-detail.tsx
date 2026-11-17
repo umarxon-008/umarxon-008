@@ -7,11 +7,12 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { api, DemoBadge, DemoNote, Modal, Toast, useFormat } from "@/components/modules/common";
 import { STAGE_ICON, STATE_STYLE, TraceStatusBadge, IssueIcon } from "@/components/modules/trace-ui";
-import type { TraceProduct } from "@/lib/modules/trace";
+import type { TraceProduct, Quality } from "@/lib/modules/trace";
+import { TrustPanel, LocalBadge, type Analog } from "@/components/modules/trust-panel";
 
 const REASONS = ["Qadoq shikastlangan yoki oʻzgartirilgan", "QR kod / partiya raqami mos emas", "Narx yoki sotuv joyi shubhali", "Boshqa sabab"];
 
-export function TraceDetail({ p }: { p: TraceProduct }) {
+export function TraceDetail({ p, quality, analogs, aiEnabled }: { p: TraceProduct; quality: Quality | null; analogs: Analog[]; aiEnabled: boolean }) {
   const t = useT();
   const fmt = useFormat();
   const formatDay = fmt.day;
@@ -41,7 +42,7 @@ export function TraceDetail({ p }: { p: TraceProduct }) {
             <h2 className="text-xl font-extrabold text-slate-900 dark:text-white">{t(p.name)}</h2>
             <p className="text-sm text-slate-500">{t(p.form)} {t("· Faol modda:")} {t(p.substance)}</p>
           </div>
-          <div className="flex flex-col items-end gap-1.5"><TraceStatusBadge status={p.status} /><DemoBadge /></div>
+          <div className="flex flex-col items-end gap-1.5"><TraceStatusBadge status={p.status} /><LocalBadge local={p.local} /><DemoBadge /></div>
         </div>
         <div className={cn("mt-4 rounded-2xl border p-3.5 text-sm text-slate-700 dark:text-slate-200 flex gap-2", tone)}>
           <Info className="h-4 w-4 shrink-0 mt-0.5" /> <p>{t(p.statusNote)}</p>
@@ -61,6 +62,8 @@ export function TraceDetail({ p }: { p: TraceProduct }) {
         </dl>
         <p className="mt-2 text-[11px] text-slate-400">{t("Litsenziya:")} {p.manufacturer.license} {t("(namunaviy raqam)")}</p>
       </section>
+
+      {quality && <TrustPanel p={p} q={quality} analogs={analogs} aiEnabled={aiEnabled} />}
 
       <section className="card-base p-5">
         <h3 className="font-bold text-slate-900 dark:text-white">{t("Taʼminot zanjiri")}</h3>

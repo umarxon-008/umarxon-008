@@ -8,26 +8,30 @@ import { Button } from "@/components/ui/button";
 import { LoadingCard } from "@/components/ui/loading";
 import { api, Chip, DemoNote, Kpi, ModuleHero, useFormat } from "@/components/modules/common";
 import { TraceStatusBadge } from "@/components/modules/trace-ui";
+import { trustBand } from "@/components/modules/trust-panel";
+import { Factory, BadgeCheck } from "lucide-react";
 import type { TraceProduct } from "@/lib/modules/trace";
 
 const SAMPLES = [
   { code: "QR-MP-7F3K-1001", label: "Tasdiqlangan namuna" },
   { code: "QR-MP-5H1Q-1003", label: "Tekshiruvdagi namuna" },
   { code: "QR-MP-9Z4T-1004", label: "Shubhali namuna" },
+  { code: "QR-MP-3C7M-1005", label: "Import → mahalliy muqobil" },
 ];
-type Filter = "all" | "verified" | "pending" | "suspicious";
+type Filter = "all" | "local" | "verified" | "pending" | "suspicious";
 
 export function TraceClient() {
   const t = useT();
   const [all, setAll] = React.useState<TraceProduct[] | null>(null);
   const [summary, setSummary] = React.useState({ total: 0, verified: 0, pending: 0, suspicious: 0 });
+  const [local, setLocal] = React.useState<{ total: number; verified: number; avgTrust: number | null; withLab: number } | null>(null);
   const [q, setQ] = React.useState("");
   const [result, setResult] = React.useState<TraceProduct[] | null>(null);
   const [filter, setFilter] = React.useState<Filter>("all");
   const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    api<{ data: TraceProduct[]; summary: typeof summary }>("/api/trace").then((r) => { setAll(r.data); setSummary(r.summary); }).catch((e) => setError(t(e.message)));
+    api<{ data: TraceProduct[]; summary: typeof summary; local: NonNullable<typeof local> }>("/api/trace").then((r) => { setAll(r.data); setSummary(r.summary); setLocal(r.local); }).catch((e) => setError(t(e.message)));
   }, []);
 
   const search = async (code?: string) => {
@@ -38,11 +42,11 @@ export function TraceClient() {
     catch (e: any) { setError(t(e.message)); }
   };
 
-  const list = (all || []).filter((p) => filter === "all" || p.status === filter);
+  const list = (all || []).filter((p) => filter === "all" || (filter === "local" ? p.local : p.status === filter));
 
   return (
     <div className="px-4 py-4 space-y-4">
-      <ModuleHero icon={ScanSearch} name="PHARMA TRACE" title={t("Dori qayerdan kelganini tekshiring")} text="QR kod yoki partiya raqami orqali dorining ishlab chiqaruvchidan dorixonagacha boʻlgan yoʻlini koʻring." />
+      <ModuleHero icon={ScanSearch} name="PHARMA TRACE" title={t("Mahalliy dorilarga ishonch: haqiqiylik, sertifikat va laboratoriya")} text="QR kod yoki partiya raqami orqali dorining yoʻli, sifat sertifikatlari, mustaqil laboratoriya natijalari va ishonch indeksini koʻring. Import dori uchun ishonchli mahalliy muqobilni taklif qiladi." />
       <DemoNote>{t("Namunaviy maʼlumotlar: mahsulotlar va tashkilotlar toʻqima. Davlat reestri yoki real sertifikatlash tizimi bilan integratsiya yoʻq.")}</DemoNote>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -51,6 +55,16 @@ export function TraceClient() {
         <Kpi icon={Clock3} tone="amber" label={t("Tekshirilmoqda")} value={summary.pending} />
         <Kpi icon={ShieldAlert} tone="red" label={t("Shubhali")} value={summary.suspicious} />
       </div>
+      {local && (
+        <section className="flex flex-wrap items-center gap-4 rounded-3xl border border-sky-200 bg-sky-50 p-4 dark:border-sky-900 dark:bg-sky-900/20">
+          <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-sky-700 shadow-soft dark:bg-slate-900 dark:text-sky-300"><Factory className="h-5 w-5" /></span>
+          <div className="min-w-[200px] flex-1">
+            <p className="font-bold text-slate-900 dark:text-white">{t("Mahalliy dorilar: {n} ta, oʻrtacha ishonch indeksi {s}/100", { n: local.total, s: local.avgTrust ?? "—" })}</p>
+            <p className="text-xs text-slate-600 dark:text-slate-300">{t("{l} tasining mustaqil laboratoriya natijasi va sertifikatlari ochiq. Import dori ochilganda mahalliy muqobil taklif qilinadi.", { l: local.withLab })}</p>
+          </div>
+          <button type="button" onClick={() => setFilter("local")} className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-sky-800 shadow-soft dark:bg-slate-900 dark:text-sky-300"><BadgeCheck className="h-4 w-4" />{t("Mahalliy dorilarni koʻrish")}</button>
+        </section>
+      )}
 
       <section className="card-base p-4 space-y-3">
         <h2 className="font-bold text-slate-900 dark:text-white flex items-center gap-2"><QrCode className="h-5 w-5 text-teal-600 dark:text-teal-400" /> {t("QR kod yoki partiya raqamini kiriting")}</h2>
@@ -78,8 +92,8 @@ export function TraceClient() {
       <section className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="font-bold text-slate-900 dark:text-white mr-auto">{t("Barcha namunaviy mahsulotlar")}</h2>
-          {(["all", "verified", "pending", "suspicious"] as Filter[]).map((f) => (
-            <Chip key={f} active={filter === f} onClick={() => setFilter(f)}>{{ all: "Barchasi", verified: "Tasdiqlangan", pending: "Tekshirilmoqda", suspicious: "Shubhali" }[f]}</Chip>
+          {(["all", "local", "verified", "pending", "suspicious"] as Filter[]).map((f) => (
+            <Chip key={f} active={filter === f} onClick={() => setFilter(f)}>{t({ all: "Barchasi", local: "🇺🇿 Mahalliy", verified: "Tasdiqlangan", pending: "Tekshirilmoqda", suspicious: "Shubhali" }[f])}</Chip>
           ))}
         </div>
         {!all ? <LoadingCard /> : <ul className="grid gap-2 lg:grid-cols-2">{list.map((p) => <ProductRow key={p.id} p={p} />)}</ul>}
@@ -99,6 +113,8 @@ function ProductRow({ p }: { p: TraceProduct }) {
           <p className="truncate font-semibold text-slate-900 dark:text-white">{t(p.name)}</p>
           <p className="truncate text-xs text-slate-500">{t(p.form)} {t("· Partiya")} {p.batch} · {formatDay(p.expiryDate)} {t("gacha")}</p>
         </div>
+        {p.local && <span className="hidden sm:inline-flex rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-bold text-sky-800 dark:bg-sky-900/30 dark:text-sky-300">🇺🇿 {t("Mahalliy")}</span>}
+        {p.trust != null && <span className="text-xs font-bold" style={{ color: trustBand(p.trust).color }} title={t("Ishonch indeksi")}>{p.trust}</span>}
         <TraceStatusBadge status={p.status} />
         <ChevronRight className="h-4 w-4 text-slate-300" />
       </Link>
