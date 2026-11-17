@@ -50,7 +50,7 @@ export function LabReportsClient({ reports: initial }: { reports: ReportItem[] }
   };
 
   return (
-    <div className="px-4 py-5 space-y-5">
+    <div className="space-y-5">
       <Disclaimer compact />
 
       {/* Upload area */}

@@ -16,32 +16,46 @@ test("Tibbiy karta: QR yaratiladi va havola kirishsiz ochiladi", async ({ page, 
   await anon.close();
 });
 
-test("Koʻrsatkichlar: xavfli bosim ogohlantirish beradi", async ({ page }) => {
-  await page.goto("/vitals");
-  await page.getByRole("button", { name: "Oʻlchov qoʻshish" }).last().click();
-  const d = page.getByRole("dialog");
-  await d.locator("input").nth(0).fill("185");
-  await d.locator("input").nth(1).fill("121");
-  await d.getByRole("button", { name: "Saqlash" }).click();
-  await expect(page.getByText(/Juda yuqori bosim/).first()).toBeVisible();
+test("Chekap va koʻrsatkichlar: bemor faqat koʻradi (shifokor kiritadi)", async ({ page }) => {
+  await page.goto("/checkup");
+  await expect(page.getByText("Shifokor xulosasi").first()).toBeVisible();
+  await expect(page.getByRole("button", { name: /Chekap oʻtkazish/ })).toHaveCount(0);
+  await page.getByRole("tab", { name: "Koʻrsatkichlar" }).click();
+  await expect(page.getByText(/Puls/).first()).toBeVisible();
+  await expect(page.getByRole("button", { name: "Oʻlchov qoʻshish" })).toHaveCount(0);
+  await expect(page.getByText(/Qon bosimi/)).toHaveCount(0);
+  const r = await page.request.post("/api/checkup", { data: { answers: {} } });
+  expect(r.status()).toBe(405);
 });
 
-test("Dorilar mosligi va chekap", async ({ page }) => {
-  await page.goto("/interactions");
+test("Dorilar: mening dorilarim, qidiruv va mosligi bitta sahifada", async ({ page }) => {
+  await page.goto("/medications");
+  await expect(page.getByRole("tab", { name: /Mening dorilarim/ })).toBeVisible();
+  await page.getByRole("tab", { name: "Mosligi" }).click();
   await page.getByRole("button", { name: /Varfarin \+ Diklofenak/ }).click();
   await expect(page.getByText("Xavfli birikma").first()).toBeVisible();
-  await page.goto("/checkup");
-  await page.getByRole("button", { name: /Chekapni (boshlash|qayta)/ }).click();
-  for (let i = 0; i < 12; i++) await page.locator("section.card-base div.grid button").first().click();
-  await expect(page.getByText("/ 100").first()).toBeVisible();
+  await page.goto("/interactions");
+  await expect(page).toHaveURL(/\/medications\?tab=interactions/);
 });
 
-test("SOS va belgilar boʻyicha mutaxassis", async ({ page }) => {
+test("SOS: faqat 103 va joylashuv; eski sahifa yoʻq", async ({ page }) => {
+  await page.goto("/dashboard");
+  await page.locator("aside").getByRole("button", { name: /SOS/ }).click();
+  const d = page.getByRole("dialog", { name: "SOS" });
+  await expect(d.getByRole("link", { name: /103 ga qoʻngʻiroq qilish/ })).toHaveAttribute("href", "tel:103");
+  await expect(d.getByRole("button", { name: /Joylashuvni yaqiningizga yuborish/ })).toBeVisible();
   await page.goto("/sos");
-  await expect(page.getByText("103").first()).toBeVisible();
+  await expect(page).toHaveURL(/\/dashboard/);
   await page.goto("/connect");
-  await page.getByRole("button", { name: "Bosim koʻtariladi, yurak tez uradi" }).click();
+  await page.getByRole("button", { name: "Yurak tez uradi, hansirayman" }).click();
   await expect(page.getByText(/Tavsiya: avval/)).toBeVisible();
+});
+
+test("Header: 🔔 bildirishnomalar va footer", async ({ page }) => {
+  await page.goto("/dashboard");
+  await page.getByRole("button", { name: "Bildirishnomalar" }).click();
+  await expect(page.getByRole("dialog", { name: "Bildirishnomalar" })).toBeVisible();
+  await expect(page.locator("footer").getByText(/Toshkent AI Hackathon/)).toBeVisible();
 });
 
 test("№17: import dori — ishonch indeksi, laboratoriya va mahalliy muqobil", async ({ page }) => {

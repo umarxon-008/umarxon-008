@@ -2,20 +2,18 @@
 
 import { useT } from "@/i18n/client";
 import Link from "next/link";
-import { MessageSquare, ScanSearch, CalendarDays, Boxes, ArrowRight, AlertTriangle, ShieldAlert, CalendarCheck, Sparkles, Activity, HeartPulse, IdCard, Siren, ShieldPlus } from "lucide-react";
+import { MessageSquare, ScanSearch, CalendarDays, ArrowRight, ShieldAlert, CalendarCheck, Sparkles, Activity, HeartPulse, IdCard, ShieldPlus } from "lucide-react";
 import { cn, uzDate } from "@/lib/utils";
 import { useLocale } from "@/i18n/client";
 
 export interface PlatformSummary {
   aiEnabled: boolean;
   trace: { total: number; verified: number; suspicious: { id: string; name: string }[] };
-  stock: { total: number; low: number; expiring: number; expired: number; reorder: number };
   connect: { doctors: number; upcoming: { id: string; doctor: string; specialty: string; date: string; time: string } | null; upcomingCount: number };
   threads: number;
   health: {
-    bp: { value: number; value2: number | null; level: string; title: { text: string; vars?: Record<string, string | number> } } | null;
-    alerts: { label: string; level: string; title: { text: string; vars?: Record<string, string | number> } }[];
     score: number | null;
+    scoreDoctor: string | null;
     cardShared: boolean;
   };
 }
@@ -29,11 +27,9 @@ export function PlatformOverview({ s }: { s: PlatformSummary }) {
     { href: "/assistant", icon: MessageSquare, name: "MEDAI", title: "AI yordamchi va kutubxona", stat: s.threads ? t("{n} ta suhbat", { n: s.threads }) : t("Savol bering"), tag: s.aiEnabled ? "AI" : "Demo", grad: "from-emerald-500 to-teal-500" },
     { href: "/trace", icon: ScanSearch, name: "PHARMA TRACE", title: "Mahalliy dorilarga ishonch", stat: t("{a}/{b} tasdiqlangan", { a: s.trace.verified, b: s.trace.total }), tag: "Demo", grad: "from-teal-500 to-cyan-600" },
     { href: "/connect", icon: CalendarDays, name: "MEDCONNECT", title: "Shifokor va qabul", stat: s.connect.upcomingCount ? t("{n} ta qabul", { n: s.connect.upcomingCount }) : t("{n} ta shifokor", { n: s.connect.doctors }), tag: "Demo", grad: "from-cyan-600 to-violet-600" },
-    { href: "/stock", icon: Boxes, name: "MEDSTOCK AI", title: "Dorixona zaxirasi", stat: t("{n} ta diqqat talab", { n: s.stock.low + s.stock.expired }), tag: "Demo", grad: "from-violet-600 to-purple-700" },
   ];
   const alerts = [
     s.trace.suspicious.length && { href: `/trace/${s.trace.suspicious[0].id}`, icon: ShieldAlert, tone: "red", text: t("PHARMA TRACE: {names} partiyasi shubhali deb belgilangan", { names: s.trace.suspicious.map((p) => t(p.name)).join(", ") }) },
-    s.stock.low + s.stock.expired > 0 && { href: "/stock", icon: AlertTriangle, tone: "amber", text: t("MEDSTOCK: {low} ta dori kam qolgan, {expired} tasining muddati oʻtgan · {reorder} ta buyurtma tavsiyasi", { low: s.stock.low, expired: s.stock.expired, reorder: s.stock.reorder }) },
     s.connect.upcoming && { href: "/connect?tab=appointments", icon: CalendarCheck, tone: "teal", text: `MEDCONNECT: ${uzDate(s.connect.upcoming.date, { year: false, locale })}, ${s.connect.upcoming.time} — ${t(s.connect.upcoming.doctor)} (${t(s.connect.upcoming.specialty)})` },
   ].filter(Boolean) as { href: string; icon: React.ElementType; tone: string; text: string }[];
   const toneCls: Record<string, string> = {
@@ -48,7 +44,7 @@ export function PlatformOverview({ s }: { s: PlatformSummary }) {
         <h2 className="flex items-center gap-1.5 text-sm font-semibold text-slate-700 dark:text-slate-300"><Sparkles className="h-4 w-4 text-teal-500" /> {t("NeuraMed modullari")}</h2>
         <span className="text-[11px] text-slate-400">{t("Demo maʼlumotlar bilan")}</span>
       </div>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
         {modules.map((m) => (
           <Link key={m.href} href={m.href} className="group card-base relative overflow-hidden p-4 transition hover:-translate-y-0.5 hover:shadow-card">
             <span className={cn("inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow", m.grad)}><m.icon className="h-5 w-5" /></span>
@@ -74,28 +70,20 @@ export function PlatformOverview({ s }: { s: PlatformSummary }) {
   );
 }
 
-/** Bosh sahifadagi "Salomatligim" bloki: bosim, chekap balli, tibbiy karta, SOS. */
+/** Bosh sahifadagi "Salomatligim" bloki: chekap balli (shifokor o'tkazgan), tibbiy karta, dorilar. */
 export function HealthOverview({ s }: { s: PlatformSummary }) {
   const t = useT();
   const h = s.health;
   const tone = (lvl?: string) => (lvl === "danger" ? "text-red-600 dark:text-red-400" : lvl === "warn" ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400");
   const tiles = [
-    { href: "/vitals", icon: Activity, label: "Qon bosimi", value: h.bp ? `${Math.round(h.bp.value)}/${Math.round(h.bp.value2 ?? 0)}` : "—", hint: h.bp ? t(h.bp.title.text, h.bp.title.vars) : t("Oʻlchov qoʻshing"), cls: tone(h.bp?.level) },
-    { href: "/checkup", icon: HeartPulse, label: "Salomatlik balli", value: h.score != null ? `${h.score}/100` : "—", hint: h.score != null ? t("Oxirgi chekap") : t("1 daqiqalik chekap"), cls: h.score == null ? "" : h.score >= 80 ? tone("ok") : h.score >= 60 ? tone("warn") : tone("danger") },
+    { href: "/checkup", icon: HeartPulse, label: "Salomatlik balli", value: h.score != null ? `${h.score}/100` : "—", hint: h.score != null ? (h.scoreDoctor ? t("Shifokor: {name}", { name: t(h.scoreDoctor) }) : t("Oxirgi chekap")) : t("Chekapni shifokor oʻtkazadi"), cls: h.score == null ? "" : h.score >= 80 ? tone("ok") : h.score >= 60 ? tone("warn") : tone("danger") },
+    { href: "/checkup?tab=vitals", icon: Activity, label: "Koʻrsatkichlar", value: t("Koʻrish"), hint: t("Puls, qand, vazn, harorat"), cls: "" },
     { href: "/medcard", icon: IdCard, label: "Tibbiy karta (QR)", value: h.cardShared ? t("Faol") : t("Oʻchiq"), hint: t("Qon guruhi, allergiyalar, dorilar"), cls: h.cardShared ? tone("ok") : "" },
-    { href: "/interactions", icon: ShieldPlus, label: "Dorilar mosligi", value: t("Tekshirish"), hint: t("Xavfli birikmalar"), cls: "" },
+    { href: "/medications?tab=interactions", icon: ShieldPlus, label: "Dorilar mosligi", value: t("Tekshirish"), hint: t("Xavfli birikmalar"), cls: "" },
   ];
   return (
     <section className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h2 className="flex items-center gap-1.5 text-sm font-semibold text-slate-700 dark:text-slate-300"><HeartPulse className="h-4 w-4 text-red-500" /> {t("Salomatligim")}</h2>
-        <Link href="/sos" className="inline-flex items-center gap-1 rounded-full bg-red-600 px-3 py-1 text-xs font-black tracking-wider text-white"><Siren className="h-3.5 w-3.5" /> SOS</Link>
-      </div>
-      {h.alerts.filter((a) => a.level === "danger" || a.level === "warn").slice(0, 2).map((a) => (
-        <Link key={a.label} href="/vitals" className={cn("flex items-center gap-3 rounded-2xl border p-3 text-sm", a.level === "danger" ? "border-red-100 bg-red-50 text-red-800 dark:border-red-900 dark:bg-red-900/20 dark:text-red-200" : "border-amber-100 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-900/20 dark:text-amber-200")}>
-          <Activity className="h-4 w-4 shrink-0" /><span className="flex-1">{t(a.label)}: {t(a.title.text, a.title.vars)}</span><ArrowRight className="h-4 w-4 opacity-60" />
-        </Link>
-      ))}
+      <h2 className="flex items-center gap-1.5 text-sm font-semibold text-slate-700 dark:text-slate-300"><HeartPulse className="h-4 w-4 text-red-500" /> {t("Salomatligim")}</h2>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {tiles.map((x) => (
           <Link key={x.href} href={x.href} className="card-base p-4 transition hover:-translate-y-0.5 hover:shadow-card">

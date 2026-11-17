@@ -74,7 +74,7 @@ export function DashboardClient({ userName, reminders, recentReports, platform }
       {/* Disclaimer */}
       <Disclaimer compact />
 
-      {/* NeuraMed modullari (MEDAI, PHARMA TRACE, MEDCONNECT, MEDSTOCK AI) */}
+      {/* Salomatligim va NeuraMed modullari (MEDAI, PHARMA TRACE, MEDCONNECT) */}
       <HealthOverview s={platform} />
 
       <PlatformOverview s={platform} />
@@ -82,7 +82,7 @@ export function DashboardClient({ userName, reminders, recentReports, platform }
       {/* Quick actions */}
       <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300 -mb-2">{t("Shaxsiy yordamchi")}</h2>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <Link href="/medications/search">
+        <Link href="/medications?tab=search">
           <Card className="h-full hover:shadow-md transition-shadow cursor-pointer">
             <CardContent className="p-4 flex flex-col gap-3">
               <div className="h-10 w-10 rounded-xl bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center">
@@ -110,7 +110,7 @@ export function DashboardClient({ userName, reminders, recentReports, platform }
           </Card>
         </Link>
 
-        <Link href="/imaging-reports">
+        <Link href="/lab-reports?tab=imaging">
           <Card className="h-full hover:shadow-md transition-shadow cursor-pointer">
             <CardContent className="p-4 flex flex-col gap-3">
               <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
@@ -124,7 +124,7 @@ export function DashboardClient({ userName, reminders, recentReports, platform }
           </Card>
         </Link>
 
-        <Link href="/doctor-visit">
+        <Link href="/connect?tab=prep">
           <Card className="h-full hover:shadow-md transition-shadow cursor-pointer">
             <CardContent className="p-4 flex flex-col gap-3">
               <div className="h-10 w-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center">
@@ -144,7 +144,7 @@ export function DashboardClient({ userName, reminders, recentReports, platform }
         <div>
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">{t("Keyingi eslatma")}</h2>
-            <Link href="/reminders" className="text-xs text-primary-500 font-medium">
+            <Link href="/medications" className="text-xs text-primary-500 font-medium">
               {t("Hammasini ko'rish")}
             </Link>
           </div>
@@ -189,7 +189,7 @@ export function DashboardClient({ userName, reminders, recentReports, platform }
             <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
               {t("Faol eslatmalar")}
             </h2>
-            <Link href="/reminders" className="text-xs text-primary-500 font-medium flex items-center gap-0.5">
+            <Link href="/medications" className="text-xs text-primary-500 font-medium flex items-center gap-0.5">
               {t("Barchasi")} <ChevronRight className="h-3 w-3" />
             </Link>
           </div>

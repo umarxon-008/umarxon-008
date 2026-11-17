@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAuth } from "@/lib/auth";
+import { requirePatient as requireAuth } from "@/lib/auth";
 import { prepareDoctorVisit } from "@/lib/ai";
 import { z } from "zod";
 import type { DoctorVisitInput } from "@/types";
@@ -14,6 +14,7 @@ const schema = z.object({
   currentMedications: z.array(z.string()),
   chronicConditions: z.array(z.string()),
   pregnancyNote: z.string().optional(),
+  appointmentId: z.string().max(64).optional(),
 });
 
 export async function GET() {
@@ -36,7 +37,9 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const user = await requireAuth();
   const body = await req.json();
-  const data = schema.parse(body) as DoctorVisitInput;
+  const parsed = schema.parse(body);
+  const data = parsed as DoctorVisitInput;
+  const appt = parsed.appointmentId ? await prisma.appointment.findFirst({ where: { id: parsed.appointmentId, userId: user.id } }) : null;
 
   const aiResult = await prepareDoctorVisit(data);
 
@@ -58,6 +61,7 @@ export async function POST(req: NextRequest) {
       pregnancyNote: data.pregnancyNote,
       aiResultJson: aiResult ? JSON.stringify(aiResult) : null,
       urgencyLevel,
+      appointmentId: appt ? appt.id : null,
     },
   });
 

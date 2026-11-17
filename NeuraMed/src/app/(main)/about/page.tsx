@@ -1,6 +1,6 @@
 import { getT } from "@/i18n/server";
 import Link from "next/link";
-import { MessageSquare, ScanSearch, CalendarDays, Boxes, Pill, ShieldCheck, FlaskConical, Server, Users, HeartPulse } from "lucide-react";
+import { MessageSquare, ScanSearch, CalendarDays, Stethoscope, Pill, ShieldCheck, FlaskConical, Server, Users, HeartPulse } from "lucide-react";
 import { TopBar } from "@/components/layout/top-bar";
 import { BrandLogo } from "@/components/layout/brand-logo";
 import { isAIEnabled } from "@/lib/ai";
@@ -11,12 +11,12 @@ export async function generateMetadata() {
 }
 
 const MODULES = [
-  { icon: HeartPulse, name: "Salomatligim", text: "QR tibbiy karta, koʻrsatkichlar va grafiklar, 1 daqiqalik chekap, dorilar mosligi va SOS sahifasi.", status: "Ishlaydi" },
-  { icon: Pill, name: "Shaxsiy yordamchi", text: "Dori maʼlumoti, eslatmalar, tahlil va rentgen hisobotlarini oddiy tilda tushuntirish, shifokorga tayyorlanish.", status: "Ishlaydi" },
+  { icon: Stethoscope, name: "Shifokor paneli", text: "Shifokor oʻziga yozilgan bemorlarni koʻradi, chekap oʻtkazadi, koʻrsatkich kiritadi, xulosa va javob yozadi, ish jadvalini belgilaydi.", status: "Ishlaydi" },
+  { icon: HeartPulse, name: "Salomatligim", text: "QR tibbiy karta va chekap: salomatlik balli, shifokor xulosasi, koʻrsatkichlar dinamikasi (bemor faqat koʻradi).", status: "Ishlaydi" },
+  { icon: Pill, name: "Shaxsiy yordamchi", text: "Dorilar (eslatma, qidiruv, mosligi) va tahlillar (laboratoriya, rentgen) — oddiy tilda tushuntirish.", status: "Ishlaydi" },
   { icon: MessageSquare, name: "MEDAI", text: "AI yordamchi va 26 atamali tibbiy kutubxona. OpenAI kaliti boʻlmasa — qoidaga asoslangan demo javob.", status: "Ishlaydi · demo/AI" },
-  { icon: ScanSearch, name: "PHARMA TRACE", text: "QR kod/partiya orqali dorining ishlab chiqaruvchidan dorixonagacha yoʻli va shubhali holat haqida xabar.", status: "Demo maʼlumot" },
-  { icon: CalendarDays, name: "MEDCONNECT", text: "Shifokor va muassasa katalogi, boʻsh vaqtlar, qabulga yozilish, shifokor bilan chat.", status: "Demo maʼlumot" },
-  { icon: Boxes, name: "MEDSTOCK AI", text: "Dorixona zaxirasi: kam qolgan va muddati yaqin dorilar, sarf grafigi, buyurtma tavsiyasi.", status: "Demo maʼlumot" },
+  { icon: ScanSearch, name: "PHARMA TRACE", text: "Mahalliy dorilarga ishonch: haqiqiylik, sertifikat, laboratoriya natijalari, ishonch indeksi va mahalliy muqobil.", status: "Demo maʼlumot" },
+  { icon: CalendarDays, name: "MEDCONNECT", text: "Shifokor topish, qabulga yozilish, qabulga tayyorlanish va shifokor bilan chat — bitta sahifada.", status: "Ishlaydi · demo katalog" },
 ];
 
 export default async function AboutPage() {
@@ -31,11 +31,11 @@ export default async function AboutPage() {
             <span className="rounded-3xl bg-white p-1.5"><BrandLogo size={72} /></span>
             <div>
               <h2 className="text-2xl font-black">{t("NeuraMed")}</h2>
-              <p className="text-sm text-white/75">{t("Bemor, shifokor va dorixonani bogʻlaydigan yagona tibbiy platforma")}</p>
+              <p className="text-sm text-white/75">{t("Bemor va shifokorni bogʻlaydigan yagona tibbiy platforma")}</p>
             </div>
           </div>
           <p className="mt-4 text-sm leading-relaxed text-white/80">
-            {t("NeuraMed — ikki loyihaning birlashmasi: shaxsiy tibbiy yordamchi (NeuraMed) va MEDPERFECT platformasi (MEDAI, PHARMA TRACE, MEDCONNECT, MEDSTOCK AI). Barcha modullar bitta hisob, bitta dizayn va bitta backend (Next.js API + Prisma) ustida ishlaydi.")}
+            {t("NeuraMed ikki rol uchun: bemor oʻz salomatligini kuzatadi, shifokor esa oʻz panelida bemorlarini koʻradi va chekap oʻtkazadi. Barcha boʻlimlar bitta dizayn va bitta backend (Next.js API + Prisma) ustida ishlaydi.")}
           </p>
         </section>
 
@@ -64,7 +64,8 @@ export default async function AboutPage() {
           <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2"><FlaskConical className="h-4 w-4 text-amber-600 dark:text-amber-400" /> {t("Hozirgi holat (hakaton demo)")}</h3>
           <ul className="list-disc pl-5 space-y-1">
             <li>{t("AI:")} {ai ? t("OpenAI ulangan") : t("OpenAI kaliti oʻrnatilmagan — demo rejim")}.</li>
-            <li>{t("Shifokorlar, muassasalar, dori partiyalari va ombor — toʻqima namunalar; real tizimlarga ulanmagan.")}</li>
+            <li>{t("Katalogdagi shifokorlar, muassasalar va dori partiyalari — toʻqima namunalar; real tizimlarga ulanmagan.")}</li>
+            <li>{t("Shifokor litsenziyasi demoda tekshirilmaydi; haqiqiy versiyada Sogʻliqni saqlash vazirligi reestri orqali tasdiqlanadi.")}</li>
             <li>{t("Qabul, xabar va shikoyatlar faqat platforma bazasida saqlanadi, tashqariga yuborilmaydi.")}</li>
           </ul>
         </section>

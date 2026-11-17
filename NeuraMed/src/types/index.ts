@@ -201,11 +201,18 @@ export interface UserProfile {
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
+export type UserRole = "patient" | "doctor";
+
 export interface AuthUser {
   id: string;
   name?: string;
   email?: string;
   phone?: string;
+  /** "patient" — bemor, "doctor" — shifokor */
+  role: UserRole;
+  /** Shifokor uchun: MEDCONNECT katalogidagi identifikator */
+  doctorRef?: string;
+  specialty?: string;
 }
 
 export interface LoginInput {

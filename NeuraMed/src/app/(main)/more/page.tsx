@@ -4,7 +4,8 @@ import { ChevronRight } from "lucide-react";
 import { LogoutButton } from "@/components/layout/logout-button";
 import { TopBar } from "@/components/layout/top-bar";
 import { BrandLogo } from "@/components/layout/brand-logo";
-import { NAV_GROUPS } from "@/components/layout/nav-items";
+import { navFor } from "@/components/layout/nav-items";
+import { getSession } from "@/lib/auth";
 
 export async function generateMetadata() {
   const t = await getT();
@@ -14,12 +15,14 @@ export async function generateMetadata() {
 /** Telefon uchun barcha bo'limlar ro'yxati. */
 export default async function MorePage() {
   const t = await getT();
+  const user = await getSession();
+  const groups = navFor(user?.role ?? "patient");
   return (
     <>
       <TopBar title={t("Menyu")} />
       <div className="px-4 py-4 space-y-5">
         <div className="card-base p-4"><BrandLogo size={48} withName /></div>
-        {NAV_GROUPS.map((g, i) => (
+        {groups.map((g, i) => (
           <section key={i}>
             {g.title && <p className="px-1 pb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">{t(g.title)}</p>}
             <ul className="card-base divide-y divide-slate-100 dark:divide-slate-800 overflow-hidden">

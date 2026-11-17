@@ -13,7 +13,7 @@ export const DOCTORS = [
   { id: 'd1', name: 'Dilnoza Rahimova', specialty: 'Terapevt', clinicId: 'c1', experience: 12, languages: ['Oʻzbek', 'Rus'], rating: 4.9, workDays: [1, 2, 3, 4, 5], hours: [9, 17], color: '#10b981',
     about: 'Kattalar terapiyasi, profilaktik koʻriklar va laboratoriya natijalarini tushuntirish boʻyicha maslahatlar.' },
   { id: 'd2', name: 'Jasur Toshmatov', specialty: 'Kardiolog', clinicId: 'c3', experience: 15, languages: ['Oʻzbek', 'Rus', 'Ingliz'], rating: 4.8, workDays: [1, 3, 5], hours: [9, 15], color: '#6d28d9',
-    about: 'Qon bosimi, yurak ritmi buzilishlari va yurak-qon tomir xavfini baholash.' },
+    about: 'Yurak ritmi buzilishlari va yurak-qon tomir xavfini baholash.' },
   { id: 'd3', name: 'Malika Yusupova', specialty: 'Pediatr', clinicId: 'c4', experience: 9, languages: ['Oʻzbek', 'Rus'], rating: 4.9, workDays: [1, 2, 3, 4, 5, 6], hours: [8, 14], color: '#0e9aa0',
     about: 'Bolalar salomatligi, emlash jadvali va oʻsish-rivojlanish nazorati.' },
   { id: 'd4', name: 'Bobur Aliyev', specialty: 'Endokrinolog', clinicId: 'c2', experience: 11, languages: ['Oʻzbek', 'Rus'], rating: 4.7, workDays: [2, 4, 6], hours: [10, 18], color: '#0b5d73',

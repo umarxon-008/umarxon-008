@@ -4,7 +4,8 @@ import { useT } from "@/i18n/client";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Mail, Lock, User, Phone, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, User, Phone, Eye, EyeOff, Stethoscope, HeartPulse, Building2, BadgeCheck } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store";
@@ -13,7 +14,11 @@ export default function RegisterPage() {
   const t = useT();
   const router = useRouter();
   const { setUser } = useAuthStore();
+  const [role, setRole] = useState<"patient" | "doctor">("patient");
   const [form, setForm] = useState({
+    specialty: "",
+    clinicName: "",
+    licenseNo: "",
     name: "",
     email: "",
     phone: "",
@@ -47,12 +52,14 @@ export default function RegisterPage() {
           email: form.email,
           phone: form.phone || undefined,
           password: form.password,
+          role,
+          ...(role === "doctor" ? { specialty: form.specialty, clinicName: form.clinicName, licenseNo: form.licenseNo } : {}),
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Ro'yxatdan o'tish amalga oshmadi");
       setUser(data.user);
-      router.push("/onboarding");
+      router.push(role === "doctor" ? "/doctor" : "/onboarding");
     } catch (err) {
       setError(t(err instanceof Error ? err.message : "Xatolik yuz berdi"));
     } finally {
@@ -65,6 +72,20 @@ export default function RegisterPage() {
       <div className="mb-6">
         <h2 className="text-xl font-bold text-slate-900 dark:text-white">{t("Ro'yxatdan o'tish")}</h2>
         <p className="text-sm text-slate-500 mt-1">{t("Yangi hisob yarating")}</p>
+      </div>
+
+      <div role="radiogroup" aria-label={t("Kim sifatida roʻyxatdan oʻtasiz?")} className="grid grid-cols-2 gap-2">
+        {([
+          { id: "patient", icon: HeartPulse, label: "Bemor", hint: "Oʻz salomatligimni kuzataman" },
+          { id: "doctor", icon: Stethoscope, label: "Shifokor", hint: "Bemorlarimni qabul qilaman" },
+        ] as const).map((r) => (
+          <button key={r.id} type="button" role="radio" aria-checked={role === r.id} onClick={() => setRole(r.id)}
+            className={cn("rounded-2xl border-2 p-3 text-left transition", role === r.id ? "border-teal-500 bg-teal-50 dark:bg-teal-900/20" : "border-slate-200 dark:border-slate-700")}>
+            <r.icon className={cn("h-5 w-5", role === r.id ? "text-teal-600" : "text-slate-400")} />
+            <span className="mt-1 block text-sm font-bold text-slate-900 dark:text-white">{t(r.label)}</span>
+            <span className="block text-[11px] leading-snug text-slate-500">{t(r.hint)}</span>
+          </button>
+        ))}
       </div>
 
       <Input
@@ -92,6 +113,36 @@ export default function RegisterPage() {
         placeholder="+998 90 123 45 67"
         leftIcon={<Phone className="h-4 w-4" />}
       />
+      {role === "doctor" && (
+        <>
+          <Input
+            label={t("Mutaxassislik *")}
+            value={form.specialty}
+            onChange={(e) => setForm((p) => ({ ...p, specialty: e.target.value }))}
+            placeholder={t("Masalan: Terapevt")}
+            leftIcon={<Stethoscope className="h-4 w-4" />}
+            required
+          />
+          <Input
+            label={t("Ish joyi *")}
+            value={form.clinicName}
+            onChange={(e) => setForm((p) => ({ ...p, clinicName: e.target.value }))}
+            placeholder={t("Klinika yoki poliklinika nomi")}
+            leftIcon={<Building2 className="h-4 w-4" />}
+            required
+          />
+          <Input
+            label={t("Litsenziya raqami *")}
+            value={form.licenseNo}
+            onChange={(e) => setForm((p) => ({ ...p, licenseNo: e.target.value }))}
+            placeholder="LIC-0000"
+            leftIcon={<BadgeCheck className="h-4 w-4" />}
+            required
+          />
+          <p className="text-[11px] leading-relaxed text-amber-700 dark:text-amber-400">{t("Demo: litsenziya hozircha tekshirilmaydi, profilingizda “tasdiqlanmagan” belgisi turadi.")}</p>
+        </>
+      )}
+
       <Input
         label={t("Parol *")}
         type={showPass ? "text" : "password"}

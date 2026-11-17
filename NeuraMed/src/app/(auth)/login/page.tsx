@@ -32,7 +32,8 @@ export default function LoginPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Kirish amalga oshmadi");
       setUser(data.user);
-      router.push("/dashboard");
+      const next = new URLSearchParams(window.location.search).get("next");
+      router.push(next && next.startsWith("/") && !next.startsWith("//") ? next : data.user?.role === "doctor" ? "/doctor" : "/dashboard");
     } catch (err) {
       setError(t(err instanceof Error ? err.message : "Xatolik yuz berdi"));
     } finally {
@@ -88,6 +89,14 @@ export default function LoginPage() {
           {t("Ro'yxatdan o'ting")}
         </Link>
       </p>
+
+      <div className="rounded-2xl bg-slate-50 dark:bg-slate-800 p-3 text-xs text-slate-600 dark:text-slate-300">
+        <p className="font-semibold">{t("Demo hisoblar (parol: Test12345!)")}</p>
+        <div className="mt-2 grid grid-cols-2 gap-2">
+          <button type="button" onClick={() => setForm({ email: "test@neuramed.uz", password: "Test12345!" })} className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2 py-2 font-semibold hover:border-teal-400">{t("Bemor")}</button>
+          <button type="button" onClick={() => setForm({ email: "doctor@neuramed.uz", password: "Test12345!" })} className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2 py-2 font-semibold hover:border-teal-400">{t("Shifokor")}</button>
+        </div>
+      </div>
     </form>
   );
 }

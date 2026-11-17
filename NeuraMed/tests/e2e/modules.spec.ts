@@ -29,28 +29,16 @@ test("MEDCONNECT: qabulga yozilish, bekor qilish va chat", async ({ page }) => {
   const dialog = page.getByRole("dialog");
   await dialog.locator(".grid button:not([disabled])").first().click();
   await dialog.getByRole("button", { name: /tasdiqlash/ }).click();
-  await expect(page.getByText("Qabulga yozildingiz (demo)")).toBeVisible();
+  await expect(page.getByText("Qabulga yozildingiz")).toBeVisible();
   // bekor qilish (oxirgi yaratilgan qabul ro'yxat boshida)
   page.once("dialog", (d) => d.accept());
-  await page.getByRole("button", { name: "Bekor qilish" }).first().click();
+  await page.getByRole("button", { name: "Bekor qilish", exact: true }).first().click();
   await expect(page.getByText("Qabul bekor qilindi")).toBeVisible();
   await page.getByRole("tab", { name: /Xabarlar/ }).click();
-  await page.locator("section ul button").first().click();
+  await page.locator("section ul button").nth(1).click();
   await page.fill("input[aria-label=Xabar]", "Salom, savolim bor");
   await page.keyboard.press("Enter");
   await expect(page.getByText(/Avtomatik demo javob|demo chat/).last()).toBeVisible();
-});
-
-test("MEDSTOCK AI: kirim saqlanadi, noto'g'ri chiqim rad etiladi", async ({ page }) => {
-  await page.goto("/stock");
-  await page.locator('button[aria-label$=": kirim"]').first().click();
-  await page.fill("[role=dialog] input[type=number]", "5");
-  await page.getByRole("dialog").getByRole("button", { name: "Saqlash" }).click();
-  await expect(page.getByText(/kirim saqlandi/)).toBeVisible();
-  await page.locator('button[aria-label$=": chiqim"]').first().click();
-  await page.fill("[role=dialog] input[type=number]", "10000");
-  await page.getByRole("dialog").getByRole("button", { name: "Saqlash" }).click();
-  await expect(page.getByRole("dialog").getByRole("alert")).toContainText("Omborda faqat");
 });
 
 test("Til almashtirish: English, Русский, Қазақша, Тоҷикӣ", async ({ page }) => {

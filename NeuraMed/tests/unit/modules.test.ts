@@ -1,25 +1,10 @@
 /** Modullar mantig'i uchun unit testlar: npm run test:unit */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { analyze, itemStatus, seedData } from "@/lib/modules/stock";
 import { slotsFor, doctors } from "@/lib/modules/connect";
 import { allProducts, findProduct, searchProducts, traceSummary } from "@/lib/modules/trace";
 import { dayOffset, isoDay } from "@/lib/modules/dates";
 import { assessMessage, demoReply, libraryTerms } from "@/lib/medai";
-
-const rows = () => seedData("u1").map((d, i) => ({ ...d, id: `s${i}` })) as any[];
-
-test("MEDSTOCK: holatlar va tahlil", () => {
-  const a = analyze(rows());
-  assert.equal(a.counts.total, 14);
-  assert.equal(a.counts.ok + a.counts.low + a.distribution.expiring + a.counts.expired, 14);
-  assert.ok(a.reorder.every((r) => r.suggest > 0), "buyurtma tavsiyasi musbat bo'lishi kerak");
-  assert.ok(a.value > 0);
-  const expired = itemStatus({ ...rows()[0], expiry: dayOffset(-1).toISOString() });
-  assert.equal(expired.key, "expired");
-  const low = itemStatus({ ...rows()[0], qty: 1, min: 50, expiry: dayOffset(400).toISOString() });
-  assert.equal(low.key, "low");
-});
 
 test("MEDCONNECT: band vaqt bo'sh emas deb ko'rsatiladi", () => {
   const doc = doctors[0];

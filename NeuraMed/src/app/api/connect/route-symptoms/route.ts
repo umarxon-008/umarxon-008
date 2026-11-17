@@ -5,7 +5,8 @@ import { requireAuth } from "@/lib/auth";
 import { apiError, HttpError, readJson } from "@/lib/modules/http";
 import { routeSymptoms } from "@/lib/modules/symptoms";
 import { assessMessage } from "@/lib/medai";
-import { doctors, slotsFor } from "@/lib/modules/connect";
+import { slotsFor } from "@/lib/modules/connect";
+import { getDoctors } from "@/lib/modules/doctors";
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,7 +16,7 @@ export async function POST(req: NextRequest) {
     if (text.length < 3) throw new HttpError(400, "Belgilaringizni bir necha soʻz bilan yozing");
     const r = routeSymptoms(text);
     const booked = await prisma.appointment.findMany({ where: { status: "pending" } });
-    const matches = doctors.filter((d) => d.specialty === r.specialty).map((d) => {
+    const matches = (await getDoctors()).filter((d) => d.specialty === r.specialty).map((d) => {
       const first = slotsFor(d, booked.filter((a: any) => a.doctorId === d.id) as any, 1)[0];
       const slot = first?.slots.find((s) => s.free);
       return { id: d.id, name: d.name, specialty: d.specialty, nextFree: first && slot ? { date: first.date, time: slot.time } : null };

@@ -96,7 +96,7 @@ export function AddReminderClient({ defaultMedName, defaultMedId }: Props) {
         throw new Error(data.error || "Xatolik yuz berdi");
       }
 
-      router.push("/reminders");
+      router.push("/medications");
     } catch (err) {
       setError(t(err instanceof Error ? err.message : "Xatolik yuz berdi"));
     } finally {

@@ -23,7 +23,7 @@ export default async function ReminderDetailPage({ params }: { params: { id: str
 
   return (
     <>
-      <TopBar title={reminder.medicationName} showBack backHref="/reminders" />
+      <TopBar title={reminder.medicationName} showBack backHref="/medications" />
       <ReminderDetailClient
         reminder={{
           id: reminder.id,

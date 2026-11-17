@@ -2,22 +2,26 @@
 
 import { useT } from "@/i18n/client";
 import * as React from "react";
-import { CalendarDays, Stethoscope, Building2, MessageCircle, Star, Clock, Languages, MapPin, Send, CalendarCheck, XCircle, Search, Sparkles } from "lucide-react";
+import { CalendarDays, Stethoscope, Building2, MessageCircle, Star, Clock, Languages, MapPin, Send, CalendarCheck, XCircle, Search, Sparkles, ClipboardList, ShieldCheck, ShieldOff } from "lucide-react";
+import { DoctorVisitClient } from "@/components/care/visit-prep";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { LoadingCard, LoadingSpinner } from "@/components/ui/loading";
 import { api, Chip, DemoBadge, DemoNote, EmergencyBanner, Modal, ModuleHero, Toast, useFormat } from "@/components/modules/common";
 import type { Doctor, Clinic } from "@/lib/modules/connect";
 
-type Doc = Doctor & { clinic?: Clinic; nextFree: { date: string; time: string } | null };
-interface Appt { id: string; doctorId: string; date: string; time: string; name: string; phone?: string | null; reason?: string | null; status: string; createdAt: string }
+type Doc = Doctor & { clinic?: Clinic; clinicName?: string; hasAccount?: boolean; nextFree: { date: string; time: string } | null };
+const clinicOf = (d?: Doc) => d?.clinic?.name || d?.clinicName || "";
+interface Appt { id: string; doctorId: string; date: string; time: string; name: string; phone?: string | null; reason?: string | null; status: string; shareAccess?: boolean; createdAt: string }
 interface Msg { id: string; sender: "me" | "doctor"; text: string; createdAt: string }
-type Tab = "doctors" | "clinics" | "appointments" | "messages";
+type Tab = "doctors" | "clinics" | "appointments" | "prep" | "messages";
+interface PastPrep { id: string; symptoms: string[]; urgencyLevel: string; createdAt: string }
 
 const TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
   { id: "doctors", label: "Shifokorlar", icon: Stethoscope },
   { id: "clinics", label: "Muassasalar", icon: Building2 },
   { id: "appointments", label: "Qabullarim", icon: CalendarCheck },
+  { id: "prep", label: "Qabulga tayyorlanish", icon: ClipboardList },
   { id: "messages", label: "Xabarlar", icon: MessageCircle },
 ];
 
@@ -27,7 +31,7 @@ function Avatar({ d, size = 48 }: { d: Doctor; size?: number }) {
   return <span className="inline-flex shrink-0 items-center justify-center rounded-2xl font-bold text-white" style={{ width: size, height: size, background: d.color, fontSize: size / 2.8 }}>{initials(d.name)}</span>;
 }
 
-export function ConnectClient({ initialTab, userName }: { initialTab?: string; userName: string }) {
+export function ConnectClient({ initialTab, userName, pastPreps = [] }: { initialTab?: string; userName: string; pastPreps?: PastPrep[] }) {
   const t = useT();
   const fmt = useFormat();
   const { day: formatDay, weekday } = fmt;
@@ -64,12 +68,19 @@ export function ConnectClient({ initialTab, userName }: { initialTab?: string; u
     setToast(t("Qabul bekor qilindi")); load();
   };
 
+  const toggleShare = async (a: Appt) => {
+    const next = a.shareAccess === false;
+    if (!next && !confirm(t("Shifokor endi maʼlumotlaringizni (karta, tahlillar, chekap) koʻra olmaydi. Davom etilsinmi?"))) return;
+    await api(`/api/connect/appointments/${a.id}`, { method: "PATCH", json: { action: "share", value: next } }).catch(() => {});
+    setToast(next ? t("Shifokorga ruxsat berildi") : t("Shifokor ruxsati bekor qilindi")); load();
+  };
+
   const openChat = (id: string) => { setProfile(null); setChatDoc(id); setTab("messages"); };
 
   return (
     <div className="px-4 py-4 space-y-4">
-      <ModuleHero icon={CalendarDays} name="MEDCONNECT" title={t("Shifokor topish, qabulga yozilish, maslahat")} text="Mutaxassis boʻyicha shifokorni tanlang, boʻsh vaqtni koʻring va bir necha bosishda qabulga yoziling." />
-      <DemoNote>{t("Namunaviy shifokorlar va muassasalar — haqiqiy shaxslar emas. Qabul real tizimda belgilanmaydi, chatdagi javoblar avtomatik.")}</DemoNote>
+      <ModuleHero icon={CalendarDays} name="MEDCONNECT" title={t("Shifokor topish, qabulga yozilish, maslahat")} text="Shifokorni tanlang, qabulga yoziling, qabulga tayyorlaning va shifokor bilan yozishing — hammasi bir joyda." />
+      <DemoNote>{t("Katalogdagi shifokorlar namunaviy. NeuraMed'da hisobi bor shifokor sizning qabulingizni, belgilaringizni va xabarlaringizni oʻz panelida koʻradi; boshqalarida javoblar avtomatik (demo).")}</DemoNote>
 
       <div role="tablist" className="flex gap-1 overflow-x-auto rounded-2xl bg-white dark:bg-slate-900 p-1 shadow-soft">
         {TABS.map((it) => {
@@ -105,9 +116,10 @@ export function ConnectClient({ initialTab, userName }: { initialTab?: string; u
                       <div className="min-w-0 flex-1">
                         <p className="font-bold text-slate-900 dark:text-white">{t(d.name)}</p>
                         <p className="text-sm text-teal-700 dark:text-teal-400 font-medium">{t(d.specialty)}</p>
-                        <p className="truncate text-xs text-slate-500">{t(d.clinic?.name ?? "")}</p>
+                        <p className="truncate text-xs text-slate-500">{t(clinicOf(d))}</p>
                       </div>
-                      <span className="inline-flex items-center gap-1 self-start text-sm font-bold text-amber-500"><Star className="h-4 w-4 fill-amber-400" />{d.rating}</span>
+                      {d.rating ? <span className="inline-flex items-center gap-1 self-start text-sm font-bold text-amber-500"><Star className="h-4 w-4 fill-amber-400" />{d.rating}</span>
+                        : <span className="self-start rounded-full bg-teal-50 dark:bg-teal-900/30 px-2 py-0.5 text-[10px] font-bold text-teal-700 dark:text-teal-300">{t("Yangi")}</span>}
                     </div>
                     <p className="text-xs text-slate-500 flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" />
                       {d.nextFree ? <>{t("Eng yaqin boʻsh vaqt:")} <b className="text-slate-700 dark:text-slate-200">{weekday(d.nextFree.date)}, {formatDay(d.nextFree.date)} · {d.nextFree.time}</b></> : t("Yaqin kunlarda boʻsh vaqt yoʻq")}
@@ -149,15 +161,33 @@ export function ConnectClient({ initialTab, userName }: { initialTab?: string; u
                     <div className="min-w-0 flex-1">
                       <p className="font-semibold text-slate-900 dark:text-white">{t(d?.name ?? "")} · <span className="text-teal-700 dark:text-teal-400">{t(d?.specialty ?? "")}</span></p>
                       <p className="text-sm text-slate-600 dark:text-slate-300">{weekday(a.date)}, {formatDay(a.date)} · {a.time}</p>
-                      <p className="text-xs text-slate-400">{t(d?.clinic?.name ?? "")}{a.reason ? ` · ${a.reason}` : ""}</p>
+                      <p className="text-xs text-slate-400">{t(clinicOf(d))}{a.reason ? ` · ${a.reason}` : ""}</p>
+                      {active && d?.hasAccount && (
+                        <p className={cn("mt-1 inline-flex items-center gap-1 text-[11px] font-semibold", a.shareAccess === false ? "text-slate-400" : "text-teal-700 dark:text-teal-400")}>
+                          {a.shareAccess === false ? <ShieldOff className="h-3.5 w-3.5" /> : <ShieldCheck className="h-3.5 w-3.5" />}
+                          {a.shareAccess === false ? t("Shifokor maʼlumotlaringizni koʻra olmaydi") : t("Shifokor kartangiz, tahlillaringiz va chekapingizni koʻradi")}
+                        </p>
+                      )}
                     </div>
                     {active ? (
-                      <><DemoBadge>{t("Kutilmoqda · demo")}</DemoBadge><Button variant="ghost" size="sm" onClick={() => cancel(a.id)}><XCircle className="h-4 w-4" /> {t("Bekor qilish")}</Button></>
+                      <div className="flex flex-wrap items-center gap-1">
+                        {d?.hasAccount ? <span className="rounded-full bg-teal-50 dark:bg-teal-900/30 px-2 py-0.5 text-[10px] font-bold text-teal-700 dark:text-teal-300">{t("Kutilmoqda")}</span> : <DemoBadge>{t("Kutilmoqda · demo")}</DemoBadge>}
+                        {d?.hasAccount && <Button variant="ghost" size="sm" onClick={() => toggleShare(a)}>{a.shareAccess === false ? t("Ruxsat berish") : t("Ruxsatni bekor qilish")}</Button>}
+                        <Button variant="ghost" size="sm" onClick={() => setTab("prep")}><ClipboardList className="h-4 w-4" /> {t("Tayyorlanish")}</Button>
+                        <Button variant="ghost" size="sm" onClick={() => cancel(a.id)}><XCircle className="h-4 w-4" /> {t("Bekor qilish")}</Button>
+                      </div>
                     ) : <span className="text-xs font-semibold text-slate-400">{t("Bekor qilingan")}</span>}
                   </article>
                 );
               })}
             </section>
+          )}
+
+          {tab === "prep" && (
+            <DoctorVisitClient
+              pastPreps={pastPreps}
+              appointments={upcoming.map((a) => { const d = docById(a.doctorId); return { id: a.id, label: `${formatDay(a.date)} · ${a.time} — ${t(d?.name ?? "")} (${t(d?.specialty ?? "")})` }; })}
+            />
           )}
 
           {tab === "messages" && <Messages doctors={doctors} unread={unread} active={chatDoc} onPick={(id) => { setChatDoc(id); setUnread((u) => ({ ...u, [id]: 0 })); }} />}
@@ -167,12 +197,12 @@ export function ConnectClient({ initialTab, userName }: { initialTab?: string; u
       <Modal open={!!profile} onClose={() => setProfile(null)} title={t("Shifokor profili")}>
         {profile && (
           <div className="space-y-3 text-sm">
-            <div className="flex gap-3 items-center"><Avatar d={profile} size={56} /><div><p className="text-lg font-bold text-slate-900 dark:text-white">{t(profile.name)}</p><p className="text-teal-700 dark:text-teal-400">{t(profile.specialty)} · {profile.experience} {t("yil tajriba")}</p></div></div>
-            <p className="text-slate-600 dark:text-slate-300">{t(profile.about)}</p>
-            <p className="flex items-center gap-1.5 text-slate-500"><Languages className="h-4 w-4" />{profile.languages.map((l) => t(l)).join(", ")}</p>
-            <p className="flex items-center gap-1.5 text-slate-500"><Building2 className="h-4 w-4" />{t(profile.clinic?.name ?? "")}, {t(profile.clinic?.city ?? "")}</p>
+            <div className="flex gap-3 items-center"><Avatar d={profile} size={56} /><div><p className="text-lg font-bold text-slate-900 dark:text-white">{t(profile.name)}</p><p className="text-teal-700 dark:text-teal-400">{t(profile.specialty)}{profile.experience ? <> · {profile.experience} {t("yil tajriba")}</> : null}</p></div></div>
+            {profile.about && <p className="text-slate-600 dark:text-slate-300">{t(profile.about)}</p>}
+            {profile.languages.length > 0 && <p className="flex items-center gap-1.5 text-slate-500"><Languages className="h-4 w-4" />{profile.languages.map((l) => t(l)).join(", ")}</p>}
+            <p className="flex items-center gap-1.5 text-slate-500"><Building2 className="h-4 w-4" />{t(clinicOf(profile))}{profile.clinic?.city ? `, ${t(profile.clinic.city)}` : ""}</p>
             <p className="flex items-center gap-1.5 text-slate-500"><Clock className="h-4 w-4" />{t("Qabul:")} {profile.workDays.map((d) => fmt.weekdayName(d)).join(", ")} · {profile.hours[0]}:00–{profile.hours[1]}:00</p>
-            <p className="text-xs text-amber-700 dark:text-amber-400">{t("Namunaviy profil — haqiqiy shifokor emas.")}</p>
+            <p className="text-xs text-amber-700 dark:text-amber-400">{profile.hasAccount ? t("NeuraMed'da hisobi bor shifokor (demo: litsenziya tekshirilmagan).") : t("Namunaviy profil — haqiqiy shifokor emas.")}</p>
             <div className="flex gap-2 pt-1">
               <Button variant="outline" className="flex-1" onClick={() => openChat(profile.id)}><MessageCircle className="h-4 w-4" /> {t("Xabar yozish")}</Button>
               <Button variant="gradient" className="flex-1" onClick={() => { setBooking(profile); setProfile(null); }}>{t("Qabulga yozilish")}</Button>
@@ -181,7 +211,7 @@ export function ConnectClient({ initialTab, userName }: { initialTab?: string; u
         )}
       </Modal>
 
-      {booking && <BookingModal doc={booking} userName={userName} onClose={() => setBooking(null)} onDone={() => { setBooking(null); setToast(t("Qabulga yozildingiz (demo)")); setTab("appointments"); load(); }} />}
+      {booking && <BookingModal doc={booking} userName={userName} onClose={() => setBooking(null)} onDone={() => { setBooking(null); setToast(t("Qabulga yozildingiz")); setTab("appointments"); load(); }} />}
       <Toast text={toast} onDone={() => setToast(null)} />
     </div>
   );
@@ -248,7 +278,7 @@ function BookingModal({ doc, userName, onClose, onDone }: { doc: Doc; userName: 
           <Button variant="gradient" className="w-full" disabled={!date || !time || busy} onClick={submit}>
             {time ? `${formatDay(date)} · ${time} — ${t("tasdiqlash")}` : t("Vaqtni tanlang")}
           </Button>
-          <p className="text-center text-[11px] text-slate-400">{t("Demo: qabul real tizimda belgilanmaydi va shifokorga xabar yuborilmaydi.")}</p>
+          <p className="text-center text-[11px] text-slate-400">{doc.hasAccount ? t("Yozilganingizdan soʻng shifokor kartangiz, tahlillaringiz va chekapingizni koʻradi. Ruxsatni istalgan vaqtda bekor qilasiz.") : t("Demo: qabul real tizimda belgilanmaydi va shifokorga xabar yuborilmaydi.")}</p>
         </div>
       )}
     </Modal>
@@ -276,11 +306,11 @@ function SymptomRouter({ onBook }: { onBook: (doctorId: string) => void }) {
     <div className="card-base p-4 space-y-3">
       <h3 className="flex items-center gap-2 font-bold text-slate-900 dark:text-white"><Sparkles className="h-4 w-4 text-teal-600 dark:text-teal-400" />{t("Qaysi shifokorga borishni bilmayapsizmi?")}</h3>
       <form onSubmit={(e) => { e.preventDefault(); go(); }} className="flex gap-2">
-        <input className="input-base flex-1" value={text} maxLength={500} onChange={(e) => setText(e.target.value)} placeholder={t("Belgilaringizni yozing: masalan, bosim tez-tez koʻtariladi")} aria-label={t("Belgilaringiz")} />
+        <input className="input-base flex-1" value={text} maxLength={500} onChange={(e) => setText(e.target.value)} placeholder={t("Belgilaringizni yozing: masalan, yurak tez uradi")} aria-label={t("Belgilaringiz")} />
         <Button type="submit" variant="gradient" disabled={busy || text.trim().length < 3}>{t("Tavsiya")}</Button>
       </form>
       <div className="flex flex-wrap gap-2">
-        {["Bosim koʻtariladi, yurak tez uradi", "Bosh ogʻrigʻi va uyqusizlik", "Bolam tez-tez shamollaydi"].map((x) => <Chip key={x} onClick={() => go(t(x))}>{t(x)}</Chip>)}
+        {["Yurak tez uradi, hansirayman", "Bosh ogʻrigʻi va uyqusizlik", "Bolam tez-tez shamollaydi"].map((x) => <Chip key={x} onClick={() => go(t(x))}>{t(x)}</Chip>)}
       </div>
       {error && <p role="alert" className="text-sm text-red-600 dark:text-red-400">{error}</p>}
       {r && (
@@ -312,6 +342,7 @@ function Messages({ doctors, unread, active, onPick }: { doctors: Doc[]; unread:
   const [text, setText] = React.useState("");
   const [busy, setBusy] = React.useState(false);
   const [emergency, setEmergency] = React.useState(false);
+  const [live, setLive] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const endRef = React.useRef<HTMLDivElement>(null);
   const doc = doctors.find((d) => d.id === active);
@@ -319,7 +350,7 @@ function Messages({ doctors, unread, active, onPick }: { doctors: Doc[]; unread:
   React.useEffect(() => {
     setEmergency(false); setError(null);
     if (!active) return;
-    api<{ data: Msg[] }>(`/api/connect/messages?doctorId=${active}`).then((r) => setMsgs(r.data)).catch(() => setMsgs([]));
+    api<{ data: Msg[]; live: boolean }>(`/api/connect/messages?doctorId=${active}`).then((r) => { setMsgs(r.data); setLive(r.live); }).catch(() => setMsgs([]));
   }, [active]);
   React.useEffect(() => { endRef.current?.scrollIntoView({ block: "end" }); }, [msgs]);
 
@@ -330,9 +361,9 @@ function Messages({ doctors, unread, active, onPick }: { doctors: Doc[]; unread:
     setMsgs((m) => [...m, { id: `tmp${Date.now()}`, sender: "me", text: msg, createdAt: new Date().toISOString() }]);
     setText("");
     try {
-      const r = await api<{ reply: Msg; flags: { emergency: boolean } }>("/api/connect/messages", { method: "POST", json: { doctorId: active, text: msg } });
+      const r = await api<{ reply: Msg | null; flags: { emergency: boolean } }>("/api/connect/messages", { method: "POST", json: { doctorId: active, text: msg } });
       setEmergency(r.flags.emergency);
-      setTimeout(() => setMsgs((m) => [...m, r.reply]), 600);
+      if (r.reply) setTimeout(() => setMsgs((m) => [...m, r.reply as Msg]), 600);
     } catch (e: any) { setError(t(e.message)); } finally { setBusy(false); }
   };
 
@@ -357,7 +388,7 @@ function Messages({ doctors, unread, active, onPick }: { doctors: Doc[]; unread:
             <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
               <Avatar d={doc} size={36} />
               <div className="flex-1"><p className="font-semibold text-slate-900 dark:text-white">{t(doc.name)}</p><p className="text-[11px] text-slate-400">{t(doc.specialty)}</p></div>
-              <DemoBadge>{t("Avtomatik javob")}</DemoBadge>
+              {live ? <span className="rounded-full bg-teal-50 dark:bg-teal-900/30 px-2 py-0.5 text-[10px] font-bold text-teal-700 dark:text-teal-300">{t("Shifokor oʻzi javob beradi")}</span> : <DemoBadge>{t("Avtomatik javob")}</DemoBadge>}
             </div>
             <div className="flex-1 space-y-2 overflow-y-auto py-3 max-h-[50vh]">
               {msgs.length === 0 && <p className="text-center text-xs text-slate-400">{t("Xabarlar yoʻq. Savolingizni yozing.")}</p>}

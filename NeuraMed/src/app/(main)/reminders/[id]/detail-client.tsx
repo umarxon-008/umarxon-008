@@ -73,7 +73,7 @@ export function ReminderDetailClient({ reminder: initial, logs: initialLogs }: P
   const handleDelete = async () => {
     setLoading(true);
     await fetch(`/api/reminders/${reminder.id}`, { method: "DELETE" });
-    router.push("/reminders");
+    router.push("/medications");
   };
 
   return (

@@ -1,5 +1,5 @@
 /**
- * Chekap (Health Score): turmush tarzi va shikoyatlar bo'yicha 1 daqiqalik so'rovnoma.
+ * Chekap (Health Score): shifokor bemor bilan birga to'ldiradigan so'rovnoma (turmush tarzi va shikoyatlar).
  * Ball — salomatlikka g'amxo'rlik ko'rsatkichi, TASHXIS EMAS. Matnlar o'zbekcha kalit (t() bilan tarjima).
  */
 export type Area = "heart" | "digest" | "musculo" | "nerve" | "immune";
@@ -18,7 +18,6 @@ export interface Question { id: string; text: string; areas: Area[]; options: Op
 export const QUESTIONS: Question[] = [
   { id: "activity", text: "Haftada necha kun kamida 30 daqiqa jismoniy faollik qilasiz?", areas: ["heart", "musculo"], options: [{ label: "Deyarli hech", score: 20 }, { label: "1–2 kun", score: 55 }, { label: "3–4 kun", score: 85 }, { label: "5 kun va undan koʻp", score: 100 }] },
   { id: "smoking", text: "Chekasizmi (sigaret, nos, vape)?", areas: ["heart", "immune"], options: [{ label: "Yoʻq", score: 100 }, { label: "Tashlaganman", score: 80 }, { label: "Baʼzan", score: 45 }, { label: "Har kuni", score: 15 }] },
-  { id: "bp", text: "Oxirgi oʻlchangan qon bosimingiz qanday edi?", areas: ["heart"], options: [{ label: "Meʼyorda (140/90 dan past)", score: 100 }, { label: "Bilmayman / oʻlchamaganman", score: 60 }, { label: "Koʻpincha yuqori", score: 30 }] },
   { id: "chest", text: "Ko‘krak og‘rig‘i yoki hansirash bo‘ladimi?", areas: ["heart"], options: [{ label: "Yoʻq", score: 100 }, { label: "Faqat katta yuklamada", score: 70 }, { label: "Oddiy yurganda ham", score: 25, flag: "urgent" }, { label: "Hozir, tinch holatda", score: 0, flag: "emergency" }] },
   { id: "food", text: "Kuniga meva va sabzavotni necha marta iste’mol qilasiz?", areas: ["digest", "immune"], options: [{ label: "Kamdan-kam", score: 30 }, { label: "1–2 marta", score: 65 }, { label: "3 va undan koʻp", score: 100 }] },
   { id: "digest", text: "Qorin ogʻrigʻi, zarda qaynashi yoki ich qotishi bezovta qiladimi?", areas: ["digest"], options: [{ label: "Yoʻq", score: 100 }, { label: "Baʼzan", score: 65 }, { label: "Haftada bir necha marta", score: 30, flag: "urgent" }] },
@@ -31,7 +30,7 @@ export const QUESTIONS: Question[] = [
 ];
 
 const TIPS: Record<Area, string[]> = {
-  heart: ["Haftada kamida 150 daqiqa oʻrtacha faollik (masalan, tez yurish) yurak uchun foydali.", "Bosimni haftasiga bir necha marta oʻlchab, “Koʻrsatkichlar” boʻlimiga yozib boring.", "Chekishni tashlash boʻyicha shifokordan yordam soʻrang."],
+  heart: ["Haftada kamida 150 daqiqa oʻrtacha faollik (masalan, tez yurish) yurak uchun foydali.", "Chekishni tashlash boʻyicha shifokordan yordam soʻrang."],
   digest: ["Har kuni meva-sabzavot va yetarli suv iching.", "Shikoyatlar takrorlansa, gastroenterolog yoki terapevtga yoziling."],
   musculo: ["Uzoq oʻtirganda har soatda 5 daqiqa harakat qiling.", "Doimiy ogʻriq boʻlsa, nevrolog yoki terapevt bilan maslahatlashing."],
   nerve: ["Bir xil vaqtda yotib, 7–9 soat uxlashga harakat qiling.", "Kuchli stress uzoq davom etsa, mutaxassis bilan gaplashing — bu odatiy holat."],

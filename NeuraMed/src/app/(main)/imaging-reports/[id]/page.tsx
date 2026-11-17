@@ -24,7 +24,7 @@ export default async function ImagingDetailPage({ params }: { params: { id: stri
 
   return (
     <>
-      <TopBar title={report.fileName || t("Hisobot")} showBack backHref="/imaging-reports" />
+      <TopBar title={report.fileName || t("Hisobot")} showBack backHref="/lab-reports?tab=imaging" />
       <ImagingDetailClient
         report={{
           id: report.id,

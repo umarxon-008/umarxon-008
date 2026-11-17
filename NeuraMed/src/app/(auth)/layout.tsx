@@ -18,9 +18,10 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
         <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl p-6">
           {children}
         </div>
-        <p className="text-center text-xs text-white/50 mt-6">
-          {t("© 2026 NeuraMed. Tibbiy maslahat emas.")}
-        </p>
+        <footer className="text-center text-[11px] leading-relaxed text-white/60 mt-6">
+          <p>{t("NeuraMed tashxis qoʻymaydi va dori buyurmaydi. Shoshilinch holatda — 103.")}</p>
+          <p className="mt-1">© 2026 NeuraMed · Toshkent AI Hackathon</p>
+        </footer>
       </div>
     </div>
   );

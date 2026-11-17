@@ -9,12 +9,23 @@ import {
 } from "@/lib/auth";
 import { z } from "zod";
 import { cookies } from "next/headers";
+import { ensureDemoData } from "@/lib/demo-seed";
+import { roleOf } from "@/lib/auth";
 
 const registerSchema = z.object({
   name: z.string().min(2, "Ism kamida 2 ta belgi bo'lishi kerak"),
   email: z.string().email("Noto'g'ri email format"),
   password: z.string().min(8, "Parol kamida 8 ta belgi bo'lishi kerak"),
   phone: z.string().optional(),
+  role: z.enum(["patient", "doctor"]).default("patient"),
+  specialty: z.string().trim().max(60).optional(),
+  clinicName: z.string().trim().max(120).optional(),
+  licenseNo: z.string().trim().max(40).optional(),
+}).superRefine((d, ctx) => {
+  if (d.role !== "doctor") return;
+  if (!d.specialty || d.specialty.length < 2) ctx.addIssue({ code: "custom", path: ["specialty"], message: "Mutaxassislikni kiriting" });
+  if (!d.clinicName || d.clinicName.length < 2) ctx.addIssue({ code: "custom", path: ["clinicName"], message: "Ish joyini kiriting" });
+  if (!d.licenseNo || d.licenseNo.length < 3) ctx.addIssue({ code: "custom", path: ["licenseNo"], message: "Litsenziya raqamini kiriting" });
 });
 
 const loginSchema = z.object({
@@ -43,17 +54,18 @@ export async function POST(req: NextRequest) {
       const { user, token } = await registerUser(data);
       setSessionCookie(token);
       return NextResponse.json({
-        user: { id: user.id, name: user.name, email: user.email },
+        user: { id: user.id, name: user.name, email: user.email, role: roleOf(user) },
       });
     }
 
     if (action === "login") {
       const body = await req.json();
       const data = loginSchema.parse(body);
+      await ensureDemoData().catch(() => {});
       const { user, token } = await loginUser(data);
       setSessionCookie(token);
       return NextResponse.json({
-        user: { id: user.id, name: user.name, email: user.email },
+        user: { id: user.id, name: user.name, email: user.email, role: roleOf(user) },
       });
     }
 

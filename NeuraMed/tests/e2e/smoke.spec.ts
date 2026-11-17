@@ -8,10 +8,12 @@ const PAGES: [string, RegExp][] = [
   ["/trace", /Mahalliy dorilarga ishonch/],
   ["/trace/MP-10004", /Taʼminot zanjiri/],
   ["/connect", /Shifokor topish, qabulga yozilish/],
-  ["/stock", /Dorixona zaxirasi nazorat ostida/],
+  ["/checkup", /Chekap — shifokor oʻtkazadi/],
+  ["/medications", /Mening dorilarim/],
+  ["/lab-reports", /Laboratoriya tahlillari/],
   ["/more", /Loyiha haqida/],
   ["/about", /Xavfsizlik qoidalari/],
-  ["/reminders", /Dori eslatmalari/],
+  ["/connect?tab=prep", /Qaysi qabulga tayyorlanyapsiz/],
   ["/settings", /Til/],
 ];
 
@@ -28,8 +30,8 @@ test("barcha asosiy sahifalar xatosiz ochiladi", async ({ page }) => {
 });
 
 test("kirmasdan sahifa login'ga, API esa 401 qaytaradi", async ({ page, request }) => {
-  await page.goto("/stock");
+  await page.goto("/doctor");
   await expect(page).toHaveURL(/\/login/);
-  const r = await request.get("/api/stock");
+  const r = await request.get("/api/doctor/patients");
   expect(r.status()).toBe(401);
 });

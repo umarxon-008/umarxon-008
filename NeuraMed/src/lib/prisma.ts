@@ -24,8 +24,6 @@ interface LocalDB {
   assistantThread: Record<string, any>[];
   appointment: Record<string, any>[];
   doctorMessage: Record<string, any>[];
-  stockItem: Record<string, any>[];
-  stockMovement: Record<string, any>[];
   traceReport: Record<string, any>[];
   // Salomatligim
   healthCard: Record<string, any>[];
@@ -33,7 +31,7 @@ interface LocalDB {
   checkup: Record<string, any>[];
 }
 
-const EXTRA_TABLES = ["assistantThread", "appointment", "doctorMessage", "stockItem", "stockMovement", "traceReport", "healthCard", "vitalReading", "checkup"] as const;
+const EXTRA_TABLES = ["assistantThread", "appointment", "doctorMessage", "traceReport", "healthCard", "vitalReading", "checkup"] as const;
 
 function getInitialLocalDB(): LocalDB {
   const now = new Date().toISOString();
@@ -124,8 +122,6 @@ function getInitialLocalDB(): LocalDB {
     assistantThread: [],
     appointment: [],
     doctorMessage: [],
-    stockItem: [],
-    stockMovement: [],
     traceReport: [],
     healthCard: [],
     vitalReading: [],
@@ -180,6 +176,7 @@ function reviveDates(obj: any): any {
     "endDate",
     "scheduledAt",
     "takenAt",
+    "notifReadAt",
   ]) {
     if (typeof copy[k] === "string") {
       copy[k] = new Date(copy[k]);

@@ -75,6 +75,15 @@ model User {
   pregnancyStatus  PregnancyStatus @default(NOT_APPLICABLE)
   emergencyContact String?         // encrypted JSON {name, phone}
   language         String          @default("uz")
+  // Rol: "patient" (bemor) yoki "doctor" (shifokor)
+  role             String          @default("patient")
+  specialty        String?         // shifokor: mutaxassislik
+  clinicName       String?         // shifokor: ish joyi
+  licenseNo        String?         // shifokor: litsenziya raqami (demo: tekshirilmaydi)
+  workDaysJson     String?         // shifokor: ish kunlari [1..6]
+  workHoursJson    String?         // shifokor: [boshlanish, tugash] soat
+  doctorRef        String?         // MEDCONNECT katalogidagi shifokor identifikatori
+  notifReadAt      DateTime?       // bildirishnomalar oxirgi marta o'qilgan vaqt
   pushSubscriptionJson String?     // encrypted Web Push subscription
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
@@ -88,8 +97,6 @@ model User {
   assistantThreads AssistantThread[]
   appointments     Appointment[]
   doctorMessages   DoctorMessage[]
-  stockItems       StockItem[]
-  stockMovements   StockMovement[]
   traceReports     TraceReport[]
   healthCard       HealthCard?
   vitalReadings    VitalReading[]
@@ -225,6 +232,7 @@ model DoctorVisitPrep {
   chronicCondJson String?
   pregnancyNote   String?
   aiResultJson    String?      // AI generated prep result
+  appointmentId   String?      // qaysi qabulga tayyorlanish
   urgencyLevel    UrgencyLevel @default(LOW)
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
@@ -261,6 +269,7 @@ model Appointment {
   phone     String?
   reason    String?
   status    String   @default("pending") // pending | cancelled
+  shareAccess Boolean @default(true)       // bemor shifokorga ma'lumotlarini ko'rishga ruxsat bergan
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -280,43 +289,6 @@ model DoctorMessage {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, doctorId])
-}
-
-// ─── MEDSTOCK AI (zaxira) ─────────────────────────────────────────────────────
-
-model StockItem {
-  id        String   @id @default(cuid())
-  userId    String
-  name      String
-  category  String
-  unit      String
-  qty       Int
-  min       Int
-  avgDaily  Float
-  batch     String
-  expiry    String   // YYYY-MM-DD
-  shelf     String
-  price     Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-}
-
-model StockMovement {
-  id        String   @id @default(cuid())
-  userId    String
-  itemId    String
-  type      String   // in | out
-  qty       Int
-  note      String?
-  at        DateTime @default(now())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
 }
 
 // ─── PHARMA TRACE ─────────────────────────────────────────────────────────────
@@ -350,7 +322,7 @@ model HealthCard {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-/// Hayotiy ko'rsatkich o'lchovi: bosim (value/value2), puls, vazn, qand, harorat, SpO2, uyqu
+/// Ko'rsatkich o'lchovi (faqat shifokor kiritadi): puls, vazn, qand, harorat, SpO2, uyqu
 model VitalReading {
   id        String   @id @default(cuid())
   userId    String
@@ -358,6 +330,8 @@ model VitalReading {
   value     Float
   value2    Float?
   note      String?
+  doctorRef  String?  // kiritgan shifokor
+  doctorName String?
   at        DateTime @default(now())
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -372,6 +346,9 @@ model Checkup {
   answersJson String
   score       Int
   scoresJson  String
+  doctorRef   String?  // chekapni o'tkazgan shifokor
+  doctorName  String?
+  conclusion  String?  // shifokor xulosasi
   createdAt   DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 

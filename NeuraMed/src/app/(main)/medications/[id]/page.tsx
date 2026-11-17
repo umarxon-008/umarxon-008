@@ -67,7 +67,7 @@ export default async function MedicationDetailPage({ params, searchParams }: Pro
       <TopBar
         title={info?.drug_name || drugName}
         showBack
-        backHref="/medications/search"
+        backHref="/medications?tab=search"
       />
       <MedicationDetailClient
         info={info}

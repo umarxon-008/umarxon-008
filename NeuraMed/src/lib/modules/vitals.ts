@@ -1,10 +1,10 @@
 /**
- * Hayotiy ko'rsatkichlar: turlar, ruxsat etilgan oraliq va umumiy baholash qoidalari.
+ * Ko'rsatkichlar (chekapning bir qismi, faqat shifokor kiritadi): turlar, oraliq va umumiy baholash qoidalari.
  * Chegaralar umumqabul qilingan kattalar ko'rsatkichlari — tashxis emas; shifokor boshqacha belgilashi mumkin.
  * Matnlar o'zbekcha kalit sifatida qaytadi (brauzerda t() bilan tarjima qilinadi).
  */
 
-export type VitalType = "bp" | "pulse" | "weight" | "glucose" | "temp" | "spo2" | "sleep";
+export type VitalType = "pulse" | "weight" | "glucose" | "temp" | "spo2" | "sleep";
 export type Level = "ok" | "info" | "warn" | "danger";
 
 export interface VitalDef {
@@ -19,7 +19,6 @@ export interface VitalDef {
 }
 
 export const VITALS: VitalDef[] = [
-  { type: "bp", label: "Qon bosimi", unit: "mm sim. ust.", min: 60, max: 260, min2: 30, max2: 160, step: 1 },
   { type: "pulse", label: "Puls", unit: "zarba/daq", min: 25, max: 230, step: 1 },
   { type: "glucose", label: "Qondagi qand", unit: "mmol/l", min: 1, max: 35, step: 0.1 },
   { type: "weight", label: "Vazn", unit: "kg", min: 2, max: 350, step: 0.1 },
@@ -53,18 +52,6 @@ export function assessVital(type: VitalType, value: number, value2: number | nul
   const callNote: Msg = { text: "Kuchli koʻkrak ogʻrigʻi, nafas qisishi, nutq buzilishi yoki hushdan ketish boʻlsa — darhol 103 ga qoʻngʻiroq qiling." };
 
   switch (type) {
-    case "bp": {
-      const sys = value, dia = value2 ?? 0;
-      if (sys >= 180 || dia >= 120)
-        return { level: "danger", emergency: true, title: { text: "Juda yuqori bosim: {sys}/{dia}", vars: { sys, dia } }, advice: [{ text: "5 daqiqa tinch oʻtirib, qayta oʻlchang." }, callNote, { text: "Belgilar boʻlmasa ham, bugunoq shifokor bilan bogʻlaning." }] };
-      if (sys >= 140 || dia >= 90) {
-        const above = base.value != null && sys >= base.value + 15;
-        return { level: "warn", emergency: false, title: above ? { text: "Odatdagidan yuqori: {sys}/{dia} (odatda ~{bs}/{bd})", vars: { sys, dia, bs: Math.round(base.value as number), bd: Math.round((base.value2 ?? 0) as number) } } : { text: "Bosim yuqori: {sys}/{dia}", vars: { sys, dia } }, advice: [{ text: "15 daqiqa tinch oʻtirib, qayta oʻlchang." }, { text: "Bir necha kun davomida yuqori boʻlsa, terapevt yoki kardiologga yoziling." }, callNote] };
-      }
-      if (sys < 90 || dia < 60) return { level: "warn", emergency: false, title: { text: "Bosim past: {sys}/{dia}", vars: { sys, dia } }, advice: [{ text: "Bosh aylanishi yoki holsizlik boʻlsa, oʻtiring va shifokorga murojaat qiling." }] };
-      if (base.value != null && sys >= base.value + 15) return { level: "info", emergency: false, title: { text: "Meʼyorda, lekin odatdagidan biroz yuqori: {sys}/{dia}", vars: { sys, dia } }, advice: [{ text: "Keyingi kunlarda kuzatib boring." }] };
-      return ok("Bosim meʼyorda: {sys}/{dia}", { sys, dia });
-    }
     case "pulse":
       if (value > 130 || value < 40) return { level: "danger", emergency: false, title: { text: value > 130 ? "Puls juda tez: {v}" : "Puls juda sekin: {v}", vars: { v: value } }, advice: [{ text: "Tinch holatda qayta oʻlchang; takrorlansa, shifokorga murojaat qiling." }, callNote] };
       if (value > 100 || value < 50) return { level: "warn", emergency: false, title: { text: "Tinch holatdagi puls meʼyordan tashqarida: {v}", vars: { v: value } }, advice: [{ text: "Jismoniy faollik, qahva yoki hayajondan keyin oshishi mumkin. Tinch holatda qayta oʻlchang." }] };
@@ -98,15 +85,13 @@ export function assessVital(type: VitalType, value: number, value2: number | nul
   }
 }
 
-/** Demo hisob uchun 14 kunlik namunaviy o'lchovlar. */
+/** Demo hisob uchun 14 kunlik namunaviy o'lchovlar (shifokor kiritgan deb belgilanadi). */
 export function demoVitals(userId: string) {
   const out: { userId: string; type: VitalType; value: number; value2?: number; at: Date; note?: string }[] = [];
   const day = (d: number, h: number) => { const x = new Date(); x.setDate(x.getDate() - d); x.setHours(h, 0, 0, 0); return x; };
   const wobble = (i: number, a: number) => Math.round(Math.sin(i * 1.7) * a);
   for (let d = 13; d >= 0; d--) {
     const i = 13 - d;
-    const high = d <= 1; // oxirgi ikki kun — AIVITA misolidagi kabi odatdagidan yuqori
-    out.push({ userId, type: "bp", value: high ? 142 - d * 3 : 123 + wobble(i, 4), value2: high ? 91 - d * 2 : 79 + wobble(i + 2, 3), at: day(d, 8), note: "namuna" });
     out.push({ userId, type: "pulse", value: 72 + wobble(i, 6), at: day(d, 8), note: "namuna" });
     if (d % 2 === 0) out.push({ userId, type: "glucose", value: Math.round((5.2 + Math.sin(i) * 0.4) * 10) / 10, at: day(d, 7), note: "namuna" });
     if (d % 3 === 0) out.push({ userId, type: "weight", value: Math.round((60.4 - i * 0.05) * 10) / 10, at: day(d, 7), note: "namuna" });

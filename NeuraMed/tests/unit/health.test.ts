@@ -1,20 +1,16 @@
 /** "Salomatligim" modullari: ko'rsatkichlarni baholash, dorilar mosligi, chekap, belgilar bo'yicha yo'naltirish. */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { assessVital } from "@/lib/modules/vitals";
+import { assessVital, VITALS } from "@/lib/modules/vitals";
 import { checkInteractions, identify } from "@/lib/modules/interactions";
 import { scoreCheckup, QUESTIONS } from "@/lib/modules/checkup";
 import { routeSymptoms } from "@/lib/modules/symptoms";
 
-test("Bosim: juda yuqori — shoshilinch, shaxsiy normadan yuqori — ogohlantirish", () => {
-  const crisis = assessVital("bp", 185, 121, []);
-  assert.equal(crisis.level, "danger");
-  assert.equal(crisis.emergency, true);
-  const history = Array.from({ length: 10 }, () => ({ value: 122, value2: 79 }));
-  const high = assessVital("bp", 142, 91, history);
-  assert.equal(high.level, "warn");
-  assert.match(high.title.text, /Odatdagidan yuqori/);
-  assert.equal(assessVital("bp", 118, 76, history).level, "ok");
+test("Qon bosimi olib tashlangan; puls va qand baholanadi", () => {
+  assert.ok(!VITALS.some((v) => (v.type as string) === "bp"), "koʻrsatkichlarda bosim boʻlmasligi kerak");
+  assert.ok(!QUESTIONS.some((q) => q.id === "bp"), "chekapda bosim savoli boʻlmasligi kerak");
+  assert.equal(assessVital("pulse", 140, null, []).level, "danger");
+  assert.equal(assessVital("pulse", 72, null, []).level, "ok");
 });
 
 test("SpO2, qand, harorat chegaralari", () => {
@@ -46,7 +42,7 @@ test("Chekap: ball 0–100, xavfli javob — shoshilinch", () => {
 });
 
 test("Belgilar bo'yicha mutaxassis (bir necha tilda)", () => {
-  assert.equal(routeSymptoms("Bosim koʻtariladi, yurak tez uradi").specialty, "Kardiolog");
+  assert.equal(routeSymptoms("Yurak tez uradi, hansirayman").specialty, "Kardiolog");
   assert.equal(routeSymptoms("Головная боль и бессонница").specialty, "Nevrolog");
   assert.equal(routeSymptoms("Қант деңгейі жоғары").specialty, "Endokrinolog");
   assert.equal(routeSymptoms("charchoq").fallback, true);

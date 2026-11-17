@@ -2,23 +2,35 @@
 
 > ⚠️ **NeuraMed tashxis qoʻymaydi, dori buyurmaydi va dozani oʻzgartirmaydi.** Shoshilinch holatda — **103** yoki **112**.
 
-NeuraMed — ikki loyihaning birlashmasi:
+NeuraMed — **bemor va shifokor** uchun yagona tibbiy platforma. Roʻyxatdan oʻtishda rol tanlanadi: **Bemor** yoki **Shifokor**; har birining oʻz dashboardi bor.
 
-- **NeuraMed** (asos) — shaxsiy tibbiy yordamchi: dori maʼlumoti, eslatmalar, tahlil va rentgen hisobotlarini oddiy oʻzbek tilida tushuntirish, shifokor qabuliga tayyorlanish. PWA.
-- **MEDPERFECT** — MEDAI, PHARMA TRACE, MEDCONNECT va MEDSTOCK AI modullari. Endi ular ham NeuraMed ichida, bitta hisob, bitta dizayn va bitta backend (Next.js API + Prisma) ustida ishlaydi.
+## 👥 Rollar
 
-## 🧩 Modullar
+| Rol | Bosh sahifa | Nima qila oladi |
+|-----|-------------|-----------------|
+| Bemor | `/dashboard` | Tibbiy karta (QR), chekap natijasi va koʻrsatkichlarni **koʻradi** (kiritmaydi), dorilar, tahlillar, MEDAI, PHARMA TRACE, MEDCONNECT, 🔔 bildirishnomalar, SOS |
+| Shifokor | `/doctor` | Bugungi/yaqin qabullar, "Bemorlarim", bemor sahifasi (karta, dorilar, tahlillar, qabulga tayyorlanish), **chekap oʻtkazish va xulosa**, **koʻrsatkich kiritish**, bemor bilan chat, ish jadvali |
 
-| Modul | Sahifa | Nima qiladi | Holat |
+- Shifokor faqat **oʻziga yozilgan** va ruxsatni bekor qilmagan bemorni koʻradi (`assertPatientAccess`). Bemor ruxsatni MEDCONNECT → "Qabullarim"da bekor qiladi.
+- Rol JWT ichida; `middleware.ts` bemor sahifalarini shifokorga, shifokor sahifalarini bemorga yopadi; API'lar `requirePatient()` / `requireDoctor()` bilan tekshiradi.
+- Roʻyxatdan oʻtgan shifokor MEDCONNECT katalogida chiqadi. Demo: litsenziya **tekshirilmaydi** ("tasdiqlanmagan" belgisi); real versiyada SSV reestri orqali.
+
+## 🧩 Boʻlimlar
+
+| Boʻlim | Sahifa | Nima qiladi | Holat |
 |-------|--------|-------------|-------|
-| Salomatligim | `/medcard`, `/vitals`, `/checkup`, `/interactions`, `/sos` | QR tibbiy karta (ochiq havola `/c/<token>`, istalgan vaqtda oʻchiriladi), koʻrsatkichlar va grafiklar (shaxsiy normaga nisbatan ogohlantirish), 12 savollik chekap (0–100 ball), dorilar oʻzaro taʼsiri (namunaviy roʻyxat), SOS (103/112, joylashuvni ulashish) | Ishlaydi; chegaralar umumqabul qilingan, tashxis emas |
-| Shaxsiy yordamchi | `/dashboard`, `/medications`, `/reminders`, `/lab-reports`, `/imaging-reports`, `/doctor-visit` | Dori, eslatma, tahlil, rentgen, qabulga tayyorlanish | Ishlaydi |
-| MEDAI | `/assistant`, `/library` | AI yordamchi (suhbatlar tarixi, manbalar, xavf ogohlantirishi) va 26 atamali tibbiy kutubxona | Ishlaydi: OpenAI kaliti boʻlsa AI, boʻlmasa qoidaga asoslangan demo |
-| PHARMA TRACE | `/trace` | QR/partiya boʻyicha dori kelib chiqishi, 4 bosqichli taʼminot zanjiri, shubhali holat haqida xabar | Demo maʼlumot |
-| MEDCONNECT | `/connect` | Shifokor va muassasalar, belgilar boʻyicha mutaxassis tavsiyasi, boʻsh vaqtlar, qabulga yozilish, shifokor bilan chat | Demo maʼlumot, avtomatik javob |
-| MEDSTOCK AI | `/stock` | Dorixona zaxirasi, kam qolgan/muddati yaqin dorilar, chiqim grafigi, buyurtma tavsiyasi | Demo ombor, qoidaga asoslangan tahlil |
+| Salomatligim | `/medcard`, `/checkup` | QR tibbiy karta (ochiq havola `/c/<token>`), chekap: shifokor oʻtkazgan 11 savollik soʻrovnoma (0–100 ball, xulosa) + shifokor kiritgan koʻrsatkichlar (puls, qand, vazn, harorat, SpO₂, uyqu) | Ishlaydi; tashxis emas |
+| Dorilar | `/medications` | Mening dorilarim (eslatmalar), dori qidirish, dorilar mosligi — bitta sahifada | Ishlaydi |
+| Tahlillar | `/lab-reports` | Laboratoriya tahlillari va rentgen/tasviriy hisobotlar — bitta sahifada | Ishlaydi |
+| MEDAI | `/assistant`, `/library` | AI yordamchi va 26 atamali tibbiy kutubxona | OpenAI kaliti boʻlsa AI, boʻlmasa demo |
+| PHARMA TRACE | `/trace` | №17: haqiqiylik, sertifikat, laboratoriya, ishonch indeksi, mahalliy muqobil | Demo maʼlumot |
+| MEDCONNECT | `/connect` | Shifokor topish, qabulga yozilish, **qabulga tayyorlanish**, chat — bitta sahifada | Namunaviy katalog + roʻyxatdan oʻtgan shifokorlar |
+| Shifokor paneli | `/doctor`, `/doctor/patients/[id]` | Yuqoridagi "Shifokor" roli | Ishlaydi |
+| Umumiy | header, footer | Til, mavzu, 🔔 bildirishnomalar (dori vaqti, qabul, chekap, xabar, PHARMA TRACE), profil; SOS tugmasi (103 va joylashuvni yuborish) | Ishlaydi |
 
-Namunaviy maʼlumotlar har doim **DEMO** yoki **(namuna)** belgisi bilan koʻrsatiladi. Shifokorlar, klinikalar, dori partiyalari va ombor toʻqima; real tizimlarga ulanmagan.
+Olib tashlangan: qon bosimi, MEDSTOCK AI, alohida SOS sahifasi. Eski havolalar (`/vitals`, `/interactions`, `/reminders`, `/imaging-reports`, `/doctor-visit`, `/sos`, `/stock`) yangi joyiga yoʻnaltiriladi.
+
+Namunaviy maʼlumotlar har doim **DEMO** yoki **(namuna)** belgisi bilan koʻrsatiladi. Katalogdagi shifokorlar, klinikalar va dori partiyalari toʻqima; real tizimlarga ulanmagan.
 
 ---
 
@@ -35,10 +47,10 @@ npm run dev
 
 Brauzerda oching: **http://localhost:3000**
 
-Test hisobi (lokal bazada avtomatik yaratiladi):
+Demo hisoblar (kirishda avtomatik yaratiladi, parol `Test12345!`):
 
-- Email: `test@neuramed.uz`
-- Parol: `Test12345!`
+- Bemor: `test@neuramed.uz`
+- Shifokor: `doctor@neuramed.uz` (Dilnoza Rahimova, namuna) — bemor bilan namunaviy qabul orqali bogʻlangan
 
 ### Muhit oʻzgaruvchilari (`.env.local`)
 
@@ -73,12 +85,12 @@ npm start          # http://localhost:3000
 ```
 src/
 ├── app/(auth)/            # login, register, onboarding
-├── app/(main)/            # barcha sahifalar (dashboard, assistant, library, trace, connect, stock, more, about ...)
-├── app/api/               # backend: auth, medications, reminders, lab/imaging, assistant, trace, connect, stock
+├── app/(main)/            # barcha sahifalar (dashboard, doctor, checkup, medications, lab-reports, trace, connect ...)
+├── app/api/               # backend: auth, medications, reminders, lab/imaging, assistant, trace, connect, doctor
 ├── components/layout/     # logotip, yon menyu (kompyuter), pastki menyu (telefon)
 ├── components/modules/    # modullar uchun umumiy UI (DEMO belgisi, modal, KPI, xavfsiz markdown)
 ├── lib/medai/             # MEDAI: xavfsizlik qoidalari, demo javoblar, kutubxona (MEDPERFECT'dan)
-├── lib/modules/           # PHARMA TRACE, MEDCONNECT, MEDSTOCK biznes-mantigʻi
+├── lib/modules/           # PHARMA TRACE, MEDCONNECT, shifokorlar, chekap, bildirishnomalar mantigʻi
 └── data/                  # namunaviy maʼlumotlar va tibbiy atamalar
 prisma/schema.prisma       # User, Reminder, LabReport ... + AssistantThread, Appointment, DoctorMessage, StockItem, StockMovement, TraceReport
 public/brand/              # NeuraMed logotipi (tabletkali)
@@ -111,11 +123,16 @@ public/brand/              # NeuraMed logotipi (tabletkali)
 | GET | `/api/connect` | MEDCONNECT: shifokorlar va muassasalar |
 | GET | `/api/connect/slots?doctorId=` | Boʻsh vaqtlar |
 | GET/POST | `/api/connect/appointments` | Qabullar / yozilish |
-| PATCH | `/api/connect/appointments/[id]` | Qabulni bekor qilish |
-| GET/POST | `/api/connect/messages` | Shifokor bilan demo chat |
-| GET | `/api/stock` | MEDSTOCK AI: zaxira va tahlil |
-| POST | `/api/stock/movements` | Kirim / chiqim |
-| POST | `/api/stock/reset` | Demo omborni tiklash |
+| PATCH | `/api/connect/appointments/[id]` | Qabulni bekor qilish / shifokorga ruxsat |
+| GET/POST | `/api/connect/messages` | Shifokor bilan chat (hisobi bor shifokor oʻzi javob beradi) |
+| GET | `/api/checkup`, `/api/vitals` | Bemor: chekap va koʻrsatkichlar (faqat oʻqish) |
+| GET | `/api/doctor/patients` | Shifokor: bemorlar va yaqin qabullar |
+| GET | `/api/doctor/patients/[id]` | Shifokor: bemor sahifasi (ruxsat bilan) |
+| GET/POST | `/api/doctor/patients/[id]/checkup` | Shifokor: chekap oʻtkazish |
+| GET/POST/DELETE | `/api/doctor/patients/[id]/vitals` | Shifokor: koʻrsatkich kiritish |
+| GET/POST | `/api/doctor/messages` | Shifokor: bemor bilan chat |
+| GET/PATCH | `/api/doctor/schedule` | Shifokor: ish jadvali |
+| GET/POST | `/api/notifications/feed` | 🔔 bildirishnomalar / hammasini oʻqildi |
 
 ---
 
@@ -166,13 +183,13 @@ Tilni **Sozlamalar → Til** boʻlimida tanlang — sahifa darhol shu tilga oʻt
 ```bash
 npm run test:unit   # modullar mantigʻi, MEDAI xavfsizligi, tarjimalar toʻliqligi
 npx playwright install chromium   # bir marta: E2E uchun brauzer
-npm run test:e2e    # brauzerda: barcha sahifalar, qabul, chat, ombor, TRACE, til almashtirish
+npm run test:e2e    # brauzerda: rollar (bemor/shifokor), chekap, qabul, chat, SOS, TRACE, til almashtirish
 npm test            # ikkalasi
 ```
 
 E2E testlar dev serverni oʻzi ishga tushiradi (port 3100) va lokal bazaga demo yozuvlar qoʻshadi.
 
-Test hisobi: `test@neuramed.uz` / `Test12345!`
+Test hisoblari: `test@neuramed.uz` (bemor) va `doctor@neuramed.uz` (shifokor), parol `Test12345!`
 
 ---
 
@@ -205,8 +222,7 @@ CMD ["npm", "start"]
 ## 🔮 Keyingi bosqich (real versiya)
 
 - **PHARMA TRACE** — davlat reestri / ishlab chiqaruvchi API bilan integratsiya
-- **MEDCONNECT** — real klinika jadvali, shifokor kabineti, bildirishnomalar
-- **MEDSTOCK AI** — dorixona hisob tizimi bilan sinxronlash, sotuv tarixiga asoslangan prognoz
+- **MEDCONNECT** — real klinika jadvali, shifokor litsenziyasini SSV reestri orqali tekshirish
 - **MEDAI** — tasdiqlangan tibbiy hujjatlar bazasi (RAG) va ekspert tekshiruvi
 - **Supabase Storage** — `STORAGE_PROVIDER=supabase` env bilan yoqiladi
 - **Cloudflare R2** — `STORAGE_PROVIDER=r2` env bilan yoqiladi

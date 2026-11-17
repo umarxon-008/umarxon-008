@@ -1,13 +1,14 @@
-/** Qabulga yozilish (DEMO: real qabul belgilanmaydi, shifokorga xabar yuborilmaydi). */
+/** Qabulga yozilish. Shifokor hisobi bo'lsa, bemor uning "Bemorlarim" ro'yxatiga tushadi (namunaviy shifokorlarda — demo). */
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAuth } from "@/lib/auth";
-import { doctorById, slotsFor } from "@/lib/modules/connect";
+import { requirePatient } from "@/lib/auth";
+import { slotsFor } from "@/lib/modules/connect";
+import { findDoctor } from "@/lib/modules/doctors";
 import { apiError, HttpError, readJson } from "@/lib/modules/http";
 
 export async function GET() {
   try {
-    const user = await requireAuth();
+    const user = await requirePatient();
     const list = await prisma.appointment.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" } });
     return NextResponse.json({ data: list });
   } catch (e) { return apiError(e); }
@@ -15,9 +16,9 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const user = await requireAuth();
+    const user = await requirePatient();
     const b = await readJson(req);
-    const doc = doctorById(String(b?.doctorId || ""));
+    const doc = await findDoctor(String(b?.doctorId || ""));
     if (!doc) throw new HttpError(400, "Shifokorni tanlang");
     const date = String(b?.date || ""); const time = String(b?.time || "");
     const name = typeof b?.name === "string" ? b.name.trim() : "";
@@ -28,7 +29,7 @@ export async function POST(req: NextRequest) {
     const ok = slotsFor(doc, taken as any).some((d) => d.date === date && d.slots.some((s) => s.time === time && s.free));
     if (!ok) throw new HttpError(409, "Bu vaqt band yoki mavjud emas. Boshqa vaqtni tanlang.");
     const a = await prisma.appointment.create({
-      data: { userId: user.id, doctorId: doc.id, date, time, name, phone: phone || null, reason: typeof b?.reason === "string" ? b.reason.trim().slice(0, 200) : null, status: "pending" },
+      data: { userId: user.id, doctorId: doc.id, date, time, name, phone: phone || null, reason: typeof b?.reason === "string" ? b.reason.trim().slice(0, 200) : null, status: "pending", shareAccess: true },
     });
     return NextResponse.json({ data: a, demo: true });
   } catch (e) { return apiError(e); }

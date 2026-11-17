@@ -15,7 +15,7 @@ export default async function AddReminderPage({ searchParams }: Props) {
 
   return (
     <>
-      <TopBar title={t("Eslatma qo'shish")} showBack backHref="/reminders" />
+      <TopBar title={t("Eslatma qo'shish")} showBack backHref="/medications" />
       <AddReminderClient
         defaultMedName={searchParams.medName}
         defaultMedId={searchParams.medId}

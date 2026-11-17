@@ -1,12 +1,9 @@
 "use client";
 
-import { useT } from "@/i18n/client";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, User, Settings } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { BrandLogo } from "./brand-logo";
 
 interface TopBarProps {
   title?: string;
@@ -35,7 +32,7 @@ export function TopBar({
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 flex items-center h-14 px-4 gap-3 safe-top",
+        "sticky top-16 z-40 flex items-center h-14 px-4 gap-3",
         !transparent &&
           "bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-100 dark:border-slate-800",
         className
@@ -53,33 +50,6 @@ export function TopBar({
       )}
       {!title && <div className="flex-1" />}
       {rightSlot}
-    </header>
-  );
-}
-
-export function HomeTopBar({ name }: { name?: string }) {
-  const t = useT();
-  return (
-    <header className="lg:hidden sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 safe-top">
-      <div className="flex items-center justify-between px-4 h-14">
-        <div className="flex items-center gap-2">
-          <BrandLogo size={34} />
-          <span className="font-extrabold gradient-text">{t("NeuraMed")}</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <Link href="/sos" aria-label={t("SOS — shoshilinch yordam")} className="mr-1 rounded-full bg-red-600 px-3 py-1.5 text-xs font-black tracking-wider text-white shadow">SOS</Link>
-          <Link href="/settings">
-            <Button variant="ghost" size="icon">
-              <Settings className="h-5 w-5" />
-            </Button>
-          </Link>
-          <Link href="/profile">
-            <Button variant="ghost" size="icon">
-              <User className="h-5 w-5" />
-            </Button>
-          </Link>
-        </div>
-      </div>
     </header>
   );
 }
