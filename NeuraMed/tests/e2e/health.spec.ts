@@ -6,7 +6,8 @@ test.beforeEach(async ({ page }) => { await login(page); });
 test("Tibbiy karta: QR yaratiladi va havola kirishsiz ochiladi", async ({ page, browser }) => {
   await page.goto("/medcard");
   const create = page.getByRole("button", { name: "QR kodni yaratish" });
-  if (await create.count()) await create.click();
+  await expect(create.or(page.locator("p.break-all").first())).toBeVisible();
+  if (await create.isVisible()) await create.click();
   const link = page.locator("p.break-all").first();
   await expect(link).toContainText("/c/");
   const url = (await link.textContent())!.trim();
@@ -51,17 +52,21 @@ test("SOS: faqat 103 va joylashuv; eski sahifa yoʻq", async ({ page }) => {
   await expect(page.getByText(/Tavsiya: avval/)).toBeVisible();
 });
 
-test("Header: 🔔 bildirishnomalar va footer", async ({ page }) => {
+test("Header: 🔔 bildirishnomalar; kirgandan keyin footer yoʻq", async ({ page }) => {
   await page.goto("/dashboard");
   await page.getByRole("button", { name: "Bildirishnomalar" }).click();
   await expect(page.getByRole("dialog", { name: "Bildirishnomalar" })).toBeVisible();
-  await expect(page.locator("footer").getByText(/Toshkent AI Hackathon/)).toBeVisible();
+  await expect(page.locator("footer")).toHaveCount(0);
+  await page.goto("/about");
+  await expect(page).toHaveURL(/\/dashboard/);
 });
 
 test("№17: import dori — ishonch indeksi, laboratoriya va mahalliy muqobil", async ({ page }) => {
   await page.goto("/trace");
-  await page.getByRole("button", { name: "Import → mahalliy muqobil" }).click();
-  await page.getByRole("link", { name: /Metformin/ }).first().click();
+  await page.getByLabel("Dori nomi yoki partiya raqami").fill("Metformin");
+  await page.keyboard.press("Enter");
+  await expect(page.getByText("2 ta dori topildi")).toBeVisible();
+  await page.getByRole("link", { name: /Medisun/ }).click();
   await expect(page.getByText("Ishonch indeksi").first()).toBeVisible();
   await expect(page.getByRole("heading", { name: "Mahalliy muqobil bor" })).toBeVisible();
   await expect(page.getByText("Mustaqil laboratoriya natijalari")).toBeVisible();

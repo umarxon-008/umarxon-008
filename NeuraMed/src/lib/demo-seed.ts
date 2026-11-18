@@ -65,7 +65,7 @@ export async function ensureDemoData() {
     const answers: Record<string, number> = {};
     for (const q of QUESTIONS) answers[q.id] = pick[q.id] ?? 0;
     const r = scoreCheckup(answers);
-    await prisma.checkup.create({
+    const c: any = await prisma.checkup.create({
       data: {
         userId: patient.id,
         answersJson: JSON.stringify(answers),
@@ -74,7 +74,11 @@ export async function ensureDemoData() {
         doctorRef: DEMO_DOCTOR_REF,
         doctorName: `${DEMO_DOCTOR_NAME}`,
         conclusion: "Umumiy holat qoniqarli. Jismoniy faollikni oshirish va uyqu rejimini tartibga solish tavsiya etiladi. Temir tanqisligi boʻyicha 1 oydan keyin qon tahlilini takrorlang.",
+        diagnosis: "Temir tanqisligi anemiyasi, yengil daraja",
       },
+    });
+    await prisma.checkupNote.create({
+      data: { checkupId: c.id, userId: patient.id, doctorRef: DEMO_DOCTOR_REF, doctorName: DEMO_DOCTOR_NAME, text: "Temir preparatini ovqatdan keyin iching. 1 oydan keyin qon tahlilini olib keling." },
     });
   }
 }

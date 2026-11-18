@@ -189,7 +189,7 @@ export function ConnectClient({ initialTab, userName, pastPreps = [] }: { initia
             />
           )}
 
-          {tab === "messages" && <Messages doctors={doctors} unread={unread} active={chatDoc} onPick={(id) => { setChatDoc(id); setUnread((u) => ({ ...u, [id]: 0 })); }} />}
+          {tab === "messages" && <Messages doctors={doctors.filter((d) => appts.some((a) => a.doctorId === d.id && a.status !== "cancelled"))} onFind={() => setTab("doctors")} unread={unread} active={chatDoc} onPick={(id) => { setChatDoc(id); setUnread((u) => ({ ...u, [id]: 0 })); }} />}
         </>
       )}
 
@@ -202,7 +202,7 @@ export function ConnectClient({ initialTab, userName, pastPreps = [] }: { initia
             <p className="flex items-center gap-1.5 text-slate-500"><Building2 className="h-4 w-4" />{t(clinicOf(profile))}{profile.clinic?.city ? `, ${t(profile.clinic.city)}` : ""}</p>
             <p className="flex items-center gap-1.5 text-slate-500"><Clock className="h-4 w-4" />{t("Qabul:")} {profile.workDays.map((d) => fmt.weekdayName(d)).join(", ")} · {profile.hours[0]}:00–{profile.hours[1]}:00</p>
             <div className="flex gap-2 pt-1">
-              <Button variant="outline" className="flex-1" onClick={() => openChat(profile.id)}><MessageCircle className="h-4 w-4" /> {t("Xabar yozish")}</Button>
+              {appts.some((a) => a.doctorId === profile.id && a.status !== "cancelled") && <Button variant="outline" className="flex-1" onClick={() => openChat(profile.id)}><MessageCircle className="h-4 w-4" /> {t("Xabar yozish")}</Button>}
               <Button variant="gradient" className="flex-1" onClick={() => { setBooking(profile); setProfile(null); }}>{t("Qabulga yozilish")}</Button>
             </div>
           </div>
@@ -333,7 +333,7 @@ function SymptomRouter({ onBook }: { onBook: (doctorId: string) => void }) {
   );
 }
 
-function Messages({ doctors, unread, active, onPick }: { doctors: Doc[]; unread: Record<string, number>; active: string | null; onPick: (id: string) => void }) {
+function Messages({ doctors, unread, active, onPick, onFind }: { doctors: Doc[]; unread: Record<string, number>; active: string | null; onPick: (id: string) => void; onFind: () => void }) {
   const t = useT();
   const [msgs, setMsgs] = React.useState<Msg[]>([]);
   const [text, setText] = React.useState("");
@@ -363,6 +363,16 @@ function Messages({ doctors, unread, active, onPick }: { doctors: Doc[]; unread:
       if (r.reply) setTimeout(() => setMsgs((m) => [...m, r.reply as Msg]), 600);
     } catch (e: any) { setError(t(e.message)); } finally { setBusy(false); }
   };
+
+  if (doctors.length === 0) {
+    return (
+      <section className="card-base flex flex-col items-center gap-3 p-8 text-center">
+        <MessageCircle className="h-10 w-10 text-primary-600" />
+        <p className="text-lg font-semibold text-slate-900 dark:text-white">{t("Shifokorga yozish uchun avval qabulga yoziling")}</p>
+        <Button variant="gradient" onClick={onFind}><Stethoscope className="h-5 w-5" /> {t("Shifokor tanlash")}</Button>
+      </section>
+    );
+  }
 
   return (
     <section className="grid gap-3 md:grid-cols-[240px_1fr]">

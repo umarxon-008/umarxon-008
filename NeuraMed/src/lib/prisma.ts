@@ -29,9 +29,10 @@ interface LocalDB {
   healthCard: Record<string, any>[];
   vitalReading: Record<string, any>[];
   checkup: Record<string, any>[];
+  checkupNote: Record<string, any>[];
 }
 
-const EXTRA_TABLES = ["assistantThread", "appointment", "doctorMessage", "traceReport", "healthCard", "vitalReading", "checkup"] as const;
+const EXTRA_TABLES = ["assistantThread", "appointment", "doctorMessage", "traceReport", "healthCard", "vitalReading", "checkup", "checkupNote"] as const;
 
 function getInitialLocalDB(): LocalDB {
   const now = new Date().toISOString();
@@ -126,6 +127,7 @@ function getInitialLocalDB(): LocalDB {
     healthCard: [],
     vitalReading: [],
     checkup: [],
+    checkupNote: [],
   };
 }
 

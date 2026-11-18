@@ -32,19 +32,17 @@ export function TopBar({
   return (
     <header
       className={cn(
-        "sticky top-16 z-40 flex items-center h-14 px-4 gap-3",
-        !transparent &&
-          "bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-100 dark:border-slate-800",
+        "flex items-center gap-2 px-4 pt-6 pb-1",
         className
       )}
     >
       {showBack && (
-        <Button variant="ghost" size="icon" onClick={handleBack} className="-ml-2">
+        <Button variant="outline" size="icon" onClick={handleBack} className="h-11 w-11 shrink-0 rounded-2xl" aria-label="←">
           <ArrowLeft className="h-5 w-5" />
         </Button>
       )}
       {title && (
-        <h1 className="flex-1 text-base font-semibold text-slate-900 dark:text-white truncate">
+        <h1 className="flex-1 truncate text-2xl font-bold text-slate-900 dark:text-white">
           {title}
         </h1>
       )}

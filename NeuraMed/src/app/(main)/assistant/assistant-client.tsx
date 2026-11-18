@@ -2,12 +2,11 @@
 
 import { useT, useLocale } from "@/i18n/client";
 import * as React from "react";
-import Link from "next/link";
-import { Bot, Copy, MessageSquarePlus, Send, Trash2, BookOpen, ShieldAlert, History } from "lucide-react";
+import { Bot, Copy, MessageSquarePlus, Send, Trash2, ShieldAlert, History } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui/loading";
-import { api, DemoBadge, EmergencyBanner, Toast } from "@/components/modules/common";
+import { api, EmergencyBanner, Modal, Toast } from "@/components/modules/common";
 import { Markdown } from "@/components/modules/markdown";
 
 interface Source { title: string; org: string; url: string; term?: string }
@@ -80,48 +79,24 @@ export function AssistantClient({ aiEnabled }: { aiEnabled: boolean }) {
   };
 
   return (
-    <div className="px-4 py-4 lg:grid lg:grid-cols-[260px_1fr] lg:gap-5">
-      {/* Suhbatlar tarixi */}
-      <aside className={cn("mb-4 lg:mb-0 lg:block", showHistory ? "block" : "hidden")}>
-        <div className="card-base p-3 lg:sticky lg:top-20">
-          <Button variant="gradient" size="sm" className="w-full mb-3" onClick={newChat}><MessageSquarePlus className="h-4 w-4" /> {t("Yangi suhbat")}</Button>
-          <p className="px-1 pb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">{t("Suhbatlar tarixi")}</p>
-          {threads.length === 0 && <p className="px-1 text-xs text-slate-400">{t("Hali suhbat yoʻq.")}</p>}
-          <ul className="space-y-1 max-h-[50vh] overflow-y-auto">
-            {threads.map((it) => (
-              <li key={it.id} className={cn("group flex items-center gap-1 rounded-xl", it.id === threadId && "bg-teal-50 dark:bg-teal-900/20")}>
-                <button type="button" onClick={() => openThread(it.id)} className="flex-1 min-w-0 px-2 py-2 text-left">
-                  <p className="truncate text-sm font-medium text-slate-800 dark:text-slate-100">{it.title}</p>
-                  <p className="truncate text-[11px] text-slate-400">{it.count} {t("ta xabar")}</p>
-                </button>
-                <button type="button" onClick={() => removeThread(it.id)} className="p-2 text-slate-300 hover:text-red-500" aria-label={t("Suhbatni oʻchirish")}><Trash2 className="h-4 w-4" /></button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </aside>
+    <div className="mx-auto flex w-full max-w-3xl flex-col px-4 py-6">
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <Button variant="gradient" onClick={newChat}><MessageSquarePlus className="h-5 w-5" /> {t("Yangi suhbat")}</Button>
+        <Button variant="outline" onClick={() => setShowHistory(true)}><History className="h-5 w-5" /> {t("Oldingi suhbatlar")}</Button>
+      </div>
 
-      <section className="flex flex-col min-h-[70vh]">
-        <div className="mb-3 flex flex-wrap items-center gap-2">
-          <div className="ml-auto flex gap-2">
-            <Button variant="outline" size="sm" className="lg:hidden" onClick={() => setShowHistory((s) => !s)}><History className="h-4 w-4" /> {t("Tarix")}</Button>
-            <Link href="/library"><Button variant="outline" size="sm"><BookOpen className="h-4 w-4" /> {t("Kutubxona")}</Button></Link>
-          </div>
-        </div>
-
-        <div className="flex-1 space-y-4">
+      <section className="flex min-h-[60vh] flex-col">
+        <div className="flex-1 space-y-5">
           {messages.length === 0 && (
-            <div className="card-base p-6 text-center">
-              <span className="module-icon h-14 w-14 mb-3"><Bot className="h-7 w-7" /></span>
-              <h2 className="text-lg font-extrabold text-slate-900 dark:text-white">{t("Tibbiy atama yoki tahlil haqida soʻrang")}</h2>
-              <p className="mx-auto mt-1 max-w-md text-sm text-slate-500">
-                {t("MEDAI tibbiy atamalarni oddiy tilda tushuntiradi va shifokorga beriladigan savollarni tayyorlashga yordam beradi.")}
-              </p>
-              <div className="mt-4 flex flex-wrap justify-center gap-2">
+            <div className="card-base p-6 sm:p-8 text-center">
+              <span className="mx-auto mb-4 inline-flex h-16 w-16 items-center justify-center rounded-3xl bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300"><Bot className="h-8 w-8" /></span>
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t("Savolingizni yozing")}</h1>
+              <p className="mt-2 text-base text-slate-600 dark:text-slate-300">{t("Tahlil, dori yoki tibbiy atama haqida soʻrang")}</p>
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
                 {TRY.map((it) => (
                   <button key={it.q} type="button" onClick={() => send(t(it.q))}
-                    className={cn("rounded-full border px-3 py-1.5 text-xs font-semibold", it.safety ? "border-amber-300 bg-amber-50 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300" : "border-slate-200 bg-white text-slate-700 hover:border-teal-400 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700")}>
-                    {it.safety && <ShieldAlert className="mr-1 inline h-3.5 w-3.5" />}{t(it.label)}
+                    className={cn("rounded-2xl border px-4 py-4 text-left text-base font-semibold transition", it.safety ? "border-amber-200 bg-amber-50 text-amber-900 hover:border-amber-400 dark:border-amber-900 dark:bg-amber-900/20 dark:text-amber-200" : "border-slate-200 bg-white text-slate-800 hover:border-primary-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100")}>
+                    {it.safety && <ShieldAlert className="mr-1.5 inline h-5 w-5" />}{t(it.label)}
                   </button>
                 ))}
               </div>
@@ -131,61 +106,69 @@ export function AssistantClient({ aiEnabled }: { aiEnabled: boolean }) {
           {messages.map((m, i) =>
             m.role === "user" ? (
               <div key={i} className="flex justify-end">
-                <div className="max-w-[85%] rounded-2xl rounded-br-md bg-gradient-primary px-4 py-2.5 text-sm text-white shadow whitespace-pre-wrap">{m.content}</div>
+                <div className="max-w-[85%] rounded-2xl rounded-br-md bg-primary-600 px-4 py-3 text-base text-white whitespace-pre-wrap">{m.content}</div>
               </div>
             ) : (
-              <div key={i} className="flex gap-2.5">
-                <span className="mt-1 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-primary text-white"><Bot className="h-4 w-4" /></span>
-                <div className="min-w-0 max-w-[90%] flex-1 space-y-2">
-                  {m.flags?.emergency && <EmergencyBanner />}
-                  <div className="card-base p-4 text-slate-700 dark:text-slate-200">
-                    <div className="mb-2 flex items-center gap-2">
-                      <button type="button" onClick={() => copy(m.content)} className="ml-auto rounded-lg p-1 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800" aria-label={t("Nusxalash")}><Copy className="h-4 w-4" /></button>
-                    </div>
-                    <Markdown text={m.content} />
-                    {(m.sources?.length || m.sourceNote) && (
-                      <div className="mt-3 border-t border-slate-100 dark:border-slate-800 pt-3">
-                        {!!m.sources?.length && (
-                          <>
-                            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">{t("Qoʻshimcha oʻqish uchun manbalar")}</p>
-                            <ul className="mt-1 space-y-1">
-                              {m.sources.map((s, j) => (
-                                <li key={j} className="text-xs"><a href={s.url} target="_blank" rel="noopener noreferrer" className="text-teal-700 dark:text-teal-400 underline">{s.title}</a> <span className="text-slate-400">— {s.org}</span></li>
-                              ))}
-                            </ul>
-                          </>
-                        )}
-                        {m.sourceNote && <p className="mt-2 text-[11px] leading-relaxed text-slate-400">{t(m.sourceNote)}{m.dataDate ? ` ${t("Kutubxona yangilangan: {date}.", { date: m.dataDate })}` : ""}</p>}
-                      </div>
-                    )}
+              <div key={i} className="space-y-2">
+                {m.flags?.emergency && <EmergencyBanner />}
+                <div className="card-base p-5 text-base text-slate-800 dark:text-slate-100">
+                  <div className="mb-2 flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 text-sm font-bold text-primary-700 dark:text-primary-300"><Bot className="h-5 w-5" />MEDAI</span>
+                    <button type="button" onClick={() => copy(m.content)} className="ml-auto rounded-lg p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800" aria-label={t("Nusxalash")}><Copy className="h-5 w-5" /></button>
                   </div>
+                  <Markdown text={m.content} />
+                  {!!m.sources?.length && (
+                    <details className="mt-4 border-t border-slate-100 pt-3 dark:border-slate-800">
+                      <summary className="cursor-pointer text-sm font-semibold text-primary-700 dark:text-primary-300">{t("Manbalar")} ({m.sources.length})</summary>
+                      <ul className="mt-2 space-y-1.5">
+                        {m.sources.map((s, j) => (
+                          <li key={j} className="text-sm"><a href={s.url} target="_blank" rel="noopener noreferrer" className="text-primary-700 underline dark:text-primary-300">{s.title}</a> <span className="text-slate-500">— {s.org}</span></li>
+                        ))}
+                      </ul>
+                    </details>
+                  )}
                 </div>
               </div>
             )
           )}
           {busy && (
-            <div className="flex items-center gap-2 text-sm text-slate-500"><LoadingSpinner size="sm" /> {t("MEDAI javob tayyorlamoqda…")}</div>
+            <div className="flex items-center gap-2 text-base text-slate-600 dark:text-slate-300"><LoadingSpinner size="sm" /> {t("MEDAI javob tayyorlamoqda…")}</div>
           )}
           <div ref={endRef} />
         </div>
 
-        {error && <p role="alert" className="mt-3 rounded-xl bg-red-50 dark:bg-red-900/30 px-3 py-2 text-sm text-red-700 dark:text-red-400">{error}</p>}
+        {error && <p role="alert" className="mt-3 rounded-xl bg-red-50 px-4 py-3 text-base text-red-700 dark:bg-red-900/30 dark:text-red-400">{error}</p>}
 
-        <form onSubmit={(e) => { e.preventDefault(); send(); }} className="sticky bottom-20 lg:bottom-4 mt-4 card-base flex items-end gap-2 p-2 shadow-card">
+        <form onSubmit={(e) => { e.preventDefault(); send(); }} className="sticky bottom-24 lg:bottom-6 mt-6 flex items-end gap-2 rounded-3xl border border-slate-200 bg-white p-2 shadow-card dark:border-slate-700 dark:bg-slate-900">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
             rows={1}
             maxLength={4000}
-            placeholder={t("Savolingizni yozing… (masalan: Gemoglobin nima?)")}
+            placeholder={t("Savolingizni yozing…")}
             aria-label={t("Savol")}
-            className="flex-1 resize-none bg-transparent px-2 py-2 text-sm outline-none max-h-40 text-slate-800 dark:text-slate-100"
+            className="max-h-40 flex-1 resize-none bg-transparent px-3 py-3 text-lg text-slate-800 outline-none dark:text-slate-100"
           />
-          <Button type="submit" variant="gradient" size="icon" disabled={busy || !input.trim()} aria-label={t("Yuborish")}>{busy ? <LoadingSpinner size="sm" /> : <Send className="h-4 w-4" />}</Button>
+          <Button type="submit" variant="gradient" className="h-12 w-12 shrink-0 rounded-2xl p-0" disabled={busy || !input.trim()} aria-label={t("Yuborish")}>{busy ? <LoadingSpinner size="sm" /> : <Send className="h-5 w-5" />}</Button>
         </form>
-        <p className="mt-2 text-center text-[11px] text-slate-400">{t("MEDAI shifokor oʻrnini bosmaydi. Shoshilinch holatda — 103 yoki 112.")}</p>
       </section>
+
+      <Modal open={showHistory} onClose={() => setShowHistory(false)} title={t("Oldingi suhbatlar")}>
+        {threads.length === 0 ? <p className="text-base text-slate-600 dark:text-slate-300">{t("Hali suhbat yoʻq.")}</p> : (
+          <ul className="max-h-[60vh] space-y-1 overflow-y-auto">
+            {threads.map((it) => (
+              <li key={it.id} className={cn("flex items-center gap-1 rounded-xl", it.id === threadId && "bg-primary-50 dark:bg-primary-900/20")}>
+                <button type="button" onClick={() => openThread(it.id)} className="min-w-0 flex-1 px-3 py-3 text-left">
+                  <p className="truncate text-base font-semibold text-slate-800 dark:text-slate-100">{it.title}</p>
+                  <p className="text-sm text-slate-500">{it.count} {t("ta xabar")}</p>
+                </button>
+                <button type="button" onClick={() => removeThread(it.id)} className="p-3 text-slate-400 hover:text-red-500" aria-label={t("Suhbatni oʻchirish")}><Trash2 className="h-5 w-5" /></button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Modal>
       <Toast text={toast} onDone={() => setToast(null)} />
     </div>
   );

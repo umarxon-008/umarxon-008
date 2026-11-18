@@ -20,9 +20,14 @@ test("Shifokor: paneli, bemor sahifasi, chekap va koʻrsatkich kiritish", async 
   await page.getByRole("tab", { name: "Chekap" }).click();
   await page.getByRole("button", { name: /Chekap oʻtkazish/ }).click();
   for (let i = 0; i < 11; i++) await page.locator("section.card-base div.grid button").first().click();
+  await page.getByPlaceholder(/Temir tanqisligi/).fill("E2E tashxis");
   await page.fill("textarea", "E2E: holat barqaror.");
   await page.getByRole("button", { name: /Saqlash va bemorga yuborish/ }).click();
   await expect(page.getByText("E2E: holat barqaror.")).toBeVisible();
+  await expect(page.getByText("E2E tashxis").first()).toBeVisible();
+  await page.fill("textarea[aria-label=Izoh]", "E2E izoh");
+  await page.getByRole("button", { name: "Izoh qoʻshish" }).click();
+  await expect(page.getByText("E2E izoh")).toBeVisible();
   await page.getByRole("tab", { name: "Koʻrsatkichlar" }).click();
   await page.getByRole("button", { name: "Oʻlchov qoʻshish" }).first().click();
   await page.getByRole("dialog").locator("input").fill("74");

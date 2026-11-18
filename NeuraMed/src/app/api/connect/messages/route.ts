@@ -33,6 +33,8 @@ export async function POST(req: NextRequest) {
     const text = typeof b?.text === "string" ? b.text.trim() : "";
     if (!text) throw new HttpError(400, "Xabar boʻsh");
     if (text.length > 500) throw new HttpError(400, "Xabar 500 belgidan oshmasligi kerak");
+    const booked: any[] = await prisma.appointment.findMany({ where: { userId: user.id, doctorId: doc.id } });
+    if (!booked.some((a) => a.status !== "cancelled")) throw new HttpError(403, "Shifokorga yozish uchun avval qabulga yoziling");
     const live = !!(await accountForRef(doc.id));
     await prisma.doctorMessage.create({ data: { userId: user.id, doctorId: doc.id, sender: "me", text, read: !live } });
     if (live) return NextResponse.json({ reply: null, live: true, flags: assessMessage(text), demo: false });

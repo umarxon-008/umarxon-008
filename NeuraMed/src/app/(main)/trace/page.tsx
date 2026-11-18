@@ -1,7 +1,6 @@
 import { getT } from "@/i18n/server";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
-import { TopBar } from "@/components/layout/top-bar";
 import { TraceClient } from "./trace-client";
 
 export async function generateMetadata() {
@@ -15,7 +14,6 @@ export default async function TracePage() {
   if (!user) redirect("/login");
   return (
     <>
-      <TopBar title={t("PHARMA TRACE")} />
       <TraceClient />
     </>
   );

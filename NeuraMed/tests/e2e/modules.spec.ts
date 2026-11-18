@@ -6,7 +6,7 @@ test.beforeEach(async ({ page }) => { await login(page); });
 test("MEDAI: manbali javob va shoshilinch holat ogohlantirishi", async ({ page }) => {
   await page.goto("/assistant");
   await page.getByRole("button", { name: "ALT nima?" }).click();
-  await expect(page.getByText("Qoʻshimcha oʻqish uchun manbalar")).toBeVisible();
+  await expect(page.getByText(/^Manbalar/).first()).toBeVisible();
   await page.locator("textarea").fill("Ko'kragim qattiq og'riyapti, nafas ololmayapman");
   await page.keyboard.press("Enter");
   await expect(page.getByText("Shoshilinch holat belgilari boʻlishi mumkin").first()).toBeVisible();
@@ -14,8 +14,9 @@ test("MEDAI: manbali javob va shoshilinch holat ogohlantirishi", async ({ page }
 
 test("PHARMA TRACE: shubhali partiya va xabar berish", async ({ page }) => {
   await page.goto("/trace");
-  await page.getByRole("button", { name: "Shubhali dori" }).click();
-  await page.getByRole("link", { name: /Ibuprofen/ }).first().click();
+  await page.getByLabel("Dori nomi yoki partiya raqami").fill("Ibuprofen");
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/\/trace\/MP-10004/);
   await expect(page.getByText("Shubhali").first()).toBeVisible();
   await page.getByRole("button", { name: "Xabar berish" }).click();
   await page.getByText("Narx yoki sotuv joyi shubhali").click();
@@ -23,22 +24,23 @@ test("PHARMA TRACE: shubhali partiya va xabar berish", async ({ page }) => {
   await expect(page.getByText("Xabar saqlandi")).toBeVisible();
 });
 
-test("MEDCONNECT: qabulga yozilish, bekor qilish va chat", async ({ page }) => {
+test("MEDCONNECT: qabulga yozilish, chat (faqat qabuldan keyin) va bekor qilish", async ({ page }) => {
   await page.goto("/connect");
-  await page.getByRole("button", { name: "Qabulga yozilish" }).first().click();
+  // Jasur Toshmatov (hisobsiz katalog shifokori) — avtomatik javob beradi
+  await page.getByRole("button", { name: "Qabulga yozilish" }).nth(1).click();
   const dialog = page.getByRole("dialog");
   await dialog.locator(".grid button:not([disabled])").first().click();
   await dialog.getByRole("button", { name: /tasdiqlash/ }).click();
   await expect(page.getByText("Qabulga yozildingiz")).toBeVisible();
-  // bekor qilish (oxirgi yaratilgan qabul ro'yxat boshida)
-  page.once("dialog", (d) => d.accept());
-  await page.getByRole("button", { name: "Bekor qilish", exact: true }).first().click();
-  await expect(page.getByText("Qabul bekor qilindi")).toBeVisible();
   await page.getByRole("tab", { name: /Xabarlar/ }).click();
-  await page.locator("section ul button").nth(1).click();
+  await page.locator("section ul button").filter({ hasText: "Jasur Toshmatov" }).first().click();
   await page.fill("input[aria-label=Xabar]", "Salom, savolim bor");
   await page.keyboard.press("Enter");
   await expect(page.getByText(/Xabaringizni oldim|koʻrik kerak|qabulga olib keling/).last()).toBeVisible();
+  await page.getByRole("tab", { name: /Qabullarim/ }).click();
+  page.once("dialog", (d) => d.accept());
+  await page.getByRole("button", { name: "Bekor qilish", exact: true }).first().click();
+  await expect(page.getByText("Qabul bekor qilindi")).toBeVisible();
 });
 
 test("Til almashtirish: English, Русский, Қазақша, Тоҷикӣ", async ({ page }) => {

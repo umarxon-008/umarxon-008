@@ -8,6 +8,7 @@ export interface DoctorStamp { ref: string; name: string }
 
 export async function checkupHistory(userId: string) {
   const list: any[] = await prisma.checkup.findMany({ where: { userId } });
+  const notes: any[] = await prisma.checkupNote.findMany({ where: { userId } });
   const history = list
     .map((c) => {
       let extra: ReturnType<typeof scoreCheckup> | null = null;
@@ -19,6 +20,11 @@ export async function checkupHistory(userId: string) {
         createdAt: new Date(c.createdAt).toISOString(),
         doctorName: c.doctorName ?? null,
         conclusion: c.conclusion ?? null,
+        diagnosis: c.diagnosis ?? null,
+        notes: notes
+          .filter((n) => n.checkupId === c.id)
+          .map((n) => ({ id: n.id, doctorName: n.doctorName, text: n.text, createdAt: new Date(n.createdAt).toISOString() }))
+          .sort((a, b) => a.createdAt.localeCompare(b.createdAt)),
         flags: extra?.flags ?? [],
         tips: extra?.tips ?? [],
         emergency: extra?.emergency ?? false,
@@ -33,10 +39,22 @@ export async function saveCheckup(patientId: string, body: any, doctor: DoctorSt
   let result;
   try { result = scoreCheckup(answers); } catch { throw new HttpError(400, "Barcha savollarga javob bering"); }
   const conclusion = typeof body?.conclusion === "string" ? body.conclusion.trim().slice(0, 1000) : "";
+  const diagnosis = typeof body?.diagnosis === "string" ? body.diagnosis.trim().slice(0, 300) : "";
   await prisma.checkup.create({
-    data: { userId: patientId, answersJson: JSON.stringify(answers), score: result.score, scoresJson: JSON.stringify(result.areas), doctorRef: doctor.ref, doctorName: doctor.name, conclusion: conclusion || null },
+    data: { userId: patientId, answersJson: JSON.stringify(answers), score: result.score, scoresJson: JSON.stringify(result.areas), doctorRef: doctor.ref, doctorName: doctor.name, conclusion: conclusion || null, diagnosis: diagnosis || null },
   });
   return result;
+}
+
+/** Saqlangan chekapga shifokor izohi (bemor bildirishnoma oladi). */
+export async function addCheckupNote(patientId: string, body: any, doctor: DoctorStamp) {
+  const checkupId = String(body?.checkupId || "");
+  const c: any = await prisma.checkup.findFirst({ where: { id: checkupId, userId: patientId } });
+  if (!c) throw new HttpError(404, "Chekap topilmadi");
+  const text = typeof body?.text === "string" ? body.text.trim() : "";
+  if (!text) throw new HttpError(400, "Izoh boʻsh");
+  if (text.length > 1000) throw new HttpError(400, "Izoh 1000 belgidan oshmasligi kerak");
+  return prisma.checkupNote.create({ data: { checkupId, userId: patientId, doctorRef: doctor.ref, doctorName: doctor.name, text } });
 }
 
 export async function saveVital(patientId: string, body: any, doctor: DoctorStamp) {

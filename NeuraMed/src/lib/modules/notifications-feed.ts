@@ -64,6 +64,11 @@ export async function buildFeed(user: AuthUser): Promise<Notif[]> {
     for (const c of checkups.filter((x) => x.doctorRef).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt))).slice(0, 2)) {
       items.push({ id: `c-${c.id}`, kind: "checkup", text: "{doctor} chekap oʻtkazdi: {score}/100", vars: { doctor: c.doctorName || "", score: c.score }, href: "/checkup", at: new Date(c.createdAt).toISOString() });
     }
+    // Shifokorning chekapga izohlari
+    const cnotes: any[] = await prisma.checkupNote.findMany({ where: { userId: user.id } });
+    for (const n of cnotes.sort((x, y) => String(y.createdAt).localeCompare(String(x.createdAt))).slice(0, 3)) {
+      items.push({ id: `cn-${n.id}`, kind: "checkup", text: "{doctor} chekapingizga izoh qoldirdi", vars: { doctor: n.doctorName || "" }, href: "/checkup", at: new Date(n.createdAt).toISOString() });
+    }
     // Shifokor kiritgan ko'rsatkichlar (eng so'nggi kun)
     const vitals: any[] = (await prisma.vitalReading.findMany({ where: { userId: user.id } })).filter((v: any) => v.doctorRef && v.type !== "bp");
     if (vitals.length) {

@@ -183,7 +183,7 @@ Tilni **Sozlamalar → Til** boʻlimida tanlang — sahifa darhol shu tilga oʻt
 ```bash
 npm run test:unit   # modullar mantigʻi, MEDAI xavfsizligi, tarjimalar toʻliqligi
 npx playwright install chromium   # bir marta: E2E uchun brauzer
-npm run test:e2e    # brauzerda: rollar (bemor/shifokor), chekap, qabul, chat, SOS, TRACE, til almashtirish
+npm run test:e2e    # brauzerda: rollar, chekap (tashxis, izoh), qabul, chat, SOS, TRACE qidiruvi, telefon oʻlchami, tillar
 npm test            # ikkalasi
 ```
 

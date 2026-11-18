@@ -1,5 +1,5 @@
 import {
-  Home, Pill, FlaskConical, MessageSquare, BookOpen, ScanSearch, CalendarDays, User, Settings, Rocket,
+  Home, Pill, FlaskConical, MessageSquare, BookOpen, ScanSearch, CalendarDays, User, Settings,
   IdCard, HeartPulse, Stethoscope, LayoutGrid,
 } from "lucide-react";
 import type { UserRole } from "@/types";
@@ -12,7 +12,6 @@ const ACCOUNT: NavGroup = {
   items: [
     { href: "/profile", icon: User, label: "Profil" },
     { href: "/settings", icon: Settings, label: "Sozlamalar" },
-    { href: "/about", icon: Rocket, label: "Loyiha haqida" },
   ],
 };
 

@@ -349,8 +349,23 @@ model Checkup {
   doctorRef   String?  // chekapni o'tkazgan shifokor
   doctorName  String?
   conclusion  String?  // shifokor xulosasi
+  diagnosis   String?  // shifokor tashxisi
   createdAt   DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
+}
+
+/// Shifokorning saqlangan chekapga keyinroq qo'shgan izohi (bemorga bildirishnoma boradi)
+model CheckupNote {
+  id         String   @id @default(cuid())
+  checkupId  String
+  userId     String   // bemor
+  doctorRef  String
+  doctorName String
+  text       String
+  createdAt  DateTime @default(now())
+
+  @@index([checkupId])
   @@index([userId])
 }

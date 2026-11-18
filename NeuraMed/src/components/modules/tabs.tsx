@@ -11,8 +11,8 @@ export function Tabs<T extends string>({ value, onChange, items }: { value: T; o
     <div role="tablist" className="flex gap-1 overflow-x-auto rounded-2xl bg-white dark:bg-slate-900 p-1 shadow-soft">
       {items.map((it) => (
         <button key={it.id} role="tab" aria-selected={value === it.id} type="button" onClick={() => onChange(it.id)}
-          className={cn("flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-semibold transition", value === it.id ? "bg-gradient-primary text-white shadow" : "text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800")}>
-          {it.icon && <it.icon className="h-4 w-4" />}{t(it.label)}
+          className={cn("flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-xl px-4 py-3 text-base font-semibold transition", value === it.id ? "bg-gradient-primary text-white shadow" : "text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800")}>
+          {it.icon && <it.icon className="h-5 w-5" />}{t(it.label)}
           {!!it.badge && <span className={cn("rounded-full px-1.5 text-[10px]", value === it.id ? "bg-white/25" : "bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400")}>{it.badge}</span>}
         </button>
       ))}

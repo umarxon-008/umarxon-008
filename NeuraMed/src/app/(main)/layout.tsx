@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { getHealthProfile } from "@/lib/modules/health-profile";
 import { AppHeader } from "@/components/layout/app-header";
-import { AppFooter } from "@/components/layout/app-footer";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { SideNav } from "@/components/layout/side-nav";
 
@@ -18,7 +17,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
         <main className="w-full flex-1 max-w-lg md:max-w-3xl lg:max-w-5xl mx-auto">
           {children}
         </main>
-        <div className="pb-20 lg:pb-0"><AppFooter /></div>
+        <div className="h-24 lg:h-10" aria-hidden="true" />
       </div>
       <BottomNav role={user.role} />
     </div>

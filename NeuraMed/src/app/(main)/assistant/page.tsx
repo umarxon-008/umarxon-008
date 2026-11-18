@@ -1,7 +1,6 @@
 import { getT } from "@/i18n/server";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
-import { TopBar } from "@/components/layout/top-bar";
 import { isAIEnabled } from "@/lib/ai";
 import { AssistantClient } from "./assistant-client";
 
@@ -16,7 +15,6 @@ export default async function AssistantPage() {
   if (!user) redirect("/login");
   return (
     <>
-      <TopBar title={t("MEDAI — AI yordamchi")} />
       <AssistantClient aiEnabled={isAIEnabled()} />
     </>
   );

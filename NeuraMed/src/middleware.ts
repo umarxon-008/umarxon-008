@@ -20,6 +20,7 @@ const MOVED: Record<string, string> = {
   "/doctor-visit": "/connect?tab=prep",
   "/sos": "/dashboard",
   "/stock": "/dashboard",
+  "/about": "/",
 };
 
 /** Faqat bemor uchun bo'limlar (shifokor o'z paneliga yo'naltiriladi). */

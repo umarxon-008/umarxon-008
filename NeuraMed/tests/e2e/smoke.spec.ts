@@ -3,16 +3,15 @@ import { login } from "./helpers";
 
 const PAGES: [string, RegExp][] = [
   ["/dashboard", /Keyingi dori/],
-  ["/assistant", /Tibbiy atama yoki tahlil haqida soʻrang/],
+  ["/assistant", /Savolingizni yozing/],
   ["/library", /Gemoglobin/],
-  ["/trace", /Barcha mahsulotlar/],
+  ["/trace", /Dorini tekshirish/],
   ["/trace/MP-10004", /Taʼminot zanjiri/],
   ["/connect", /Qaysi shifokorga borishni bilmayapsizmi/],
   ["/checkup", /Shifokor xulosasi/],
   ["/medications", /Mening dorilarim/],
   ["/lab-reports", /Laboratoriya tahlillari/],
-  ["/more", /Loyiha haqida/],
-  ["/about", /Xavfsizlik qoidalari/],
+  ["/more", /Sozlamalar/],
   ["/connect?tab=prep", /Qaysi qabulga tayyorlanyapsiz/],
   ["/settings", /Til/],
 ];
