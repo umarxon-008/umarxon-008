@@ -4,7 +4,7 @@
  * Xabar matnidan shoshilinch holat, tashxis yoki doza so'rovi belgilarini aniqlaydi.
  * Natija ham demo, ham AI rejimida interfeysda ogohlantirish ko'rsatish uchun ishlatiladi.
  */
-import { normalize } from './text.js';
+import { normalize } from './text-normalize.js';
 
 const EMERGENCY = [
   "ko'krak og'ri", "ko'kragim og'ri", "ko'kragimda og'riq", 'nafas ololma', 'nafas olishim qiyin', 'nafas qisil',
@@ -42,4 +42,4 @@ export function assessMessage(raw) {
 export const EMERGENCY_TEXT =
   "Agar hozir sizda yoki yoningizdagi odamda koʻkrak ogʻrigʻi, nafas qisilishi, hushdan ketish, kuchli qon ketishi, " +
   "yuz qiyshayishi yoki nutq buzilishi kabi belgilar boʻlsa — **darhol 103 (tez tibbiy yordam) yoki 112 ga qoʻngʻiroq qiling**. " +
-  'MEDAI shoshilinch yordam oʻrnini bosa olmaydi.';
+  'Ilova shoshilinch yordam oʻrnini bosa olmaydi.';

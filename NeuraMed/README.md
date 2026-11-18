@@ -8,7 +8,7 @@ NeuraMed — **bemor va shifokor** uchun yagona tibbiy platforma. Roʻyxatdan o�
 
 | Rol | Bosh sahifa | Nima qila oladi |
 |-----|-------------|-----------------|
-| Bemor | `/dashboard` | Tibbiy karta (QR), chekap natijasi va koʻrsatkichlarni **koʻradi** (kiritmaydi), dorilar, tahlillar, MEDAI, PHARMA TRACE, MEDCONNECT, 🔔 bildirishnomalar, SOS |
+| Bemor | `/dashboard` | Tibbiy karta (QR), chekap natijasi va koʻrsatkichlarni **koʻradi** (kiritmaydi), dorilar, tahlillar, PHARMA TRACE, MEDCONNECT, 🔔 bildirishnomalar, SOS |
 | Shifokor | `/doctor` | Bugungi/yaqin qabullar, "Bemorlarim", bemor sahifasi (karta, dorilar, tahlillar, qabulga tayyorlanish), **chekap oʻtkazish va xulosa**, **koʻrsatkich kiritish**, bemor bilan chat, ish jadvali |
 
 - Shifokor faqat **oʻziga yozilgan** va ruxsatni bekor qilmagan bemorni koʻradi (`assertPatientAccess`). Bemor ruxsatni MEDCONNECT → "Qabullarim"da bekor qiladi.
@@ -22,7 +22,6 @@ NeuraMed — **bemor va shifokor** uchun yagona tibbiy platforma. Roʻyxatdan o�
 | Salomatligim | `/medcard`, `/checkup` | QR tibbiy karta (ochiq havola `/c/<token>`), chekap: shifokor oʻtkazgan 11 savollik soʻrovnoma (0–100 ball, xulosa) + shifokor kiritgan koʻrsatkichlar (puls, qand, vazn, harorat, SpO₂, uyqu) | Ishlaydi; tashxis emas |
 | Dorilar | `/medications` | Mening dorilarim (eslatmalar), dori qidirish, dorilar mosligi — bitta sahifada | Ishlaydi |
 | Tahlillar | `/lab-reports` | Laboratoriya tahlillari va rentgen/tasviriy hisobotlar — bitta sahifada | Ishlaydi |
-| MEDAI | `/assistant`, `/library` | AI yordamchi va 26 atamali tibbiy kutubxona | OpenAI kaliti boʻlsa AI, boʻlmasa demo |
 | PHARMA TRACE | `/trace` | №17: haqiqiylik, sertifikat, laboratoriya, ishonch indeksi, mahalliy muqobil | Demo maʼlumot |
 | MEDCONNECT | `/connect` | Shifokor topish, qabulga yozilish, **qabulga tayyorlanish**, chat — bitta sahifada | Namunaviy katalog + roʻyxatdan oʻtgan shifokorlar |
 | Shifokor paneli | `/doctor`, `/doctor/patients/[id]` | Yuqoridagi "Shifokor" roli | Ishlaydi |
@@ -56,7 +55,7 @@ Demo hisoblar (kirishda avtomatik yaratiladi, parol `Test12345!`):
 
 | Oʻzgaruvchi | Kerakmi | Izoh |
 |-------------|---------|------|
-| `OPENAI_API_KEY` | Ixtiyoriy | `sk-...` boʻlsa MEDAI va tushuntirishlar AI orqali; boʻlmasa demo rejim |
+| `OPENAI_API_KEY` | Ixtiyoriy | `sk-...` boʻlsa tahlil, dori va PHARMA TRACE tushuntirishlari AI orqali; boʻlmasa shablon |
 | `DATABASE_URL` | Ixtiyoriy | PostgreSQL. Boʻlmasa — lokal JSON baza |
 | `JWT_SECRET` | Productionda majburiy | Kamida 32 belgi. Lokal rejimda vaqtinchalik kalit ishlatiladi |
 | `ENCRYPTION_KEY` | Productionda majburiy | 64 hex belgi: `openssl rand -hex 32` |
@@ -86,10 +85,10 @@ npm start          # http://localhost:3000
 src/
 ├── app/(auth)/            # login, register, onboarding
 ├── app/(main)/            # barcha sahifalar (dashboard, doctor, checkup, medications, lab-reports, trace, connect ...)
-├── app/api/               # backend: auth, medications, reminders, lab/imaging, assistant, trace, connect, doctor
+├── app/api/               # backend: auth, medications, reminders, lab/imaging, trace, connect, doctor
 ├── components/layout/     # logotip, yon menyu (kompyuter), pastki menyu (telefon)
 ├── components/modules/    # modullar uchun umumiy UI (DEMO belgisi, modal, KPI, xavfsiz markdown)
-├── lib/medai/             # MEDAI: xavfsizlik qoidalari, demo javoblar, kutubxona (MEDPERFECT'dan)
+├── lib/safety.ts          # xabar xavfsizligi: shoshilinch belgilar → 103
 ├── lib/modules/           # PHARMA TRACE, MEDCONNECT, shifokorlar, chekap, bildirishnomalar mantigʻi
 └── data/                  # namunaviy maʼlumotlar va tibbiy atamalar
 prisma/schema.prisma       # User, Reminder, LabReport ... + AssistantThread, Appointment, DoctorMessage, StockItem, StockMovement, TraceReport
@@ -115,8 +114,6 @@ public/brand/              # NeuraMed logotipi (tabletkali)
 | GET/PATCH/DELETE | `/api/profile` | Profil boshqaruv |
 | POST | `/api/notifications/subscribe` | Push subscribe |
 | POST | `/api/notifications/send` | Push yuborish |
-| GET/POST | `/api/assistant` | MEDAI: suhbatlar roʻyxati / savol yuborish |
-| GET/DELETE | `/api/assistant/[id]` | MEDAI suhbati |
 | GET | `/api/trace?q=...` | PHARMA TRACE: qidiruv va statistika |
 | GET | `/api/trace/[id]` | Mahsulot va taʼminot zanjiri |
 | POST | `/api/trace/reports` | Shubhali holat haqida xabar (demo) |
@@ -164,7 +161,6 @@ Tilni **Sozlamalar → Til** boʻlimida tanlang — sahifa darhol shu tilga oʻt
 - Qozoq, qirgʻiz va tojik tarjimalarini ona tili egasi tekshirib chiqishi tavsiya etiladi.
 - Server komponentlarida `const t = await getT()` (`@/i18n/server`), brauzer komponentlarida `const t = useT()` (`@/i18n/client`).
 - Yangi matn qoʻshsangiz, barcha lugʻatlarga tarjimasini yozing — `npm run test:unit` tarjimasi yoʻq matnlarni koʻrsatadi.
-- MEDAI kutubxonasi maqolalari va demo javoblar hozircha faqat oʻzbekcha; OpenAI kaliti boʻlsa, AI tanlangan tilda javob beradi.
 
 ---
 
@@ -181,7 +177,7 @@ Tilni **Sozlamalar → Til** boʻlimida tanlang — sahifa darhol shu tilga oʻt
 ## 🧪 Testlar
 
 ```bash
-npm run test:unit   # modullar mantigʻi, MEDAI xavfsizligi, tarjimalar toʻliqligi
+npm run test:unit   # modullar mantigʻi, xavfsizlik tekshiruvi, tarjimalar toʻliqligi
 npx playwright install chromium   # bir marta: E2E uchun brauzer
 npm run test:e2e    # brauzerda: rollar, chekap (tashxis, izoh), qabul, chat, SOS, TRACE qidiruvi, telefon oʻlchami, tillar
 npm test            # ikkalasi
@@ -223,7 +219,6 @@ CMD ["npm", "start"]
 
 - **PHARMA TRACE** — davlat reestri / ishlab chiqaruvchi API bilan integratsiya
 - **MEDCONNECT** — real klinika jadvali, shifokor litsenziyasini SSV reestri orqali tekshirish
-- **MEDAI** — tasdiqlangan tibbiy hujjatlar bazasi (RAG) va ekspert tekshiruvi
 - **Supabase Storage** — `STORAGE_PROVIDER=supabase` env bilan yoqiladi
 - **Cloudflare R2** — `STORAGE_PROVIDER=r2` env bilan yoqiladi
 

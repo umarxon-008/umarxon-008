@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
 import { apiError, HttpError, readJson } from "@/lib/modules/http";
 import { routeSymptoms } from "@/lib/modules/symptoms";
-import { assessMessage } from "@/lib/medai";
+import { assessMessage } from "@/lib/safety";
 import { slotsFor } from "@/lib/modules/connect";
 import { getDoctors } from "@/lib/modules/doctors";
 

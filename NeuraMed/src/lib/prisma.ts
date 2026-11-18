@@ -21,7 +21,6 @@ interface LocalDB {
   imagingReport: Record<string, any>[];
   doctorVisitPrep: Record<string, any>[];
   // MEDPERFECT modullari
-  assistantThread: Record<string, any>[];
   appointment: Record<string, any>[];
   doctorMessage: Record<string, any>[];
   traceReport: Record<string, any>[];
@@ -32,7 +31,7 @@ interface LocalDB {
   checkupNote: Record<string, any>[];
 }
 
-const EXTRA_TABLES = ["assistantThread", "appointment", "doctorMessage", "traceReport", "healthCard", "vitalReading", "checkup", "checkupNote"] as const;
+const EXTRA_TABLES = ["appointment", "doctorMessage", "traceReport", "healthCard", "vitalReading", "checkup", "checkupNote"] as const;
 
 function getInitialLocalDB(): LocalDB {
   const now = new Date().toISOString();
@@ -120,7 +119,6 @@ function getInitialLocalDB(): LocalDB {
     labReport: [],
     imagingReport: [],
     doctorVisitPrep: [],
-    assistantThread: [],
     appointment: [],
     doctorMessage: [],
     traceReport: [],

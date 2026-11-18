@@ -33,9 +33,8 @@ export default async function DashboardPage() {
     }),
   ]);
 
-  const [appts, threads, checkups, card, doctors] = await Promise.all([
+  const [appts, checkups, card, doctors] = await Promise.all([
     prisma.appointment.findMany({ where: { userId: user.id, status: "pending" } }),
-    prisma.assistantThread.findMany({ where: { userId: user.id } }),
     prisma.checkup.findMany({ where: { userId: user.id } }),
     prisma.healthCard.findFirst({ where: { userId: user.id } }),
     getDoctors(),
@@ -54,7 +53,6 @@ export default async function DashboardPage() {
       upcomingCount: appts.length,
       upcoming: next && nextDoc ? { id: next.id, doctor: nextDoc.name, specialty: nextDoc.specialty, date: next.date, time: next.time } : null,
     },
-    threads: threads.length,
     health: {
       score: lastCheckup?.score ?? null,
       scoreDoctor: lastCheckup?.doctor ?? null,

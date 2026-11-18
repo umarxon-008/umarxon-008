@@ -3,8 +3,6 @@ import { login } from "./helpers";
 
 const PAGES: [string, RegExp][] = [
   ["/dashboard", /Keyingi dori/],
-  ["/assistant", /Savolingizni yozing/],
-  ["/library", /Gemoglobin/],
   ["/trace", /Dorini tekshirish/],
   ["/trace/MP-10004", /Taʼminot zanjiri/],
   ["/connect", /Qaysi shifokorga borishni bilmayapsizmi/],

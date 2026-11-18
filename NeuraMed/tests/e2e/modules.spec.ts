@@ -3,15 +3,6 @@ import { login } from "./helpers";
 
 test.beforeEach(async ({ page }) => { await login(page); });
 
-test("MEDAI: manbali javob va shoshilinch holat ogohlantirishi", async ({ page }) => {
-  await page.goto("/assistant");
-  await page.getByRole("button", { name: "ALT nima?" }).click();
-  await expect(page.getByText(/^Manbalar/).first()).toBeVisible();
-  await page.locator("textarea").fill("Ko'kragim qattiq og'riyapti, nafas ololmayapman");
-  await page.keyboard.press("Enter");
-  await expect(page.getByText("Shoshilinch holat belgilari boʻlishi mumkin").first()).toBeVisible();
-});
-
 test("PHARMA TRACE: shubhali partiya va xabar berish", async ({ page }) => {
   await page.goto("/trace");
   await page.getByLabel("Dori nomi yoki partiya raqami").fill("Ibuprofen");

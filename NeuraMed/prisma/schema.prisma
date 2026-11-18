@@ -94,7 +94,6 @@ model User {
   imagingReports   ImagingReport[]
   doctorVisitPreps DoctorVisitPrep[]
   sessions         Session[]
-  assistantThreads AssistantThread[]
   appointments     Appointment[]
   doctorMessages   DoctorMessage[]
   traceReports     TraceReport[]
@@ -238,20 +237,6 @@ model DoctorVisitPrep {
   updatedAt       DateTime     @updatedAt
 
   user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-}
-
-// ─── MEDAI (AI yordamchi) ─────────────────────────────────────────────────────
-
-model AssistantThread {
-  id           String   @id @default(cuid())
-  userId       String
-  title        String
-  messagesJson String   // JSON: [{role, content, mode, sources, sourceNote, flags, createdAt}]
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }

@@ -1,5 +1,5 @@
 import {
-  Home, Pill, FlaskConical, MessageSquare, BookOpen, ScanSearch, CalendarDays, User, Settings,
+  Home, Pill, FlaskConical, ScanSearch, CalendarDays, User, Settings,
   IdCard, HeartPulse, Stethoscope, LayoutGrid,
 } from "lucide-react";
 import type { UserRole } from "@/types";
@@ -12,14 +12,6 @@ const ACCOUNT: NavGroup = {
   items: [
     { href: "/profile", icon: User, label: "Profil" },
     { href: "/settings", icon: Settings, label: "Sozlamalar" },
-  ],
-};
-
-const MEDAI: NavGroup = {
-  title: "MEDAI",
-  items: [
-    { href: "/assistant", icon: MessageSquare, label: "AI yordamchi" },
-    { href: "/library", icon: BookOpen, label: "Tibbiy kutubxona" },
   ],
 };
 
@@ -40,7 +32,6 @@ export const PATIENT_NAV: NavGroup[] = [
       { href: "/lab-reports", icon: FlaskConical, label: "Tahlillar" },
     ],
   },
-  MEDAI,
   {
     title: null,
     items: [
@@ -54,7 +45,6 @@ export const PATIENT_NAV: NavGroup[] = [
 /** Shifokor menyusi. */
 export const DOCTOR_NAV: NavGroup[] = [
   { title: null, items: [{ href: "/doctor", icon: Stethoscope, label: "Shifokor paneli" }] },
-  MEDAI,
   { title: null, items: [{ href: "/trace", icon: ScanSearch, label: "PHARMA TRACE" }] },
   ACCOUNT,
 ];
@@ -66,7 +56,6 @@ export const bottomFor = (role: UserRole): NavItem[] =>
   role === "doctor"
     ? [
         { href: "/doctor", icon: Stethoscope, label: "Panel" },
-        { href: "/assistant", icon: MessageSquare, label: "MEDAI" },
         { href: "/trace", icon: ScanSearch, label: "PHARMA TRACE" },
         { href: "/more", icon: LayoutGrid, label: "Menyu" },
       ]
@@ -74,7 +63,7 @@ export const bottomFor = (role: UserRole): NavItem[] =>
         { href: "/dashboard", icon: Home, label: "Bosh sahifa" },
         { href: "/medications", icon: Pill, label: "Dorilar" },
         { href: "/checkup", icon: HeartPulse, label: "Chekap" },
-        { href: "/assistant", icon: MessageSquare, label: "MEDAI" },
+        { href: "/connect", icon: CalendarDays, label: "Shifokor" },
         { href: "/more", icon: LayoutGrid, label: "Menyu" },
       ];
 

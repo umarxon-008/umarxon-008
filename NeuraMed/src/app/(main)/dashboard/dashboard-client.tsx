@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Pill, FlaskConical, HeartPulse, CalendarDays, MessageSquare, ScanSearch, Clock, ShieldAlert, ChevronRight } from "lucide-react";
+import { Pill, FlaskConical, HeartPulse, CalendarDays, IdCard, ScanSearch, Clock, ShieldAlert, ChevronRight } from "lucide-react";
 import { useT } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 import { useFormat } from "@/components/modules/common";
@@ -22,7 +22,7 @@ const ACTIONS = [
   { href: "/lab-reports", icon: FlaskConical, label: "Tahlillar" },
   { href: "/checkup", icon: HeartPulse, label: "Chekap" },
   { href: "/connect", icon: CalendarDays, label: "Shifokorga yozilish" },
-  { href: "/assistant", icon: MessageSquare, label: "Savol berish" },
+  { href: "/medcard", icon: IdCard, label: "Tibbiy karta" },
   { href: "/trace", icon: ScanSearch, label: "Dorini tekshirish" },
 ];
 

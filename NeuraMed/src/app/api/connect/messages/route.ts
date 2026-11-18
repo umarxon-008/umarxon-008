@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requirePatient } from "@/lib/auth";
 import { demoReplies } from "@/lib/modules/connect";
 import { accountForRef, findDoctor } from "@/lib/modules/doctors";
-import { assessMessage } from "@/lib/medai";
+import { assessMessage } from "@/lib/safety";
 import { apiError, HttpError, readJson } from "@/lib/modules/http";
 
 export async function GET(req: NextRequest) {

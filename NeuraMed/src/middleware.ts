@@ -21,6 +21,8 @@ const MOVED: Record<string, string> = {
   "/sos": "/dashboard",
   "/stock": "/dashboard",
   "/about": "/",
+  "/assistant": "/",
+  "/library": "/",
 };
 
 /** Faqat bemor uchun bo'limlar (shifokor o'z paneliga yo'naltiriladi). */
