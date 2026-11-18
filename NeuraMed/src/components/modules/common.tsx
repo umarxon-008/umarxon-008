@@ -20,46 +20,20 @@ export async function api<T = any>(url: string, init?: RequestInit & { json?: un
 }
 
 /** "DEMO" belgisi: namunaviy ma'lumot ekanini doim ko'rsatadi. */
-export function DemoBadge({ children = "DEMO", className }: { children?: React.ReactNode; className?: string }) {
-  const t = useT();
-  return (
-    <span className={cn("inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-900/40 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300", className)}>
-      <FlaskConical className="h-3 w-3" />
-      {typeof children === "string" ? t(children) : children}
-    </span>
-  );
+/** Namunaviy maʼlumot belgisi (video/taqdimot uchun koʻrsatilmaydi). */
+export function DemoBadge(_props: { children?: React.ReactNode; className?: string }) {
+  return null;
 }
 
-export function DemoNote({ children, className }: { children: React.ReactNode; className?: string }) {
-  const t = useT();
-  return (
-    <div className={cn("demo-note", className)}>
-      <FlaskConical className="h-4 w-4 shrink-0 mt-0.5" />
-      <p>{typeof children === "string" ? t(children) : children}</p>
-    </div>
-  );
+/** Izoh bloki — sodda interfeys uchun koʻrsatilmaydi. */
+export function DemoNote(_props: { children?: React.ReactNode; className?: string }) {
+  return null;
 }
 
 /** Modul sarlavhasi (gradient fon, ikona, tavsif). */
-export function ModuleHero({ icon: Icon, name, title, text, right }: { icon: React.ElementType; name: string; title: string; text: string; right?: React.ReactNode }) {
-  const t = useT();
-  return (
-    <section className="relative overflow-hidden rounded-3xl bg-gradient-brand-deep p-5 text-white shadow-card">
-      <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-emerald-400/20 blur-2xl" />
-      <div className="absolute -bottom-12 right-20 h-32 w-32 rounded-full bg-violet-500/30 blur-2xl" />
-      <div className="relative flex items-start gap-4">
-        <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15 ring-1 ring-white/20">
-          <Icon className="h-6 w-6" />
-        </span>
-        <div className="flex-1 min-w-0">
-          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-200">{t(name)}</p>
-          <h2 className="mt-0.5 text-lg font-extrabold leading-snug">{t(title)}</h2>
-          <p className="mt-1 text-sm text-white/75 leading-relaxed">{t(text)}</p>
-        </div>
-        {right}
-      </div>
-    </section>
-  );
+/** Boʻlim sarlavhasi bloki — sodda interfeysda sahifa nomi yuqoridagi qatorda koʻrinadi, shuning uchun bu blok koʻrsatilmaydi. */
+export function ModuleHero(_props: { icon: React.ElementType; name: string; title: string; text: string; right?: React.ReactNode }) {
+  return null;
 }
 
 export function Kpi({ label, value, hint, tone = "slate", icon: Icon }: { label: string; value: React.ReactNode; hint?: string; tone?: "slate" | "green" | "amber" | "red" | "violet" | "teal"; icon?: React.ElementType }) {

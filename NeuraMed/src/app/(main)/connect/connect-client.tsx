@@ -80,7 +80,6 @@ export function ConnectClient({ initialTab, userName, pastPreps = [] }: { initia
   return (
     <div className="px-4 py-4 space-y-4">
       <ModuleHero icon={CalendarDays} name="MEDCONNECT" title={t("Shifokor topish, qabulga yozilish, maslahat")} text="Shifokorni tanlang, qabulga yoziling, qabulga tayyorlaning va shifokor bilan yozishing — hammasi bir joyda." />
-      <DemoNote>{t("Katalogdagi shifokorlar namunaviy. NeuraMed'da hisobi bor shifokor sizning qabulingizni, belgilaringizni va xabarlaringizni oʻz panelida koʻradi; boshqalarida javoblar avtomatik (demo).")}</DemoNote>
 
       <div role="tablist" className="flex gap-1 overflow-x-auto rounded-2xl bg-white dark:bg-slate-900 p-1 shadow-soft">
         {TABS.map((it) => {
@@ -171,7 +170,7 @@ export function ConnectClient({ initialTab, userName, pastPreps = [] }: { initia
                     </div>
                     {active ? (
                       <div className="flex flex-wrap items-center gap-1">
-                        {d?.hasAccount ? <span className="rounded-full bg-teal-50 dark:bg-teal-900/30 px-2 py-0.5 text-[10px] font-bold text-teal-700 dark:text-teal-300">{t("Kutilmoqda")}</span> : <DemoBadge>{t("Kutilmoqda · demo")}</DemoBadge>}
+                        <span className="rounded-full bg-primary-50 dark:bg-primary-900/30 px-2.5 py-1 text-xs font-bold text-primary-700 dark:text-primary-300">{t("Kutilmoqda")}</span>
                         {d?.hasAccount && <Button variant="ghost" size="sm" onClick={() => toggleShare(a)}>{a.shareAccess === false ? t("Ruxsat berish") : t("Ruxsatni bekor qilish")}</Button>}
                         <Button variant="ghost" size="sm" onClick={() => setTab("prep")}><ClipboardList className="h-4 w-4" /> {t("Tayyorlanish")}</Button>
                         <Button variant="ghost" size="sm" onClick={() => cancel(a.id)}><XCircle className="h-4 w-4" /> {t("Bekor qilish")}</Button>
@@ -202,7 +201,6 @@ export function ConnectClient({ initialTab, userName, pastPreps = [] }: { initia
             {profile.languages.length > 0 && <p className="flex items-center gap-1.5 text-slate-500"><Languages className="h-4 w-4" />{profile.languages.map((l) => t(l)).join(", ")}</p>}
             <p className="flex items-center gap-1.5 text-slate-500"><Building2 className="h-4 w-4" />{t(clinicOf(profile))}{profile.clinic?.city ? `, ${t(profile.clinic.city)}` : ""}</p>
             <p className="flex items-center gap-1.5 text-slate-500"><Clock className="h-4 w-4" />{t("Qabul:")} {profile.workDays.map((d) => fmt.weekdayName(d)).join(", ")} · {profile.hours[0]}:00–{profile.hours[1]}:00</p>
-            <p className="text-xs text-amber-700 dark:text-amber-400">{profile.hasAccount ? t("NeuraMed'da hisobi bor shifokor (demo: litsenziya tekshirilmagan).") : t("Namunaviy profil — haqiqiy shifokor emas.")}</p>
             <div className="flex gap-2 pt-1">
               <Button variant="outline" className="flex-1" onClick={() => openChat(profile.id)}><MessageCircle className="h-4 w-4" /> {t("Xabar yozish")}</Button>
               <Button variant="gradient" className="flex-1" onClick={() => { setBooking(profile); setProfile(null); }}>{t("Qabulga yozilish")}</Button>
@@ -278,7 +276,6 @@ function BookingModal({ doc, userName, onClose, onDone }: { doc: Doc; userName: 
           <Button variant="gradient" className="w-full" disabled={!date || !time || busy} onClick={submit}>
             {time ? `${formatDay(date)} · ${time} — ${t("tasdiqlash")}` : t("Vaqtni tanlang")}
           </Button>
-          <p className="text-center text-[11px] text-slate-400">{doc.hasAccount ? t("Yozilganingizdan soʻng shifokor kartangiz, tahlillaringiz va chekapingizni koʻradi. Ruxsatni istalgan vaqtda bekor qilasiz.") : t("Demo: qabul real tizimda belgilanmaydi va shifokorga xabar yuborilmaydi.")}</p>
         </div>
       )}
     </Modal>
@@ -388,7 +385,6 @@ function Messages({ doctors, unread, active, onPick }: { doctors: Doc[]; unread:
             <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
               <Avatar d={doc} size={36} />
               <div className="flex-1"><p className="font-semibold text-slate-900 dark:text-white">{t(doc.name)}</p><p className="text-[11px] text-slate-400">{t(doc.specialty)}</p></div>
-              {live ? <span className="rounded-full bg-teal-50 dark:bg-teal-900/30 px-2 py-0.5 text-[10px] font-bold text-teal-700 dark:text-teal-300">{t("Shifokor oʻzi javob beradi")}</span> : <DemoBadge>{t("Avtomatik javob")}</DemoBadge>}
             </div>
             <div className="flex-1 space-y-2 overflow-y-auto py-3 max-h-[50vh]">
               {msgs.length === 0 && <p className="text-center text-xs text-slate-400">{t("Xabarlar yoʻq. Savolingizni yozing.")}</p>}

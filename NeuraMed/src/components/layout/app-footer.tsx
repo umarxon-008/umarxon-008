@@ -32,7 +32,6 @@ export function AppFooter({ simple }: { simple?: boolean }) {
       <div className="border-t border-slate-100 dark:border-slate-800">
         <div className="mx-auto flex max-w-lg md:max-w-3xl lg:max-w-5xl flex-wrap items-center gap-x-4 gap-y-1 px-4 py-4 text-[11px] text-slate-400">
           <span className="font-semibold text-red-600 dark:text-red-400">{t("NeuraMed tashxis qoʻymaydi va dori buyurmaydi. Shoshilinch holatda — 103.")}</span>
-          <span>{t("Demo maʼlumotlar namunaviy.")}</span>
           <span className="sm:ml-auto">© {year} NeuraMed · Toshkent AI Hackathon</span>
         </div>
       </div>

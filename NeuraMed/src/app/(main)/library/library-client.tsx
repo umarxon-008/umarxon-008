@@ -23,8 +23,6 @@ export function LibraryClient({ terms, meta }: { terms: LibraryTerm[]; meta: { u
   return (
     <div className="px-4 py-4 space-y-4">
       <ModuleHero icon={BookOpen} name="MEDAI · Kutubxona" title={t("{n} ta tibbiy atama oddiy tilda", { n: terms.length })} text="Tahlil koʻrsatkichlari va keng tarqalgan atamalar: oddiy tushuntirish, tibbiy izoh, shifokorga savollar va manbalar." />
-      <DemoNote>{t(meta.notice)} {t("Yangilangan sana:")} {meta.updatedAt}.</DemoNote>
-      {locale !== "uz" && <p className="rounded-xl bg-sky-50 dark:bg-sky-900/20 px-3 py-2 text-xs text-sky-800 dark:text-sky-200">{t("Kutubxona maqolalari va demo javoblar hozircha faqat oʻzbek tilida. AI rejimida (OpenAI kaliti bilan) javob tanlangan tilda beriladi.")}</p>}
 
       <div className="relative">
         <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />

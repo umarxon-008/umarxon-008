@@ -11,14 +11,8 @@ interface DisclaimerProps {
 
 export function Disclaimer({ className, compact }: DisclaimerProps) {
   const t = useT();
-  if (compact) {
-    return (
-      <p className={cn("text-xs text-amber-700 dark:text-amber-400 flex items-center gap-1", className)}>
-        <AlertTriangle className="h-3 w-3 shrink-0" />
-        {t("Shifokor maslahati emas. Tibbiy qaror qabul qilishdan oldin shifokorga murojaat qiling.")}
-      </p>
-    );
-  }
+  // Sodda interfeys: qisqa variant ko'rsatilmaydi (asosiy eslatma footerda turadi).
+  if (compact) return null;
 
   return (
     <div
@@ -28,8 +22,8 @@ export function Disclaimer({ className, compact }: DisclaimerProps) {
       )}
     >
       <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-      <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
-        <strong>{t("Muhim eslatma:")}</strong> {t("Bu umumiy ma'lumot bo'lib, tashxis yoki davolash bo'yicha shifokor maslahati emas. Har qanday tibbiy qaror qabul qilishdan oldin malakali shifokorga murojaat qiling.")}
+      <p className="text-sm text-amber-900 dark:text-amber-200 leading-relaxed">
+        {t("Shifokor maslahati emas. Tibbiy qaror qabul qilishdan oldin shifokorga murojaat qiling.")}
       </p>
     </div>
   );

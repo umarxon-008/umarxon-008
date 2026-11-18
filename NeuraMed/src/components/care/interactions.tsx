@@ -47,7 +47,6 @@ export function InteractionsClient() {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-slate-500">{t("Qabul qilayotgan dorilaringizni tekshiraman: xavfli birikmalar va bir xil faol moddaning takrorlanishi. Savdo, rus va ingliz nomlarini ham taniyman.")}</p>
 
       <section className="card-base p-4 space-y-3">
         <h3 className="font-bold text-slate-900 dark:text-white">{t("Eslatmalaringizdagi dorilar")}</h3>
@@ -85,7 +84,6 @@ export function InteractionsClient() {
         {res && <Findings r={res} />}
       </section>
 
-      <DemoNote>{t("Cheklangan namunaviy roʻyxat: {i} ta faol modda va {r} ta keng maʼlum oʻzaro taʼsir. Roʻyxatda yoʻqligi xavfsiz degani emas — har doim farmatsevt yoki shifokor bilan tekshiring. Doza tavsiya qilinmaydi.", { i: coverage?.ingredients ?? "…", r: coverage?.rules ?? "…" })}</DemoNote>
     </div>
   );
 }

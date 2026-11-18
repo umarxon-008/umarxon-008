@@ -2,12 +2,12 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Stethoscope, CalendarCheck, Users, MessageCircle, Clock, ArrowRight, BadgeAlert, Settings2 } from "lucide-react";
+import { Stethoscope, CalendarCheck, Users, MessageCircle, Clock, ArrowRight, Settings2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useT } from "@/i18n/client";
 import { Button } from "@/components/ui/button";
 import { LoadingCard } from "@/components/ui/loading";
-import { api, Chip, Kpi, Modal, ModuleHero, Toast, useFormat } from "@/components/modules/common";
+import { api, Chip, Kpi, Modal, Toast, useFormat } from "@/components/modules/common";
 
 interface Patient { id: string; name: string; age: number | null; gender: string | null; appointments: { id: string; date: string; time: string; reason: string | null }[] }
 interface Upcoming { id: string; patientId: string; patientName: string; date: string; time: string; reason: string | null; shared: boolean }
@@ -35,14 +35,14 @@ export function DoctorHome({ name, specialty }: { name: string; specialty: strin
 
   return (
     <div className="px-4 py-4 space-y-4">
-      <ModuleHero icon={Stethoscope} name="Shifokor paneli" title={t("Xush kelibsiz, {name}", { name: t(name) })} text={specialty ? t(specialty) : "Bemorlaringiz, qabullar va chekaplar bir joyda."} />
+      <div className="flex items-center gap-3">
+        <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300"><Stethoscope className="h-6 w-6" /></span>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t("Xush kelibsiz, {name}", { name: t(name) })}</h1>
+          {specialty && <p className="text-base text-slate-600 dark:text-slate-300">{t(specialty)}</p>}
+        </div>
+      </div>
 
-      {sched && !sched.verified && (
-        <p className="flex items-start gap-2 rounded-2xl border border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-900/20 p-3 text-sm text-amber-900 dark:text-amber-200">
-          <BadgeAlert className="mt-0.5 h-4 w-4 shrink-0" />
-          <span>{t("Litsenziya tekshirilmagan (demo). Haqiqiy versiyada shifokor hisobi Sogʻliqni saqlash vazirligi reestri orqali tasdiqlanadi.")}{sched.licenseNo ? ` · ${sched.licenseNo}` : ""}</span>
-        </p>
-      )}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Kpi icon={CalendarCheck} label={t("Bugungi qabullar")} value={todays.length} tone="teal" />
@@ -96,7 +96,6 @@ export function DoctorHome({ name, specialty }: { name: string; specialty: strin
           <div className="flex-1 min-w-[200px]">
             <h2 className="font-bold text-slate-900 dark:text-white">{t("Ish jadvali")}</h2>
             <p className="text-sm text-slate-500">{sched.workDays.map((n) => fmt.weekdayName(n)).join(", ")} · {sched.hours[0]}:00–{sched.hours[1]}:00</p>
-            <p className="text-xs text-slate-400">{t("Bemorlar MEDCONNECT'da shu vaqtlar ichidan boʻsh vaqtni tanlaydi.")}</p>
           </div>
           <Button variant="outline" size="sm" onClick={() => setEditing(true)}><Settings2 className="h-4 w-4" /> {t("Oʻzgartirish")}</Button>
         </section>

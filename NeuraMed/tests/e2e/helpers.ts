@@ -6,5 +6,5 @@ export async function login(page: Page) {
   await page.fill("input[type=password]", "Test12345!");
   await page.click("button[type=submit]");
   await page.waitForURL("**/dashboard");
-  await expect(page.getByText("NeuraMed modullari")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Bugun" })).toBeVisible();
 }

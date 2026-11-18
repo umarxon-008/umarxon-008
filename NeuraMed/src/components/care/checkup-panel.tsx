@@ -53,11 +53,6 @@ export function CheckupPanel({ patientId }: { patientId?: string }) {
     <div className="space-y-4">
       {step === -1 && (
         <>
-          {!isDoctor && (
-            <p className="flex items-center gap-2 rounded-2xl bg-teal-50 dark:bg-teal-900/20 p-3 text-sm text-teal-800 dark:text-teal-200">
-              <Stethoscope className="h-4 w-4 shrink-0" />{t("Chekapni shifokoringiz qabulda oʻtkazadi. Bu yerda natija, shifokor xulosasi va maslahatlarni koʻrasiz.")}
-            </p>
-          )}
           {last?.emergency && <EmergencyBanner />}
           <section className="card-base p-5 space-y-4">
             {last ? (
@@ -136,7 +131,6 @@ export function CheckupPanel({ patientId }: { patientId?: string }) {
         </section>
       )}
 
-      <DemoNote>{t("Ball turmush tarzi va shikoyatlarga asoslangan qoidaviy hisob — tashxis emas.")}</DemoNote>
     </div>
   );
 }

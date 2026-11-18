@@ -15,6 +15,6 @@ export async function POST(req: NextRequest) {
     if (!REASONS.includes(b?.reason)) throw new HttpError(400, "Sababni tanlang");
     const note = typeof b?.note === "string" ? b.note.trim().slice(0, 300) : "";
     const r = await prisma.traceReport.create({ data: { userId: user.id, productId: b.productId, reason: b.reason, note } });
-    return NextResponse.json({ data: { id: r.id }, demo: true, message: "Demo: xabar saqlandi, real tizimga yuborilmadi." });
+    return NextResponse.json({ data: { id: r.id }, demo: true, message: "Xabar saqlandi. Rahmat!" });
   } catch (e) { return apiError(e); }
 }

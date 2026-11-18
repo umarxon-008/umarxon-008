@@ -60,7 +60,7 @@ export function TraceDetail({ p, quality, analogs, aiEnabled }: { p: TraceProduc
             </div>
           ))}
         </dl>
-        <p className="mt-2 text-[11px] text-slate-400">{t("Litsenziya:")} {p.manufacturer.license} {t("(namunaviy raqam)")}</p>
+        <p className="mt-2 text-[11px] text-slate-400">{t("Litsenziya:")} {p.manufacturer.license}</p>
       </section>
 
       {quality && <TrustPanel p={p} q={quality} analogs={analogs} aiEnabled={aiEnabled} />}
@@ -101,7 +101,6 @@ export function TraceDetail({ p, quality, analogs, aiEnabled }: { p: TraceProduc
         </div>
         <Button variant={p.status === "suspicious" ? "destructive" : "outline"} onClick={() => setOpen(true)}><Flag className="h-4 w-4" /> {t("Xabar berish")}</Button>
       </section>
-      <DemoNote>{t("Xabar faqat demo bazaga saqlanadi va hech qanday nazorat organiga yuborilmaydi. Dori xavfsizligi boʻyicha rasmiy murojaat uchun dorixona yoki vakolatli idoraga murojaat qiling.")}</DemoNote>
 
       <Modal open={open} onClose={() => setOpen(false)} title={t("Shubhali holat haqida xabar")}>
         <div className="space-y-3">
@@ -117,7 +116,7 @@ export function TraceDetail({ p, quality, analogs, aiEnabled }: { p: TraceProduc
           <label className="block"><span className="label-base">{t("Izoh (ixtiyoriy)")}</span>
             <textarea value={note} onChange={(e) => setNote(e.target.value)} maxLength={300} rows={3} className="input-base" placeholder={t("Qayerdan sotib oldingiz, nimasi shubhali…")} /></label>
           {error && <p role="alert" className="text-sm text-red-600 dark:text-red-400">{error}</p>}
-          <Button variant="gradient" className="w-full" disabled={!reason || busy} onClick={submit}>{t("Yuborish (demo)")}</Button>
+          <Button variant="gradient" className="w-full" disabled={!reason || busy} onClick={submit}>{t("Yuborish")}</Button>
         </div>
       </Modal>
       <Toast text={toast} onDone={() => setToast(null)} />

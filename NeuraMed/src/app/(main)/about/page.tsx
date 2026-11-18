@@ -1,9 +1,8 @@
 import { getT } from "@/i18n/server";
 import Link from "next/link";
-import { MessageSquare, ScanSearch, CalendarDays, Stethoscope, Pill, ShieldCheck, FlaskConical, Server, Users, HeartPulse } from "lucide-react";
+import { MessageSquare, ScanSearch, CalendarDays, Stethoscope, Pill, ShieldCheck, Server, Users, HeartPulse } from "lucide-react";
 import { TopBar } from "@/components/layout/top-bar";
 import { BrandLogo } from "@/components/layout/brand-logo";
-import { isAIEnabled } from "@/lib/ai";
 
 export async function generateMetadata() {
   const t = await getT();
@@ -14,14 +13,13 @@ const MODULES = [
   { icon: Stethoscope, name: "Shifokor paneli", text: "Shifokor oʻziga yozilgan bemorlarni koʻradi, chekap oʻtkazadi, koʻrsatkich kiritadi, xulosa va javob yozadi, ish jadvalini belgilaydi.", status: "Ishlaydi" },
   { icon: HeartPulse, name: "Salomatligim", text: "QR tibbiy karta va chekap: salomatlik balli, shifokor xulosasi, koʻrsatkichlar dinamikasi (bemor faqat koʻradi).", status: "Ishlaydi" },
   { icon: Pill, name: "Shaxsiy yordamchi", text: "Dorilar (eslatma, qidiruv, mosligi) va tahlillar (laboratoriya, rentgen) — oddiy tilda tushuntirish.", status: "Ishlaydi" },
-  { icon: MessageSquare, name: "MEDAI", text: "AI yordamchi va 26 atamali tibbiy kutubxona. OpenAI kaliti boʻlmasa — qoidaga asoslangan demo javob.", status: "Ishlaydi · demo/AI" },
-  { icon: ScanSearch, name: "PHARMA TRACE", text: "Mahalliy dorilarga ishonch: haqiqiylik, sertifikat, laboratoriya natijalari, ishonch indeksi va mahalliy muqobil.", status: "Demo maʼlumot" },
-  { icon: CalendarDays, name: "MEDCONNECT", text: "Shifokor topish, qabulga yozilish, qabulga tayyorlanish va shifokor bilan chat — bitta sahifada.", status: "Ishlaydi · demo katalog" },
+  { icon: MessageSquare, name: "MEDAI", text: "AI yordamchi va 26 atamali tibbiy kutubxona.", status: "Ishlaydi" },
+  { icon: ScanSearch, name: "PHARMA TRACE", text: "Mahalliy dorilarga ishonch: haqiqiylik, sertifikat, laboratoriya natijalari, ishonch indeksi va mahalliy muqobil.", status: "Ishlaydi" },
+  { icon: CalendarDays, name: "MEDCONNECT", text: "Shifokor topish, qabulga yozilish, qabulga tayyorlanish va shifokor bilan chat — bitta sahifada.", status: "Ishlaydi" },
 ];
 
 export default async function AboutPage() {
   const t = await getT();
-  const ai = isAIEnabled();
   return (
     <>
       <TopBar title={t("Loyiha haqida")} />
@@ -56,19 +54,9 @@ export default async function AboutPage() {
           <ul className="list-disc pl-5 space-y-1">
             <li>{t("Tashxis qoʻyilmaydi, dori dozasi tavsiya qilinmaydi.")}</li>
             <li>{t("Xavfli belgilar aniqlansa — 103 / 112 ga qoʻngʻiroq qilish haqida ogohlantirish.")}</li>
-            <li>{t("Namunaviy maʼlumotlar har doim “DEMO” yoki “(namuna)” belgisi bilan koʻrsatiladi.")}</li>
           </ul>
         </section>
 
-        <section className="card-base p-4 space-y-2 text-sm text-slate-600 dark:text-slate-300">
-          <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2"><FlaskConical className="h-4 w-4 text-amber-600 dark:text-amber-400" /> {t("Hozirgi holat (hakaton demo)")}</h3>
-          <ul className="list-disc pl-5 space-y-1">
-            <li>{t("AI:")} {ai ? t("OpenAI ulangan") : t("OpenAI kaliti oʻrnatilmagan — demo rejim")}.</li>
-            <li>{t("Katalogdagi shifokorlar, muassasalar va dori partiyalari — toʻqima namunalar; real tizimlarga ulanmagan.")}</li>
-            <li>{t("Shifokor litsenziyasi demoda tekshirilmaydi; haqiqiy versiyada Sogʻliqni saqlash vazirligi reestri orqali tasdiqlanadi.")}</li>
-            <li>{t("Qabul, xabar va shikoyatlar faqat platforma bazasida saqlanadi, tashqariga yuborilmaydi.")}</li>
-          </ul>
-        </section>
 
         <section className="card-base p-4 text-sm text-slate-600 dark:text-slate-300">
           <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2"><Server className="h-4 w-4 text-violet-600 dark:text-violet-400" /> {t("Texnologiyalar")}</h3>

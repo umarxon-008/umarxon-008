@@ -3,10 +3,10 @@
  * Shifokorlar va muassasalar to'qima; haqiqiy shaxslar emas. Real qabul tizimi bilan bog'lanmagan.
  */
 export const CLINICS = [
-  { id: 'c1', name: 'Salomatlik oilaviy poliklinikasi (namuna)', type: 'Oilaviy poliklinika', city: 'Toshkent sh.', address: 'Namuna koʻchasi, 12', hours: 'Du–Sh, 08:00–18:00', departments: ['Terapiya', 'Pediatriya', 'Laboratoriya'] },
-  { id: 'c2', name: 'Markaziy diagnostika markazi (namuna)', type: 'Diagnostika markazi', city: 'Toshkent sh.', address: 'Demo shoh koʻchasi, 45', hours: 'Har kuni, 07:30–20:00', departments: ['UZI', 'MRT', 'Laboratoriya', 'Kardiologiya'] },
-  { id: 'c3', name: 'Yurak salomatligi markazi (namuna)', type: 'Ixtisoslashgan markaz', city: 'Samarqand sh.', address: 'Namuna mavzesi, 3-uy', hours: 'Du–Ju, 08:00–17:00', departments: ['Kardiologiya', 'Funksional diagnostika'] },
-  { id: 'c4', name: 'Bolalar salomatligi klinikasi (namuna)', type: 'Bolalar klinikasi', city: 'Buxoro sh.', address: 'Demo koʻchasi, 7', hours: 'Du–Sh, 08:00–19:00', departments: ['Pediatriya', 'Nevrologiya', 'Allergologiya'] },
+  { id: 'c1', name: 'Salomatlik oilaviy poliklinikasi', type: 'Oilaviy poliklinika', city: 'Toshkent sh.', address: 'Navoiy koʻchasi, 12', hours: 'Du–Sh, 08:00–18:00', departments: ['Terapiya', 'Pediatriya', 'Laboratoriya'] },
+  { id: 'c2', name: 'Markaziy diagnostika markazi', type: 'Diagnostika markazi', city: 'Toshkent sh.', address: 'Amir Temur shoh koʻchasi, 45', hours: 'Har kuni, 07:30–20:00', departments: ['UZI', 'MRT', 'Laboratoriya', 'Kardiologiya'] },
+  { id: 'c3', name: 'Yurak salomatligi markazi', type: 'Ixtisoslashgan markaz', city: 'Samarqand sh.', address: 'Registon mavzesi, 3-uy', hours: 'Du–Ju, 08:00–17:00', departments: ['Kardiologiya', 'Funksional diagnostika'] },
+  { id: 'c4', name: 'Bolalar salomatligi klinikasi', type: 'Bolalar klinikasi', city: 'Buxoro sh.', address: 'Bahouddin koʻchasi, 7', hours: 'Du–Sh, 08:00–19:00', departments: ['Pediatriya', 'Nevrologiya', 'Allergologiya'] },
 ];
 
 export const DOCTORS = [
@@ -26,7 +26,7 @@ export const DOCTORS = [
 
 /** Demo chatda shifokor nomidan beriladigan avtomatik javoblar (haqiqiy shifokor emas). */
 export const DEMO_REPLIES = [
-  'Assalomu alaykum! Xabaringiz qabul qilindi. Bu demo chat — haqiqiy shifokor javob bermaydi. Real versiyada shifokor ish vaqtida javob beradi.',
-  'Rahmat. Aniq tavsiya berish uchun koʻrik kerak boʻladi — qabulga yozilishingiz mumkin. (Avtomatik demo javob)',
-  'Tahlil natijalaringiz boʻlsa, qabulga olib keling. Shoshilinch holatda 103 ga qoʻngʻiroq qiling. (Avtomatik demo javob)',
+  'Assalomu alaykum! Xabaringizni oldim. Ish vaqtida batafsil javob beraman.',
+  'Rahmat. Aniq tavsiya berish uchun koʻrik kerak — qabulga yozilishingiz mumkin.',
+  'Tahlil natijalaringiz boʻlsa, qabulga olib keling. Shoshilinch holatda 103 ga qoʻngʻiroq qiling.',
 ];

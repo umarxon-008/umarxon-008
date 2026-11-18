@@ -2,13 +2,13 @@ import { test, expect } from "@playwright/test";
 import { login } from "./helpers";
 
 const PAGES: [string, RegExp][] = [
-  ["/dashboard", /NeuraMed modullari/],
+  ["/dashboard", /Keyingi dori/],
   ["/assistant", /Tibbiy atama yoki tahlil haqida soʻrang/],
-  ["/library", /tibbiy atama oddiy tilda/],
-  ["/trace", /Mahalliy dorilarga ishonch/],
+  ["/library", /Gemoglobin/],
+  ["/trace", /Barcha mahsulotlar/],
   ["/trace/MP-10004", /Taʼminot zanjiri/],
-  ["/connect", /Shifokor topish, qabulga yozilish/],
-  ["/checkup", /Chekap — shifokor oʻtkazadi/],
+  ["/connect", /Qaysi shifokorga borishni bilmayapsizmi/],
+  ["/checkup", /Shifokor xulosasi/],
   ["/medications", /Mening dorilarim/],
   ["/lab-reports", /Laboratoriya tahlillari/],
   ["/more", /Loyiha haqida/],

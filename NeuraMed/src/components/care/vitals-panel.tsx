@@ -54,11 +54,6 @@ export function VitalsPanel({ patientId }: { patientId?: string }) {
 
   return (
     <div className="space-y-4">
-      {!canEdit && (
-        <p className="flex items-center gap-2 rounded-2xl bg-teal-50 dark:bg-teal-900/20 p-3 text-sm text-teal-800 dark:text-teal-200">
-          <Stethoscope className="h-4 w-4 shrink-0" />{t("Koʻrsatkichlarni shifokoringiz qabulda kiritadi. Bu yerda natija va dinamikani koʻrasiz.")}
-        </p>
-      )}
 
       {emergency && <EmergencyBanner />}
       {d.alerts.length > 0 && (
@@ -115,7 +110,6 @@ export function VitalsPanel({ patientId }: { patientId?: string }) {
         </ul>
       </section>
 
-      <DemoNote>{t("Baholash umumqabul qilingan kattalar chegaralariga asoslangan va tashxis emas. Demo hisobdagi oʻlchovlar namunaviy.")}</DemoNote>
 
       {canEdit && adding && <AddModal url={url} s={d.series.find((x) => x.type === adding)!} series={d.series} onClose={() => setAdding(null)} onSaved={(a) => { setAdding(null); setResult(a); load(); }} />}
       <Modal open={!!result} onClose={() => setResult(null)} title={t("Oʻlchov saqlandi")}>

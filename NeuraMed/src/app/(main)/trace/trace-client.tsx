@@ -13,9 +13,9 @@ import { Factory, BadgeCheck } from "lucide-react";
 import type { TraceProduct } from "@/lib/modules/trace";
 
 const SAMPLES = [
-  { code: "QR-MP-7F3K-1001", label: "Tasdiqlangan namuna" },
-  { code: "QR-MP-5H1Q-1003", label: "Tekshiruvdagi namuna" },
-  { code: "QR-MP-9Z4T-1004", label: "Shubhali namuna" },
+  { code: "QR-MP-7F3K-1001", label: "Tasdiqlangan dori" },
+  { code: "QR-MP-5H1Q-1003", label: "Tekshiruvdagi dori" },
+  { code: "QR-MP-9Z4T-1004", label: "Shubhali dori" },
   { code: "QR-MP-3C7M-1005", label: "Import → mahalliy muqobil" },
 ];
 type Filter = "all" | "local" | "verified" | "pending" | "suspicious";
@@ -47,7 +47,6 @@ export function TraceClient() {
   return (
     <div className="px-4 py-4 space-y-4">
       <ModuleHero icon={ScanSearch} name="PHARMA TRACE" title={t("Mahalliy dorilarga ishonch: haqiqiylik, sertifikat va laboratoriya")} text="QR kod yoki partiya raqami orqali dorining yoʻli, sifat sertifikatlari, mustaqil laboratoriya natijalari va ishonch indeksini koʻring. Import dori uchun ishonchli mahalliy muqobilni taklif qiladi." />
-      <DemoNote>{t("Namunaviy maʼlumotlar: mahsulotlar va tashkilotlar toʻqima. Davlat reestri yoki real sertifikatlash tizimi bilan integratsiya yoʻq.")}</DemoNote>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Kpi icon={Package} label={t("Mahsulotlar")} value={summary.total} />
@@ -91,7 +90,7 @@ export function TraceClient() {
 
       <section className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">
-          <h2 className="font-bold text-slate-900 dark:text-white mr-auto">{t("Barcha namunaviy mahsulotlar")}</h2>
+          <h2 className="font-bold text-slate-900 dark:text-white mr-auto">{t("Barcha mahsulotlar")}</h2>
           {(["all", "local", "verified", "pending", "suspicious"] as Filter[]).map((f) => (
             <Chip key={f} active={filter === f} onClick={() => setFilter(f)}>{t({ all: "Barchasi", local: "🇺🇿 Mahalliy", verified: "Tasdiqlangan", pending: "Tekshirilmoqda", suspicious: "Shubhali" }[f])}</Chip>
           ))}

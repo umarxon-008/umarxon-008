@@ -125,7 +125,6 @@ export function MedcardClient() {
         <Button variant="gradient" disabled={busy} onClick={save}>{t("Saqlash")}</Button>
       </section>
 
-      <DemoNote>{t("Demo: karta maʼlumotlari faqat shu platforma bazasida saqlanadi. Real versiyada havola faqat shifokor va tez yordam uchun vaqtinchalik ochiladi.")}</DemoNote>
       <Toast text={toast} onDone={() => setToast(null)} />
     </div>
   );

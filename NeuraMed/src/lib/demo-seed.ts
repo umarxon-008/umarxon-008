@@ -26,8 +26,8 @@ export async function ensureDemoData() {
         passwordHash: bcrypt.hashSync("Test12345!", 10),
         role: "doctor",
         specialty: "Terapevt",
-        clinicName: "Salomatlik oilaviy poliklinikasi (namuna)",
-        licenseNo: "DEMO-LIC-0001",
+        clinicName: "Salomatlik oilaviy poliklinikasi",
+        licenseNo: "UZ-LIC-0001",
         workDaysJson: "[1,2,3,4,5]",
         workHoursJson: "[9,17]",
         doctorRef: DEMO_DOCTOR_REF,
@@ -44,7 +44,7 @@ export async function ensureDemoData() {
   const appts: any[] = await prisma.appointment.findMany({ where: { userId: patient.id, doctorId: DEMO_DOCTOR_REF } });
   if (!appts.some((a) => a.status !== "cancelled" && a.date >= today)) {
     await prisma.appointment.create({
-      data: { userId: patient.id, doctorId: DEMO_DOCTOR_REF, date: today, time: "15:00", name: patient.name || "Bemor", reason: "Chekap va tahlil natijalarini muhokama qilish (namuna)", status: "pending", shareAccess: true },
+      data: { userId: patient.id, doctorId: DEMO_DOCTOR_REF, date: today, time: "15:00", name: patient.name || "Bemor", reason: "Chekap va tahlil natijalarini muhokama qilish", status: "pending", shareAccess: true },
     });
   }
 
@@ -52,10 +52,10 @@ export async function ensureDemoData() {
   const vitals: any[] = await prisma.vitalReading.findMany({ where: { userId: patient.id } });
   if (!vitals.some((v) => v.type !== "bp")) {
     for (const r of demoVitals(patient.id)) {
-      await prisma.vitalReading.create({ data: { ...r, doctorRef: DEMO_DOCTOR_REF, doctorName: `${DEMO_DOCTOR_NAME} (namuna)` } });
+      await prisma.vitalReading.create({ data: { ...r, doctorRef: DEMO_DOCTOR_REF, doctorName: `${DEMO_DOCTOR_NAME}` } });
     }
   } else if (vitals.some((v) => v.note === "namuna" && !v.doctorRef)) {
-    await prisma.vitalReading.updateMany({ where: { userId: patient.id, note: "namuna" }, data: { doctorRef: DEMO_DOCTOR_REF, doctorName: `${DEMO_DOCTOR_NAME} (namuna)` } });
+    await prisma.vitalReading.updateMany({ where: { userId: patient.id, note: "namuna" }, data: { doctorRef: DEMO_DOCTOR_REF, doctorName: `${DEMO_DOCTOR_NAME}` } });
   }
 
   // 3. Shifokor o'tkazgan chekap
@@ -72,8 +72,8 @@ export async function ensureDemoData() {
         score: r.score,
         scoresJson: JSON.stringify(r.areas),
         doctorRef: DEMO_DOCTOR_REF,
-        doctorName: `${DEMO_DOCTOR_NAME} (namuna)`,
-        conclusion: "Umumiy holat qoniqarli. Jismoniy faollikni oshirish va uyqu rejimini tartibga solish tavsiya etiladi. Temir tanqisligi boʻyicha 1 oydan keyin qon tahlilini takrorlang. (namuna)",
+        doctorName: `${DEMO_DOCTOR_NAME}`,
+        conclusion: "Umumiy holat qoniqarli. Jismoniy faollikni oshirish va uyqu rejimini tartibga solish tavsiya etiladi. Temir tanqisligi boʻyicha 1 oydan keyin qon tahlilini takrorlang.",
       },
     });
   }

@@ -58,7 +58,7 @@ function templateSummary(p: ProductLite, q: Quality, analogs: Analog[], t: (s: s
   lines.push(p.status === "verified" ? t("Taʼminot zanjiri toʻliq tasdiqlangan.") : p.status === "pending" ? t("Taʼminot zanjirining oxirgi bosqichi hali tasdiqlanmagan.") : t("Taʼminot zanjirida nomuvofiqliklar bor — bu partiyani sotib olmang va dorixonaga xabar bering."));
   if (p.local) lines.push(t("Bu dori Oʻzbekistonda ishlab chiqarilgan."));
   else if (analogs[0]) lines.push(t("Shu faol moddali mahalliy muqobil bor: {name} ({maker}) — ishonch indeksi {score}/100", { name: t(analogs[0].name), maker: t(analogs[0].manufacturer), score: analogs[0].trust ?? "—" }) + (analogs[0].cheaperPct ? `, ${t("~{p}% arzonroq", { p: analogs[0].cheaperPct })}` : "") + ".");
-  lines.push(t("Bu tibbiy maslahat emas: dorini tanlash yoki almashtirishni shifokor yoki farmatsevt bilan kelishing. Maʼlumotlar namunaviy."));
+  lines.push(t("Dorini almashtirishni shifokor yoki farmatsevt bilan kelishing."));
   void sum;
   return lines.map((l) => `- ${l}`).join("\n");
 }

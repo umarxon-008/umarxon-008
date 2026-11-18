@@ -16,7 +16,7 @@ export function SideNav({ role, contactPhone }: { role: UserRole; contactPhone?:
   return (
     <aside className="hidden lg:flex fixed inset-y-0 left-0 z-40 w-72 flex-col gap-5 border-r border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-5 overflow-y-auto">
       <Link href={role === "doctor" ? "/doctor" : "/dashboard"} className="px-2"><BrandLogo size={44} withName /></Link>
-      <nav className="flex flex-col gap-4" aria-label={t("Boʻlimlar")}>
+      <nav className="flex flex-col gap-3" aria-label={t("Boʻlimlar")}>
         {navFor(role).map((g, gi) => (
           <div key={gi} className="flex flex-col gap-0.5">
             {g.title && <p className="px-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">{t(g.title)}</p>}
@@ -28,7 +28,7 @@ export function SideNav({ role, contactPhone }: { role: UserRole; contactPhone?:
                   href={it.href}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+                    "relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-base font-medium transition-colors",
                     active
                       ? "bg-gradient-to-r from-emerald-50 to-violet-50 dark:from-emerald-900/20 dark:to-violet-900/20 text-slate-900 dark:text-white font-semibold"
                       : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-800"
@@ -43,7 +43,11 @@ export function SideNav({ role, contactPhone }: { role: UserRole; contactPhone?:
           </div>
         ))}
       </nav>
-      {role === "patient" && <SosButton contactPhone={contactPhone} className="mt-auto mx-1" />}
+      {role === "patient" && (
+        <div className="sticky bottom-0 -mx-4 -mb-5 mt-auto bg-white px-5 pb-5 pt-3 dark:bg-slate-900">
+          <SosButton contactPhone={contactPhone} className="w-full py-3 text-base" />
+        </div>
+      )}
     </aside>
   );
 }

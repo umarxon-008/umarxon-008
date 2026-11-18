@@ -91,12 +91,12 @@
   }
 
   .gradient-text {
-    @apply bg-gradient-to-r from-emerald-500 via-teal-500 to-violet-600 bg-clip-text text-transparent;
+    @apply text-primary-700 dark:text-primary-300;
   }
 
   /* NeuraMed modullari uchun umumiy bloklar */
   .module-icon {
-    @apply inline-flex items-center justify-center rounded-2xl text-white shadow-lg bg-gradient-primary;
+    @apply inline-flex items-center justify-center rounded-2xl bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300;
   }
   .demo-note {
     @apply flex items-start gap-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-xs text-amber-800 dark:text-amber-300 leading-relaxed;
@@ -128,3 +128,13 @@
 /* Safe area for mobile */
 .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0); }
 .safe-top { padding-top: env(safe-area-inset-top, 0); }
+
+
+/* ── Sodda va oʻqilishi oson interfeys ──────────────────────────────────────
+   Yozuv kattaroq (asosiy matn ~18px), mayda yozuvlar kattalashtirilgan,
+   och kulrang matnlar toʻqroq — yoshi katta foydalanuvchilar uchun. */
+html { font-size: 112.5%; }
+[class~="text-[10px]"], [class~="text-[11px]"] { font-size: 0.8125rem !important; line-height: 1.25rem !important; }
+html:not(.dark) .text-slate-400 { color: rgb(71 85 105); }
+html:not(.dark) .text-slate-500 { color: rgb(51 65 85); }
+.dark .text-slate-400, .dark .text-slate-500 { color: rgb(203 213 225); }

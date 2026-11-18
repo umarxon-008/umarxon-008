@@ -102,14 +102,7 @@ export function AssistantClient({ aiEnabled }: { aiEnabled: boolean }) {
       </aside>
 
       <section className="flex flex-col min-h-[70vh]">
-        {locale !== "uz" && !aiEnabled && <p className="mb-3 rounded-xl bg-sky-50 dark:bg-sky-900/20 px-3 py-2 text-xs text-sky-800 dark:text-sky-200">{t("Kutubxona maqolalari va demo javoblar hozircha faqat oʻzbek tilida. AI rejimida (OpenAI kaliti bilan) javob tanlangan tilda beriladi.")}</p>}
         <div className="mb-3 flex flex-wrap items-center gap-2">
-          {aiEnabled ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800 dark:text-emerald-300">{t("AI rejimi · OpenAI")}</span>
-          ) : (
-            <DemoBadge>{t("Demo rejim · AI emas")}</DemoBadge>
-          )}
-          <span className="text-xs text-slate-500">{t("Tashxis qoʻymaydi · dori dozasini aytmaydi")}</span>
           <div className="ml-auto flex gap-2">
             <Button variant="outline" size="sm" className="lg:hidden" onClick={() => setShowHistory((s) => !s)}><History className="h-4 w-4" /> {t("Tarix")}</Button>
             <Link href="/library"><Button variant="outline" size="sm"><BookOpen className="h-4 w-4" /> {t("Kutubxona")}</Button></Link>
@@ -123,7 +116,6 @@ export function AssistantClient({ aiEnabled }: { aiEnabled: boolean }) {
               <h2 className="text-lg font-extrabold text-slate-900 dark:text-white">{t("Tibbiy atama yoki tahlil haqida soʻrang")}</h2>
               <p className="mx-auto mt-1 max-w-md text-sm text-slate-500">
                 {t("MEDAI tibbiy atamalarni oddiy tilda tushuntiradi va shifokorga beriladigan savollarni tayyorlashga yordam beradi.")}
-                {!aiEnabled && t(" Hozir demo rejim: javoblar ichki kutubxona va qoidalar asosida tuziladi.")}
               </p>
               <div className="mt-4 flex flex-wrap justify-center gap-2">
                 {TRY.map((it) => (
@@ -148,8 +140,6 @@ export function AssistantClient({ aiEnabled }: { aiEnabled: boolean }) {
                   {m.flags?.emergency && <EmergencyBanner />}
                   <div className="card-base p-4 text-slate-700 dark:text-slate-200">
                     <div className="mb-2 flex items-center gap-2">
-                      {m.mode === "ai" ? <span className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 text-[10px] font-bold text-emerald-800 dark:text-emerald-300">{t("AI")}</span> : <DemoBadge>{t("Demo · AI emas")}</DemoBadge>}
-                      {m.aiFailed && <span className="text-[11px] text-amber-600 dark:text-amber-400">{t("AI javob bermadi — demo javob")}</span>}
                       <button type="button" onClick={() => copy(m.content)} className="ml-auto rounded-lg p-1 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800" aria-label={t("Nusxalash")}><Copy className="h-4 w-4" /></button>
                     </div>
                     <Markdown text={m.content} />

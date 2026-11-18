@@ -14,13 +14,13 @@ test("MEDAI: manbali javob va shoshilinch holat ogohlantirishi", async ({ page }
 
 test("PHARMA TRACE: shubhali partiya va xabar berish", async ({ page }) => {
   await page.goto("/trace");
-  await page.getByRole("button", { name: "Shubhali namuna" }).click();
+  await page.getByRole("button", { name: "Shubhali dori" }).click();
   await page.getByRole("link", { name: /Ibuprofen/ }).first().click();
   await expect(page.getByText("Shubhali").first()).toBeVisible();
   await page.getByRole("button", { name: "Xabar berish" }).click();
   await page.getByText("Narx yoki sotuv joyi shubhali").click();
-  await page.getByRole("button", { name: "Yuborish (demo)" }).click();
-  await expect(page.getByText("Demo: xabar saqlandi")).toBeVisible();
+  await page.getByRole("button", { name: "Yuborish", exact: true }).click();
+  await expect(page.getByText("Xabar saqlandi")).toBeVisible();
 });
 
 test("MEDCONNECT: qabulga yozilish, bekor qilish va chat", async ({ page }) => {
@@ -38,7 +38,7 @@ test("MEDCONNECT: qabulga yozilish, bekor qilish va chat", async ({ page }) => {
   await page.locator("section ul button").nth(1).click();
   await page.fill("input[aria-label=Xabar]", "Salom, savolim bor");
   await page.keyboard.press("Enter");
-  await expect(page.getByText(/Avtomatik demo javob|demo chat/).last()).toBeVisible();
+  await expect(page.getByText(/Xabaringizni oldim|koʻrik kerak|qabulga olib keling/).last()).toBeVisible();
 });
 
 test("Til almashtirish: English, Русский, Қазақша, Тоҷикӣ", async ({ page }) => {
@@ -46,7 +46,7 @@ test("Til almashtirish: English, Русский, Қазақша, Тоҷикӣ", 
   await page.getByRole("button", { name: /English/ }).click();
   await expect(page.getByText("Appearance")).toBeVisible();
   await page.goto("/dashboard");
-  await expect(page.getByText("NeuraMed modules")).toBeVisible();
+  await expect(page.getByText("Next medicine")).toBeVisible();
   await page.goto("/settings");
   await page.getByRole("button", { name: /Русский/ }).click();
   await expect(page.getByText("Оформление")).toBeVisible();

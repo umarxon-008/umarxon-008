@@ -30,7 +30,7 @@ NeuraMed — **bemor va shifokor** uchun yagona tibbiy platforma. Roʻyxatdan o�
 
 Olib tashlangan: qon bosimi, MEDSTOCK AI, alohida SOS sahifasi. Eski havolalar (`/vitals`, `/interactions`, `/reminders`, `/imaging-reports`, `/doctor-visit`, `/sos`, `/stock`) yangi joyiga yoʻnaltiriladi.
 
-Namunaviy maʼlumotlar har doim **DEMO** yoki **(namuna)** belgisi bilan koʻrsatiladi. Katalogdagi shifokorlar, klinikalar va dori partiyalari toʻqima; real tizimlarga ulanmagan.
+Interfeys sodda: katta yozuv, bitta asosiy rang, ortiqcha izoh va DEMO belgilarisiz (video va taqdimot uchun). Katalogdagi shifokorlar, klinikalar va dori partiyalari toʻqima; real tizimlarga ulanmagan.
 
 ---
 

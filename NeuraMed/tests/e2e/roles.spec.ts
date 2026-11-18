@@ -50,5 +50,5 @@ test("Ro'yxatdan o'tish: shifokor roli bilan", async ({ page }) => {
   await page.getByLabel("Parolni tasdiqlang *").fill("Test12345!");
   await page.click("button[type=submit]");
   await page.waitForURL(/\/doctor/);
-  await expect(page.getByText(/Litsenziya tekshirilmagan/)).toBeVisible();
+  await expect(page.getByText("Bemorlarim").first()).toBeVisible();
 });

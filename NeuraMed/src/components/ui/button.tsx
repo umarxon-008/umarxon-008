@@ -19,12 +19,12 @@ const buttonVariants = cva(
         destructive:
           "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30",
         gradient:
-          "bg-gradient-primary text-white shadow-sm hover:opacity-90",
+          "bg-primary-600 text-white shadow-sm hover:bg-primary-700",
         link: "text-primary-500 underline-offset-4 hover:underline p-0 h-auto",
       },
       size: {
         default: "h-11 px-5 py-2.5",
-        sm: "h-9 px-3 py-2 text-xs",
+        sm: "h-10 px-3.5 py-2 text-sm",
         lg: "h-13 px-6 py-3 text-base",
         xl: "h-14 px-8 py-3 text-base",
         icon: "h-10 w-10 p-0",

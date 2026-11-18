@@ -56,7 +56,7 @@ function getInitialLocalDB(): LocalDB {
         chronicConditionsJson: JSON.stringify(["Temir tanqisligi anemiyasi"]),
         currentMedicationsJson: null,
         pregnancyStatus: "NOT_APPLICABLE",
-        emergencyContact: JSON.stringify({ name: "Karim Karimov (turmush oʻrtogʻi, namuna)", phone: "+998 90 000 00 00" }),
+        emergencyContact: JSON.stringify({ name: "Karim Karimov (turmush oʻrtogʻi)", phone: "+998 90 000 00 00" }),
         language: "uz",
         pushSubscriptionJson: null,
         createdAt: now,
@@ -142,7 +142,7 @@ function loadLocalDB(): LocalDB {
       if (!hadCard && demo) {
         demo.allergiesJson ??= JSON.stringify(["Penitsillin"]);
         demo.chronicConditionsJson ??= JSON.stringify(["Temir tanqisligi anemiyasi"]);
-        demo.emergencyContact ??= JSON.stringify({ name: "Karim Karimov (turmush oʻrtogʻi, namuna)", phone: "+998 90 000 00 00" });
+        demo.emergencyContact ??= JSON.stringify({ name: "Karim Karimov (turmush oʻrtogʻi)", phone: "+998 90 000 00 00" });
       }
       return db;
     }

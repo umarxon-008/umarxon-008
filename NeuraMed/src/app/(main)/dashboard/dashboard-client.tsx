@@ -1,277 +1,109 @@
 "use client";
 
-import { useT, useLocale } from "@/i18n/client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import {
-  Search,
-  Upload,
-  Stethoscope,
-  Bell,
-  ChevronRight,
-  Clock,
-  AlertTriangle,
-  Scan,
-} from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Disclaimer } from "@/components/ui/disclaimer";
-import { formatDate, getTimeLabel, foodRuleLabel } from "@/lib/utils";
+import { Pill, FlaskConical, HeartPulse, CalendarDays, MessageSquare, ScanSearch, Clock, ShieldAlert, ChevronRight } from "lucide-react";
+import { useT } from "@/i18n/client";
+import { cn } from "@/lib/utils";
+import { useFormat } from "@/components/modules/common";
 import type { ReminderWithMed } from "@/types";
 import { registerServiceWorker } from "@/hooks/use-push-notifications";
-import { PlatformOverview, HealthOverview, type PlatformSummary } from "@/components/modules/platform-overview";
+import type { PlatformSummary } from "@/components/modules/platform-overview";
 
 interface Props {
   userName: string;
   reminders: ReminderWithMed[];
   platform: PlatformSummary;
-  recentReports: {
-    id: string;
-    fileName: string;
-    hasUrgentValues: boolean;
-    createdAt: string;
-  }[];
+  recentReports: { id: string; fileName: string; hasUrgentValues: boolean; createdAt: string }[];
 }
 
-export function DashboardClient({ userName, reminders, recentReports, platform }: Props) {
-  const locale = useLocale();
+const ACTIONS = [
+  { href: "/medications", icon: Pill, label: "Dorilar" },
+  { href: "/lab-reports", icon: FlaskConical, label: "Tahlillar" },
+  { href: "/checkup", icon: HeartPulse, label: "Chekap" },
+  { href: "/connect", icon: CalendarDays, label: "Shifokorga yozilish" },
+  { href: "/assistant", icon: MessageSquare, label: "Savol berish" },
+  { href: "/trace", icon: ScanSearch, label: "Dorini tekshirish" },
+];
+
+/** Bemorning bosh sahifasi: bugungi eng muhim narsalar va 6 ta katta tugma. */
+export function DashboardClient({ userName, reminders, platform }: Props) {
   const t = useT();
+  const fmt = useFormat();
   // Vaqtga bog'liq qiymatlar faqat brauzerda hisoblanadi (server va brauzer HTML'i mos kelishi uchun).
   const [now, setNow] = useState<Date | null>(null);
-  useEffect(() => {
-    registerServiceWorker();
-    setNow(new Date());
-  }, []);
+  useEffect(() => { registerServiceWorker(); setNow(new Date()); }, []);
 
-  // Find next reminder
-  const nextReminder = !now ? undefined : reminders
+  const nextDose = !now ? undefined : reminders
     .filter((r) => r.status === "ACTIVE")
-    .flatMap((r) =>
-      r.schedule.map((s) => ({ ...s, reminder: r }))
-    )
-    .find((s) => {
-      const [h, m] = s.time.split(":").map(Number);
-      const at = new Date();
-      at.setHours(h, m, 0, 0);
-      return at > now;
-    });
+    .flatMap((r) => r.schedule.map((s) => ({ ...s, reminder: r })))
+    .filter((s) => { const [h, m] = s.time.split(":").map(Number); const at = new Date(); at.setHours(h, m, 0, 0); return at > now; })
+    .sort((a, b) => a.time.localeCompare(b.time))[0];
 
+  const hour = now?.getHours() ?? 12;
+  const greeting = hour >= 5 && hour < 12 ? "Xayrli tong" : hour < 17 ? "Xayrli kun" : hour < 21 ? "Xayrli kech" : "Yaxshi kechalar";
   const firstName = userName.split(" ")[0];
+  const appt = platform.connect.upcoming;
+  const suspicious = platform.trace.suspicious[0];
+  const score = platform.health.score;
 
   return (
-    <div className="px-4 py-5 space-y-5">
-      {/* Greeting */}
-      <div>
-        <p className="text-sm text-slate-500 dark:text-slate-400">
-          {now ? t(getGreeting(now)) : t("Salom,")}
-        </p>
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white mt-0.5">
-          {firstName} 👋
-        </h1>
-      </div>
+    <div className="px-4 py-6 space-y-6">
+      <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{now ? t(greeting) : t("Salom")}, {firstName}</h1>
 
-      {/* Disclaimer */}
-      <Disclaimer compact />
+      <section className="card-base space-y-1">
+        <h2 className="mb-2 text-xl font-bold text-slate-900 dark:text-white">{t("Bugun")}</h2>
 
-      {/* Salomatligim va NeuraMed modullari (MEDAI, PHARMA TRACE, MEDCONNECT) */}
-      <HealthOverview s={platform} />
-
-      <PlatformOverview s={platform} />
-
-      {/* Quick actions */}
-      <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300 -mb-2">{t("Shaxsiy yordamchi")}</h2>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <Link href="/medications?tab=search">
-          <Card className="h-full hover:shadow-md transition-shadow cursor-pointer">
-            <CardContent className="p-4 flex flex-col gap-3">
-              <div className="h-10 w-10 rounded-xl bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center">
-                <Search className="h-5 w-5 text-primary-500" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-slate-800 dark:text-white">{t("Dori qidirish")}</p>
-                <p className="text-xs text-slate-400 mt-0.5">{t("Ma'lumot oling")}</p>
-              </div>
-            </CardContent>
-          </Card>
+        <Link href={nextDose ? `/reminders/${nextDose.reminder.id}` : "/medications"} className="flex items-center gap-4 rounded-2xl p-3 hover:bg-slate-50 dark:hover:bg-slate-700/40">
+          <span className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300"><Clock className="h-7 w-7" /></span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-base text-slate-600 dark:text-slate-300">{t("Keyingi dori")}</span>
+            <span className="block text-lg font-bold text-slate-900 dark:text-white">
+              {nextDose ? `${nextDose.time} — ${nextDose.reminder.medicationName} ${nextDose.reminder.dose}` : t("Bugun boshqa dori yoʻq")}
+            </span>
+          </span>
+          <ChevronRight className="h-6 w-6 text-slate-400" />
         </Link>
 
-        <Link href="/lab-reports">
-          <Card className="h-full hover:shadow-md transition-shadow cursor-pointer">
-            <CardContent className="p-4 flex flex-col gap-3">
-              <div className="h-10 w-10 rounded-xl bg-violet-50 dark:bg-violet-900/30 flex items-center justify-center">
-                <Upload className="h-5 w-5 text-violet-500" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-slate-800 dark:text-white">{t("Tahlil yuklash")}</p>
-                <p className="text-xs text-slate-400 mt-0.5">{t("Lab natijasi")}</p>
-              </div>
-            </CardContent>
-          </Card>
+        <Link href="/connect?tab=appointments" className="flex items-center gap-4 rounded-2xl p-3 hover:bg-slate-50 dark:hover:bg-slate-700/40">
+          <span className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300"><CalendarDays className="h-7 w-7" /></span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-base text-slate-600 dark:text-slate-300">{t("Shifokor qabuli")}</span>
+            <span className="block text-lg font-bold text-slate-900 dark:text-white">
+              {appt ? `${fmt.day(appt.date)}, ${appt.time} — ${t(appt.doctor)}` : t("Qabul yoʻq")}
+            </span>
+          </span>
+          <ChevronRight className="h-6 w-6 text-slate-400" />
         </Link>
 
-        <Link href="/lab-reports?tab=imaging">
-          <Card className="h-full hover:shadow-md transition-shadow cursor-pointer">
-            <CardContent className="p-4 flex flex-col gap-3">
-              <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
-                <Scan className="h-5 w-5 text-blue-500" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-slate-800 dark:text-white">{t("Rentgen")}</p>
-                <p className="text-xs text-slate-400 mt-0.5">{t("Hisobot")}</p>
-              </div>
-            </CardContent>
-          </Card>
+        <Link href="/checkup" className="flex items-center gap-4 rounded-2xl p-3 hover:bg-slate-50 dark:hover:bg-slate-700/40">
+          <span className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300"><HeartPulse className="h-7 w-7" /></span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-base text-slate-600 dark:text-slate-300">{t("Salomatlik balli")}</span>
+            <span className={cn("block text-lg font-bold", score == null ? "text-slate-900 dark:text-white" : score >= 80 ? "text-emerald-700 dark:text-emerald-400" : score >= 60 ? "text-amber-700 dark:text-amber-400" : "text-red-700 dark:text-red-400")}>
+              {score != null ? `${score} / 100` : t("Chekap hali oʻtkazilmagan")}
+            </span>
+          </span>
+          <ChevronRight className="h-6 w-6 text-slate-400" />
         </Link>
 
-        <Link href="/connect?tab=prep">
-          <Card className="h-full hover:shadow-md transition-shadow cursor-pointer">
-            <CardContent className="p-4 flex flex-col gap-3">
-              <div className="h-10 w-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center">
-                <Stethoscope className="h-5 w-5 text-emerald-500" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-slate-800 dark:text-white">{t("Shifokorga")}</p>
-                <p className="text-xs text-slate-400 mt-0.5">{t("Tayyorlanish")}</p>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-      </div>
+        {suspicious && (
+          <Link href={`/trace/${suspicious.id}`} className="mt-1 flex items-center gap-4 rounded-2xl bg-red-50 p-3 dark:bg-red-900/20">
+            <ShieldAlert className="h-7 w-7 shrink-0 text-red-600 dark:text-red-400" />
+            <span className="flex-1 text-base font-semibold text-red-800 dark:text-red-200">{t("{name} dorisining partiyasi shubhali", { name: t(suspicious.name) })}</span>
+            <ChevronRight className="h-6 w-6 text-red-400" />
+          </Link>
+        )}
+      </section>
 
-      {/* Next reminder */}
-      {nextReminder ? (
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">{t("Keyingi eslatma")}</h2>
-            <Link href="/medications" className="text-xs text-primary-500 font-medium">
-              {t("Hammasini ko'rish")}
-            </Link>
-          </div>
-          <Card>
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className="h-12 w-12 rounded-xl bg-primary-50 dark:bg-primary-900/30 flex flex-col items-center justify-center shrink-0">
-                <Clock className="h-5 w-5 text-primary-500" />
-                <span className="text-[10px] text-primary-600 dark:text-primary-400 font-semibold mt-0.5">
-                  {nextReminder.time}
-                </span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-slate-800 dark:text-white truncate">
-                  {nextReminder.reminder.medicationName}
-                </p>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  {nextReminder.reminder.dose} · {t(foodRuleLabel(nextReminder.reminder.foodRule))}
-                </p>
-              </div>
-              <Bell className="h-4 w-4 text-slate-300 shrink-0" />
-            </CardContent>
-          </Card>
-        </div>
-      ) : (
-        <Card>
-          <CardContent className="p-4 flex items-center gap-3">
-            <Bell className="h-5 w-5 text-slate-300" />
-            <div className="flex-1">
-              <p className="text-sm text-slate-500">{t("Bugun eslatma yo'q")}</p>
-            </div>
-            <Link href="/reminders/add">
-              <Button variant="outline" size="sm">{t("Qo'shish")}</Button>
-            </Link>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Active reminders today */}
-      {reminders.length > 0 && (
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-              {t("Faol eslatmalar")}
-            </h2>
-            <Link href="/medications" className="text-xs text-primary-500 font-medium flex items-center gap-0.5">
-              {t("Barchasi")} <ChevronRight className="h-3 w-3" />
-            </Link>
-          </div>
-          <div className="space-y-2">
-            {reminders.slice(0, 3).map((r) => (
-              <Link key={r.id} href={`/reminders/${r.id}`}>
-                <Card className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-4 flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-primary-500 to-violet-500 flex items-center justify-center shrink-0">
-                      <span className="text-white text-xs font-bold">
-                        {r.medicationName.slice(0, 2).toUpperCase()}
-                      </span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-slate-800 dark:text-white truncate">
-                        {r.medicationName}
-                      </p>
-                      <p className="text-xs text-slate-400">
-                        {r.dose} · {r.timesPerDay}{t("x kuniga")}
-                      </p>
-                    </div>
-                    <div className="text-right shrink-0">
-                      {r.schedule.slice(0, 2).map((s, i) => (
-                        <span key={i} className="block text-xs text-slate-500">
-                          {s.time}
-                        </span>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Recent reports */}
-      {recentReports.length > 0 && (
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-              {t("So'nggi tahlillar")}
-            </h2>
-            <Link href="/lab-reports" className="text-xs text-primary-500 font-medium flex items-center gap-0.5">
-              {t("Barchasi")} <ChevronRight className="h-3 w-3" />
-            </Link>
-          </div>
-          <div className="space-y-2">
-            {recentReports.map((r) => (
-              <Link key={r.id} href={`/lab-reports/${r.id}`}>
-                <Card className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-4 flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
-                      <Upload className="h-4 w-4 text-blue-500" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-slate-800 dark:text-white truncate">
-                        {r.fileName}
-                      </p>
-                      <p className="text-xs text-slate-400">{formatDate(r.createdAt, locale)}</p>
-                    </div>
-                    {r.hasUrgentValues && (
-                      <Badge variant="high" className="shrink-0">
-                        <AlertTriangle className="h-3 w-3" />
-                        {t("Urgent")}
-                      </Badge>
-                    )}
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
+      <section className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        {ACTIONS.map((a) => (
+          <Link key={a.href} href={a.href} className="card-base flex min-h-[120px] flex-col items-center justify-center gap-3 text-center transition hover:border-primary-300 hover:shadow-card">
+            <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300"><a.icon className="h-7 w-7" /></span>
+            <span className="text-lg font-bold text-slate-900 dark:text-white">{t(a.label)}</span>
+          </Link>
+        ))}
+      </section>
     </div>
   );
-}
-
-function getGreeting(date: Date): string {
-  const hour = date.getHours();
-  if (hour >= 5 && hour < 12) return "Xayrli tong,";
-  if (hour >= 12 && hour < 17) return "Xayrli kun,";
-  if (hour >= 17 && hour < 21) return "Xayrli kech,";
-  return "Yaxshi kechalar,";
 }

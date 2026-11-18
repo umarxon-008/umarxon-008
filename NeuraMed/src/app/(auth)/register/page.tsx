@@ -139,7 +139,6 @@ export default function RegisterPage() {
             leftIcon={<BadgeCheck className="h-4 w-4" />}
             required
           />
-          <p className="text-[11px] leading-relaxed text-amber-700 dark:text-amber-400">{t("Demo: litsenziya hozircha tekshirilmaydi, profilingizda “tasdiqlanmagan” belgisi turadi.")}</p>
         </>
       )}
 

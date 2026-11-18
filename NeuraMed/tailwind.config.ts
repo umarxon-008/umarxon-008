@@ -29,11 +29,11 @@ const config: Config = {
           500: "#16A34A",
           600: "#15803D",
         },
-        violet: {
-          DEFAULT: "#7C3AED",
-          500: "#7C3AED",
-          600: "#6D28D9",
-        },
+        // Sodda dizayn: binafsha va boshqa qo'shimcha ranglar o'rniga bitta asosiy rang (teal)
+        violet: { DEFAULT: "#0F8F84", 50: "#E6F6F4", 100: "#C0E9E4", 200: "#93D9D1", 300: "#5FC5BA", 400: "#2FB0A3", 500: "#0F8F84", 600: "#0C776E", 700: "#0A5F58", 800: "#084A45", 900: "#063632" },
+        purple: { DEFAULT: "#0F8F84", 50: "#E6F6F4", 100: "#C0E9E4", 200: "#93D9D1", 300: "#5FC5BA", 400: "#2FB0A3", 500: "#0F8F84", 600: "#0C776E", 700: "#0A5F58", 800: "#084A45", 900: "#063632" },
+        sky: { 50: "#E6F6F4", 100: "#C0E9E4", 200: "#93D9D1", 300: "#5FC5BA", 400: "#2FB0A3", 500: "#0F8F84", 600: "#0C776E", 700: "#0A5F58", 800: "#084A45", 900: "#063632" },
+        cyan: { 50: "#E6F6F4", 100: "#C0E9E4", 200: "#93D9D1", 300: "#5FC5BA", 400: "#2FB0A3", 500: "#0F8F84", 600: "#0C776E", 700: "#0A5F58", 800: "#084A45", 900: "#063632" },
         "deep-blue": "#1E3A8A",
         brand: { navy: "#0B2F55", teal: "#0E9AA0", emerald: "#10B981", purple: "#6D28D9" },
         background: {
@@ -63,11 +63,11 @@ const config: Config = {
         card: "0 1px 3px rgba(0,0,0,0.05), 0 10px 24px rgba(0,0,0,0.05)",
       },
       backgroundImage: {
-        // Logotip gradienti: emerald -> teal -> binafsha
-        "gradient-primary": "linear-gradient(135deg, #10B981 0%, #0E9AA0 45%, #6D28D9 100%)",
-        "gradient-brand-deep": "linear-gradient(135deg, #0B2F55 0%, #0B5D73 50%, #4C1D95 100%)",
-        "gradient-emerald": "linear-gradient(135deg, #16A34A 0%, #0E7C5A 100%)",
-        "gradient-violet": "linear-gradient(135deg, #7C3AED 0%, #1E3A8A 100%)",
+        // Sodda dizayn: gradientlar o'rniga tekis ranglar (klass nomlari saqlangan)
+        "gradient-primary": "linear-gradient(#0C776E, #0C776E)",
+        "gradient-brand-deep": "linear-gradient(#0A4A4A, #0A4A4A)",
+        "gradient-emerald": "linear-gradient(#0C776E, #0C776E)",
+        "gradient-violet": "linear-gradient(#0C776E, #0C776E)",
       },
     },
   },
