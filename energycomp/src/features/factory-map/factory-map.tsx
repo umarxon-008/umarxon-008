@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import { Hand, Lock, Minus, Move, Plus, RotateCcw, Save, Trash2, X } from 'lucide-react';
+import { ChevronDown, Hand, Lock, Minus, Move, Plus, RotateCcw, Save, Trash2, X } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -88,6 +88,7 @@ export function FactoryMap({
 }) {
   const [mapView, setMapView] = useState<'2d' | '3d'>(has3d ? initialView : '2d');
   const [resetKey, setResetKey] = useState(0);
+  const [listOpen, setListOpen] = useState(false);
   function switchView(v: '2d' | '3d') {
     setMapView(v);
     if (v === '3d') setEditMode(false);
@@ -479,22 +480,39 @@ export function FactoryMap({
           )}
 
           <Card>
-            <h2 className="px-5 pt-4 text-sm font-semibold text-navy">Uskunalar ({equipment.length})</h2>
-            <ul className="max-h-80 overflow-y-auto p-2">
-              {equipment.map((e) => (
-                <li key={e.id}>
-                  <button
-                    type="button"
-                    onClick={() => setSelected(e.id)}
-                    aria-pressed={e.id === selected}
-                    className={cn('flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm hover:bg-surface', e.id === selected && 'bg-brand-50')}
-                  >
-                    <span className="min-w-0 truncate font-medium text-navy">{e.name}</span>
-                    <StatusBadge status={e.status} />
-                  </button>
-                </li>
-              ))}
-            </ul>
+            {/* Uskunalar ro'yxati — uchburchakli tugma bosilganda ochiladi, yana bosilganda yopiladi */}
+            <button
+              type="button"
+              onClick={() => setListOpen((v) => !v)}
+              aria-expanded={listOpen}
+              aria-controls="map-equipment-list"
+              className="flex w-full items-center justify-between gap-2 rounded-card px-5 py-4 text-left hover:bg-surface"
+            >
+              <span className="text-sm font-semibold text-navy">Uskunalar ({equipment.length})</span>
+              <ChevronDown className={cn('h-5 w-5 text-muted transition-transform duration-200', listOpen && 'rotate-180')} aria-hidden />
+            </button>
+            {listOpen && (
+              <div id="map-equipment-list" className="border-t border-line">
+                <ul className="max-h-80 overflow-y-auto p-2">
+                  {equipment.map((e) => (
+                    <li key={e.id}>
+                      <button
+                        type="button"
+                        onClick={() => setSelected(e.id)}
+                        aria-pressed={e.id === selected}
+                        className={cn('flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm hover:bg-surface', e.id === selected && 'bg-brand-50')}
+                      >
+                        <span className="min-w-0 truncate font-medium text-navy">{e.name}</span>
+                        <StatusBadge status={e.status} />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/app/equipment" className="block border-t border-line px-5 py-2.5 text-sm font-semibold text-brand hover:bg-surface">
+                  Barcha uskunalar →
+                </Link>
+              </div>
+            )}
           </Card>
 
           {editMode && (

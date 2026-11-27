@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Bell, FlaskConical, LogOut, Menu, Radio, Settings as SettingsIcon, X, ChevronDown, Layers } from 'lucide-react';
+import { ChevronDown, ChevronRight, FlaskConical, Layers, LogOut, Menu, Radio, Settings as SettingsIcon, ShieldCheck, Sparkles, X } from 'lucide-react';
 import { Logo } from '@/components/brand/logo';
 import { Badge } from '@/components/ui/badge';
 import { api } from '@/lib/api-client';
@@ -11,6 +11,8 @@ import { can, ROLE_LABELS, type OrgRoleName } from '@/lib/permissions';
 import { cn } from '@/lib/utils';
 import { APP_NAV } from './nav';
 import { GlobalSearch } from './global-search';
+import { NotificationsPopover } from './notifications-popover';
+import { PlanDialog } from './plan-dialog';
 
 export interface ShellProps {
   user: { name: string; email: string; isPlatformAdmin: boolean; mustChangePassword: boolean };
@@ -49,13 +51,15 @@ export function AppShell({ user, org, role, memberships, unread, dataMode, planN
   const pathname = usePathname();
   const router = useRouter();
   // Menyular qaysi sahifada ochilgan bo'lsa, faqat o'sha sahifada ochiq turadi (navigatsiyada avtomatik yopiladi)
-  const [openMenu, setOpenMenu] = useState<{ kind: 'mobile' | 'profile' | 'org'; path: string } | null>(null);
-  const isOpen = (kind: 'mobile' | 'profile' | 'org') => openMenu?.kind === kind && openMenu.path === pathname;
+  const [openMenu, setOpenMenu] = useState<{ kind: 'mobile' | 'profile' | 'org' | 'notif'; path: string } | null>(null);
+  const isOpen = (kind: 'mobile' | 'profile' | 'org' | 'notif') => openMenu?.kind === kind && openMenu.path === pathname;
+  const notifOpen = isOpen('notif');
+  const [planOpen, setPlanOpen] = useState(false);
   const mobileOpen = isOpen('mobile');
   const menuOpen = isOpen('profile');
   const orgOpen = isOpen('org');
   const setMobileOpen = (v: boolean) => setOpenMenu(v ? { kind: 'mobile', path: pathname } : null);
-  const toggle = (kind: 'profile' | 'org') => setOpenMenu((m) => (m?.kind === kind && m.path === pathname ? null : { kind, path: pathname }));
+  const toggle = (kind: 'profile' | 'org' | 'notif') => setOpenMenu((m) => (m?.kind === kind && m.path === pathname ? null : { kind, path: pathname }));
 
   useEffect(() => {
     if (user.mustChangePassword && pathname !== '/app/settings') router.replace('/app/settings?mustChange=1#security');
@@ -100,13 +104,35 @@ export function AppShell({ user, org, role, memberships, unread, dataMode, planN
           >
             <n.icon className="h-[18px] w-[18px] shrink-0" aria-hidden />
             <span className="flex-1">{n.label}</span>
-            {n.href === '/app/notifications' && unread > 0 && (
-              <span className="rounded-full bg-energy px-1.5 text-xs font-bold text-white">{unread > 99 ? '99+' : unread}</span>
-            )}
           </Link>
         );
       })}
     </nav>
+  );
+
+  // Yon menyu pastidagi tarif kartasi — bosilganda tarifni yangilash oynasi ochiladi
+  const planCard = (
+    <button
+      type="button"
+      onClick={() => {
+        setMobileOpen(false);
+        setPlanOpen(true);
+      }}
+      className="group mx-3 mt-3 flex items-center gap-3 rounded-xl bg-white/5 p-3 text-left text-xs text-[#b9c6dd] transition-colors hover:bg-white/10"
+      aria-label={`Tarif: ${planName}. Tarifni yangilash`}
+    >
+      <span className="rounded-lg bg-energy/20 p-1.5 text-energy">
+        <Sparkles className="h-4 w-4" aria-hidden />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate font-semibold text-white">{org.name}</span>
+        <span className="mt-0.5 block">
+          Tarif: {planName}
+          {org.isDemo && ' · demo'}
+        </span>
+      </span>
+      <ChevronRight className="h-4 w-4 shrink-0 opacity-60 transition-transform group-hover:translate-x-0.5" aria-hidden />
+    </button>
   );
 
   return (
@@ -119,13 +145,7 @@ export function AppShell({ user, org, role, memberships, unread, dataMode, planN
           </Link>
         </div>
         <div className="flex-1 overflow-y-auto pt-2">{nav}</div>
-        <div className="mx-3 mt-3 rounded-xl bg-white/5 p-3 text-xs text-[#b9c6dd]">
-          <p className="font-semibold text-white">{org.name}</p>
-          <p className="mt-0.5">
-            Tarif: {planName}
-            {org.isDemo && ' · demo tashkilot'}
-          </p>
-        </div>
+        {planCard}
       </aside>
 
       {/* Mobile drawer */}
@@ -140,6 +160,7 @@ export function AppShell({ user, org, role, memberships, unread, dataMode, planN
               </button>
             </div>
             <div className="flex-1 overflow-y-auto">{nav}</div>
+            {planCard}
           </aside>
         </div>
       )}
@@ -189,10 +210,7 @@ export function AppShell({ user, org, role, memberships, unread, dataMode, planN
           <div className="hidden sm:block">
             <DataModeIndicator mode={dataMode} />
           </div>
-          <Link href="/app/notifications" className="relative rounded-xl p-2 text-navy hover:bg-brand-50" aria-label={`Bildirishnomalar: ${unread} ta o‘qilmagan`}>
-            <Bell className="h-5 w-5" />
-            {unread > 0 && <span className="absolute right-1 top-1 h-2.5 w-2.5 rounded-full bg-danger ring-2 ring-white" aria-hidden />}
-          </Link>
+          <NotificationsPopover open={notifOpen} onToggle={() => toggle('notif')} onClose={() => setOpenMenu(null)} unread={unread} />
           <div className="relative">
             <button
               type="button"
@@ -222,6 +240,11 @@ export function AppShell({ user, org, role, memberships, unread, dataMode, planN
                 <Link role="menuitem" href="/app/settings" className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-navy hover:bg-surface">
                   <SettingsIcon className="h-4 w-4" aria-hidden /> Sozlamalar
                 </Link>
+                {user.isPlatformAdmin && (
+                  <Link role="menuitem" href="/app/admin" className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-navy hover:bg-surface">
+                    <ShieldCheck className="h-4 w-4" aria-hidden /> Platforma admin
+                  </Link>
+                )}
                 <button role="menuitem" type="button" onClick={logout} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-danger hover:bg-danger-50">
                   <LogOut className="h-4 w-4" aria-hidden /> Chiqish
                 </button>
@@ -235,6 +258,13 @@ export function AppShell({ user, org, role, memberships, unread, dataMode, planN
           </div>
         )}
       </header>
+      <PlanDialog
+        open={planOpen}
+        onClose={() => setPlanOpen(false)}
+        canView={can(role, 'billing.view')}
+        canManage={can(role, 'billing.manage')}
+        currentPlanName={planName}
+      />
       <main id="main" className="mx-auto w-full max-w-[1400px] px-3 py-5 sm:px-6 sm:py-6">
         {children}
       </main>

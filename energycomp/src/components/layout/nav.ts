@@ -1,17 +1,4 @@
-import {
-  Bell,
-  Bot,
-  Building2,
-  CreditCard,
-  Gauge,
-  LayoutDashboard,
-  LineChart,
-  Map,
-  Settings,
-  ShieldCheck,
-  Users,
-  Wrench,
-} from 'lucide-react';
+import { Bot, Building2, Gauge, LayoutDashboard, LineChart, Map, Settings, Users } from 'lucide-react';
 import type { Permission } from '@/lib/permissions';
 
 export interface NavItem {
@@ -28,13 +15,15 @@ export const APP_NAV: NavItem[] = [
   { href: '/app/monitoring', label: 'Monitoring', icon: Gauge },
   { href: '/app/ai-inspector', label: 'AI Inspector', icon: Bot },
   { href: '/app/analytics', label: 'Analytics', icon: LineChart },
-  { href: '/app/equipment', label: 'Uskunalar', icon: Wrench },
-  { href: '/app/notifications', label: 'Bildirishnomalar', icon: Bell },
   { href: '/app/organization', label: 'Korxona', icon: Building2 },
   { href: '/app/users', label: 'Foydalanuvchilar', icon: Users, permission: 'users.view' },
-  { href: '/app/billing', label: 'Tariflar', icon: CreditCard },
   { href: '/app/settings', label: 'Sozlamalar', icon: Settings },
-  { href: '/app/admin', label: 'Platforma admin', icon: ShieldCheck, adminOnly: true },
 ];
 
-export const SEARCHABLE_PAGES = APP_NAV.map((n) => ({ href: n.href, label: n.label }));
+/** Qidiruvda topiladigan sahifalar (yon menyuda bo'lmaganlari ham). */
+export const SEARCHABLE_PAGES = [
+  ...APP_NAV.map((n) => ({ href: n.href, label: n.label })),
+  { href: '/app/equipment', label: 'Uskunalar' },
+  { href: '/app/notifications', label: 'Bildirishnomalar' },
+  { href: '/app/billing', label: 'Tarif va obuna' },
+];
