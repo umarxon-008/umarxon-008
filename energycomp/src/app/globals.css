@@ -102,32 +102,204 @@ body {
 .ec-blink { transform-box: fill-box; transform-origin: center; animation: ec-blink 5s ease-in-out infinite; }
 .ec-draw { stroke-dasharray: 60; animation: ec-draw 2.6s ease-in-out infinite alternate; }
 
-/* Robot yurib kelishi: kartaning chap chetidan zavodning o'rtasigacha (~4 soniya), keyin to'xtaydi.
-   Animatsiyasiz (reduced motion) holatda ham robot yakuniy joyida turadi. */
-@keyframes ec-walk-in {
-  from { left: -22%; }
-  to { left: 22%; }
+/* Robot sekin yurib zavod o'rtasigacha boradi, 2 s turadi, joyiga qaytadi, yana 2 s turadi — takrorlanadi.
+   Aylana 20 s: 8 s oldinga, 2 s to'xtash, 8 s orqaga, 2 s to'xtash.
+   Oyoq va tana kadrlari shu jadvalga moslab hisoblangan (faqat yurishda qadam tashlaydi).
+   Animatsiyasiz (reduced motion) holatda robot o'z joyida turadi. */
+@keyframes ec-walk {
+  0% { left: -6%; }
+  40.000% { left: 22%; }
+  50.000% { left: 22%; }
+  90.000% { left: -6%; }
+  100% { left: -6%; }
 }
-.ec-walk-in { left: 22%; animation: ec-walk-in 4s cubic-bezier(0.35, 0.1, 0.45, 1) 0.3s both; }
+.ec-walk { left: -6%; animation: ec-walk 20s ease-in-out 0.5s infinite both; }
 
-/* Yurayotganda tana tebranadi, to'xtagach sekin "suzadi" */
 @keyframes ec-walk-bob {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  25% { transform: translateY(-5px) rotate(-2deg); }
-  75% { transform: translateY(-5px) rotate(2deg); }
+  0% { transform: translateY(0) rotate(0deg); }
+  0.000% { transform: translateY(0) rotate(0deg); }
+  1.375% { transform: translateY(-3px) rotate(1.2deg); }
+  2.750% { transform: translateY(0) rotate(0deg); }
+  2.750% { transform: translateY(0) rotate(0deg); }
+  4.125% { transform: translateY(-3px) rotate(-1.2deg); }
+  5.500% { transform: translateY(0) rotate(0deg); }
+  5.500% { transform: translateY(0) rotate(0deg); }
+  6.875% { transform: translateY(-3px) rotate(1.2deg); }
+  8.250% { transform: translateY(0) rotate(0deg); }
+  8.250% { transform: translateY(0) rotate(0deg); }
+  9.625% { transform: translateY(-3px) rotate(-1.2deg); }
+  11.000% { transform: translateY(0) rotate(0deg); }
+  11.000% { transform: translateY(0) rotate(0deg); }
+  12.375% { transform: translateY(-3px) rotate(1.2deg); }
+  13.750% { transform: translateY(0) rotate(0deg); }
+  13.750% { transform: translateY(0) rotate(0deg); }
+  15.125% { transform: translateY(-3px) rotate(-1.2deg); }
+  16.500% { transform: translateY(0) rotate(0deg); }
+  16.500% { transform: translateY(0) rotate(0deg); }
+  17.875% { transform: translateY(-3px) rotate(1.2deg); }
+  19.250% { transform: translateY(0) rotate(0deg); }
+  19.250% { transform: translateY(0) rotate(0deg); }
+  20.625% { transform: translateY(-3px) rotate(-1.2deg); }
+  22.000% { transform: translateY(0) rotate(0deg); }
+  22.000% { transform: translateY(0) rotate(0deg); }
+  23.375% { transform: translateY(-3px) rotate(1.2deg); }
+  24.750% { transform: translateY(0) rotate(0deg); }
+  24.750% { transform: translateY(0) rotate(0deg); }
+  26.125% { transform: translateY(-3px) rotate(-1.2deg); }
+  27.500% { transform: translateY(0) rotate(0deg); }
+  27.500% { transform: translateY(0) rotate(0deg); }
+  28.875% { transform: translateY(-3px) rotate(1.2deg); }
+  30.250% { transform: translateY(0) rotate(0deg); }
+  30.250% { transform: translateY(0) rotate(0deg); }
+  31.625% { transform: translateY(-3px) rotate(-1.2deg); }
+  33.000% { transform: translateY(0) rotate(0deg); }
+  33.000% { transform: translateY(0) rotate(0deg); }
+  34.375% { transform: translateY(-3px) rotate(1.2deg); }
+  35.750% { transform: translateY(0) rotate(0deg); }
+  35.750% { transform: translateY(0) rotate(0deg); }
+  37.125% { transform: translateY(-3px) rotate(-1.2deg); }
+  38.500% { transform: translateY(0) rotate(0deg); }
+  50.000% { transform: translateY(0) rotate(0deg); }
+  51.375% { transform: translateY(-3px) rotate(1.2deg); }
+  52.750% { transform: translateY(0) rotate(0deg); }
+  52.750% { transform: translateY(0) rotate(0deg); }
+  54.125% { transform: translateY(-3px) rotate(-1.2deg); }
+  55.500% { transform: translateY(0) rotate(0deg); }
+  55.500% { transform: translateY(0) rotate(0deg); }
+  56.875% { transform: translateY(-3px) rotate(1.2deg); }
+  58.250% { transform: translateY(0) rotate(0deg); }
+  58.250% { transform: translateY(0) rotate(0deg); }
+  59.625% { transform: translateY(-3px) rotate(-1.2deg); }
+  61.000% { transform: translateY(0) rotate(0deg); }
+  61.000% { transform: translateY(0) rotate(0deg); }
+  62.375% { transform: translateY(-3px) rotate(1.2deg); }
+  63.750% { transform: translateY(0) rotate(0deg); }
+  63.750% { transform: translateY(0) rotate(0deg); }
+  65.125% { transform: translateY(-3px) rotate(-1.2deg); }
+  66.500% { transform: translateY(0) rotate(0deg); }
+  66.500% { transform: translateY(0) rotate(0deg); }
+  67.875% { transform: translateY(-3px) rotate(1.2deg); }
+  69.250% { transform: translateY(0) rotate(0deg); }
+  69.250% { transform: translateY(0) rotate(0deg); }
+  70.625% { transform: translateY(-3px) rotate(-1.2deg); }
+  72.000% { transform: translateY(0) rotate(0deg); }
+  72.000% { transform: translateY(0) rotate(0deg); }
+  73.375% { transform: translateY(-3px) rotate(1.2deg); }
+  74.750% { transform: translateY(0) rotate(0deg); }
+  74.750% { transform: translateY(0) rotate(0deg); }
+  76.125% { transform: translateY(-3px) rotate(-1.2deg); }
+  77.500% { transform: translateY(0) rotate(0deg); }
+  77.500% { transform: translateY(0) rotate(0deg); }
+  78.875% { transform: translateY(-3px) rotate(1.2deg); }
+  80.250% { transform: translateY(0) rotate(0deg); }
+  80.250% { transform: translateY(0) rotate(0deg); }
+  81.625% { transform: translateY(-3px) rotate(-1.2deg); }
+  83.000% { transform: translateY(0) rotate(0deg); }
+  83.000% { transform: translateY(0) rotate(0deg); }
+  84.375% { transform: translateY(-3px) rotate(1.2deg); }
+  85.750% { transform: translateY(0) rotate(0deg); }
+  85.750% { transform: translateY(0) rotate(0deg); }
+  87.125% { transform: translateY(-3px) rotate(-1.2deg); }
+  88.500% { transform: translateY(0) rotate(0deg); }
+  100% { transform: translateY(0) rotate(0deg); }
 }
-.ec-walk-bob {
-  transform-origin: 50% 100%;
-  animation: ec-walk-bob 0.9s ease-in-out 0.3s 4, ec-float 4s ease-in-out 3.9s infinite;
-}
+.ec-walk-bob { transform-origin: 50% 100%; animation: ec-walk-bob 20s linear 0.5s infinite both; }
 
-/* Oyoqlar navbatma-navbat ko'tariladi (faqat yurish davomida) */
-@keyframes ec-step {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-7px); }
+@keyframes ec-step-a {
+  0% { transform: translateY(0); }
+  0.000% { transform: translateY(0); }
+  1.375% { transform: translateY(-5px); }
+  2.750% { transform: translateY(0); }
+  5.500% { transform: translateY(0); }
+  6.875% { transform: translateY(-5px); }
+  8.250% { transform: translateY(0); }
+  11.000% { transform: translateY(0); }
+  12.375% { transform: translateY(-5px); }
+  13.750% { transform: translateY(0); }
+  16.500% { transform: translateY(0); }
+  17.875% { transform: translateY(-5px); }
+  19.250% { transform: translateY(0); }
+  22.000% { transform: translateY(0); }
+  23.375% { transform: translateY(-5px); }
+  24.750% { transform: translateY(0); }
+  27.500% { transform: translateY(0); }
+  28.875% { transform: translateY(-5px); }
+  30.250% { transform: translateY(0); }
+  33.000% { transform: translateY(0); }
+  34.375% { transform: translateY(-5px); }
+  35.750% { transform: translateY(0); }
+  50.000% { transform: translateY(0); }
+  51.375% { transform: translateY(-5px); }
+  52.750% { transform: translateY(0); }
+  55.500% { transform: translateY(0); }
+  56.875% { transform: translateY(-5px); }
+  58.250% { transform: translateY(0); }
+  61.000% { transform: translateY(0); }
+  62.375% { transform: translateY(-5px); }
+  63.750% { transform: translateY(0); }
+  66.500% { transform: translateY(0); }
+  67.875% { transform: translateY(-5px); }
+  69.250% { transform: translateY(0); }
+  72.000% { transform: translateY(0); }
+  73.375% { transform: translateY(-5px); }
+  74.750% { transform: translateY(0); }
+  77.500% { transform: translateY(0); }
+  78.875% { transform: translateY(-5px); }
+  80.250% { transform: translateY(0); }
+  83.000% { transform: translateY(0); }
+  84.375% { transform: translateY(-5px); }
+  85.750% { transform: translateY(0); }
+  100% { transform: translateY(0); }
 }
-.ec-leg { transform-box: fill-box; animation: ec-step 0.45s ease-in-out 0.3s 8; }
-.ec-leg-b { animation-delay: 0.525s; }
+@keyframes ec-step-b {
+  0% { transform: translateY(0); }
+  2.750% { transform: translateY(0); }
+  4.125% { transform: translateY(-5px); }
+  5.500% { transform: translateY(0); }
+  8.250% { transform: translateY(0); }
+  9.625% { transform: translateY(-5px); }
+  11.000% { transform: translateY(0); }
+  13.750% { transform: translateY(0); }
+  15.125% { transform: translateY(-5px); }
+  16.500% { transform: translateY(0); }
+  19.250% { transform: translateY(0); }
+  20.625% { transform: translateY(-5px); }
+  22.000% { transform: translateY(0); }
+  24.750% { transform: translateY(0); }
+  26.125% { transform: translateY(-5px); }
+  27.500% { transform: translateY(0); }
+  30.250% { transform: translateY(0); }
+  31.625% { transform: translateY(-5px); }
+  33.000% { transform: translateY(0); }
+  35.750% { transform: translateY(0); }
+  37.125% { transform: translateY(-5px); }
+  38.500% { transform: translateY(0); }
+  52.750% { transform: translateY(0); }
+  54.125% { transform: translateY(-5px); }
+  55.500% { transform: translateY(0); }
+  58.250% { transform: translateY(0); }
+  59.625% { transform: translateY(-5px); }
+  61.000% { transform: translateY(0); }
+  63.750% { transform: translateY(0); }
+  65.125% { transform: translateY(-5px); }
+  66.500% { transform: translateY(0); }
+  69.250% { transform: translateY(0); }
+  70.625% { transform: translateY(-5px); }
+  72.000% { transform: translateY(0); }
+  74.750% { transform: translateY(0); }
+  76.125% { transform: translateY(-5px); }
+  77.500% { transform: translateY(0); }
+  80.250% { transform: translateY(0); }
+  81.625% { transform: translateY(-5px); }
+  83.000% { transform: translateY(0); }
+  85.750% { transform: translateY(0); }
+  87.125% { transform: translateY(-5px); }
+  88.500% { transform: translateY(0); }
+  100% { transform: translateY(0); }
+}
+.ec-leg { transform-box: fill-box; }
+.ec-leg-a { animation: ec-step-a 20s linear 0.5s infinite both; }
+.ec-leg-b { animation: ec-step-b 20s linear 0.5s infinite both; }
 
 /* Robot qo'li: yelka (158,168) atrofida silkinadi */
 @keyframes ec-wave {
