@@ -29,8 +29,11 @@ export function EnergyRobot({ className }: { className?: string }) {
       {/* arms */}
       <path d="M62 168q-26 6-30 30" stroke="#102B5C" strokeWidth="5" fill="none" strokeLinecap="round" />
       <circle cx="31" cy="203" r="10" fill="#fff" stroke="#102B5C" strokeWidth="5" />
-      <path d="M158 168q24-10 32-38" stroke="#102B5C" strokeWidth="5" fill="none" strokeLinecap="round" />
-      <circle cx="191" cy="125" r="10" fill="#fff" stroke="#102B5C" strokeWidth="5" />
+      {/* o'ng qo'l — doimiy silkitadi (yelka nuqtasi atrofida aylanadi) */}
+      <g className="ec-wave">
+        <path d="M158 168q24-10 32-38" stroke="#102B5C" strokeWidth="5" fill="none" strokeLinecap="round" />
+        <circle cx="191" cy="125" r="10" fill="#fff" stroke="#102B5C" strokeWidth="5" />
+      </g>
       {/* legs */}
       <rect x="80" y="222" width="18" height="22" rx="8" fill="#102B5C" />
       <rect x="122" y="222" width="18" height="22" rx="8" fill="#102B5C" />
@@ -45,8 +48,10 @@ export function FactoryScene({ className }: { className?: string }) {
       {/* factory building */}
       <path d="M40 262V140l70 40v-40l70 40v-40l70 40V96h48v166H40Z" fill="#fff" stroke="#102B5C" strokeWidth="4" strokeLinejoin="round" />
       <rect x="262" y="60" width="26" height="40" rx="4" fill="#102B5C" />
-      <circle className="ec-smoke" cx="280" cy="50" r="10" fill="#D3E5FD" />
-      <circle className="ec-smoke ec-smoke-2" cx="284" cy="48" r="8" fill="#D3E5FD" />
+      {/* tutun — mo'ridan uzluksiz ko'tariladi */}
+      <circle className="ec-smoke" cx="275" cy="54" r="11" fill="#BFD3EC" />
+      <circle className="ec-smoke ec-smoke-2" cx="275" cy="54" r="13" fill="#C9DAF0" />
+      <circle className="ec-smoke ec-smoke-3" cx="275" cy="54" r="10" fill="#BFD3EC" />
       <rect x="64" y="200" width="36" height="28" rx="6" fill="#D3E5FD" />
       <rect x="134" y="200" width="36" height="28" rx="6" fill="#D3E5FD" />
       <rect x="204" y="200" width="36" height="28" rx="6" fill="#D3E5FD" />
@@ -58,17 +63,54 @@ export function FactoryScene({ className }: { className?: string }) {
       {/* machine */}
       <rect x="370" y="186" width="110" height="76" rx="14" fill="#fff" stroke="#102B5C" strokeWidth="4" />
       <rect x="386" y="200" width="46" height="30" rx="6" fill="#102B5C" />
-      <path className="ec-draw" d="M392 222l8-8 8 5 10-11 8 6" stroke="#5BE0A6" strokeWidth="3" fill="none" strokeLinecap="round" />
+      <clipPath id="ec-screen">
+        <rect x="389" y="203" width="40" height="24" rx="4" />
+      </clipPath>
+      {/* jonli grafik — chiziq to'xtovsiz chapga siljiydi, shakli doim o'zgarib turadi */}
+      <g clipPath="url(#ec-screen)">
+        <path
+          className="ec-chart"
+          d="M386 222L394 213L402 218L410 207L418 222L426 213L434 218L442 207L450 222L458 213L466 218L474 207L482 222"
+          stroke="#5BE0A6"
+          strokeWidth="2.5"
+          fill="none"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
+        <path
+          className="ec-chart ec-chart-slow"
+          d="M386 216L396 220L406 212L416 216L426 220L436 212L446 216L456 220L466 212L476 216L486 220"
+          stroke="#1677F2"
+          strokeWidth="2"
+          fill="none"
+          strokeLinejoin="round"
+          opacity="0.9"
+        />
+      </g>
       <circle className="ec-pulse" cx="455" cy="207" r="7" fill="#20B879" />
       <circle cx="455" cy="230" r="7" fill="#F2B01E" />
-      <rect x="386" y="240" width="78" height="8" rx="4" fill="#D3E5FD" />
+      {/* ustunli grafik — balandliklar uzluksiz o'zgaradi */}
+      {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+        <rect
+          key={i}
+          className="ec-bar"
+          x={388 + i * 11}
+          y={238}
+          width={7}
+          height={14}
+          rx={2}
+          fill={i % 2 ? '#1677F2' : '#20B879'}
+          style={{ animationDelay: `${-i * 0.37}s`, animationDuration: `${1.6 + (i % 3) * 0.35}s` }}
+        />
+      ))}
       {/* energy line */}
       {/* energiya oqimi: panel → zavod → stanok */}
       <path className="ec-flow" d="M345 200V230q0 8 8 8h17" stroke="#20B879" strokeWidth="4" fill="none" strokeLinecap="round" />
       <path className="ec-flow" d="M292 238h53" stroke="#20B879" strokeWidth="4" fill="none" strokeLinecap="round" />
+      {/* chaqmoq — rangi qizildan yashilga va qaytib o'zgaradi */}
       <g className="ec-pulse">
-        <circle cx="470" cy="150" r="22" fill="#E6F8F0" />
-        <path d="M473 136 461 154h8l-3 11 12-17h-8l3-12Z" fill="#20B879" />
+        <circle className="ec-bolt-bg" cx="470" cy="150" r="22" fill="#E6F8F0" />
+        <path className="ec-bolt" d="M473 136 461 154h8l-3 11 12-17h-8l3-12Z" fill="#20B879" />
       </g>
     </svg>
   );

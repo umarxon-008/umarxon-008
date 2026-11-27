@@ -72,9 +72,9 @@ body {
   to { stroke-dashoffset: -30; }
 }
 @keyframes ec-smoke {
-  0% { opacity: 0; transform: translate(0, 6px) scale(0.7); }
-  30% { opacity: 1; }
-  100% { opacity: 0; transform: translate(10px, -26px) scale(1.25); }
+  0% { opacity: 0; transform: translate(0, 4px) scale(0.5); }
+  20% { opacity: 0.95; }
+  100% { opacity: 0; transform: translate(18px, -48px) scale(1.6); }
 }
 @keyframes ec-pulse {
   0%, 100% { transform: scale(1); }
@@ -96,11 +96,41 @@ body {
 .ec-delay-4 { animation-delay: 0.48s; }
 .ec-float { animation: ec-float 4s ease-in-out infinite; }
 .ec-flow { stroke-dasharray: 8 7; animation: ec-flow 1.1s linear infinite; }
-.ec-smoke { transform-box: fill-box; transform-origin: center; animation: ec-smoke 3.2s ease-out infinite; }
-.ec-smoke-2 { animation-delay: 1.6s; }
+.ec-smoke { transform-box: fill-box; transform-origin: center; animation: ec-smoke 3.3s ease-out infinite; }
+.ec-smoke-2 { animation-delay: 1.1s; }
 .ec-pulse { transform-box: fill-box; transform-origin: center; animation: ec-pulse 2.4s ease-in-out infinite; }
 .ec-blink { transform-box: fill-box; transform-origin: center; animation: ec-blink 5s ease-in-out infinite; }
 .ec-draw { stroke-dasharray: 60; animation: ec-draw 2.6s ease-in-out infinite alternate; }
+
+/* Robot qo'li: yelka (158,168) atrofida silkinadi */
+@keyframes ec-wave {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-28deg); }
+}
+.ec-wave { transform-box: view-box; transform-origin: 158px 168px; animation: ec-wave 1.2s ease-in-out infinite; }
+
+/* Jonli grafik: davr 32px — chok sezilmaydigan uzluksiz siljish */
+@keyframes ec-chart { to { transform: translateX(-32px); } }
+.ec-chart { animation: ec-chart 1.8s linear infinite; }
+@keyframes ec-chart-slow { to { transform: translateX(-30px); } }
+.ec-chart-slow { animation: ec-chart-slow 3.2s linear infinite; }
+
+/* Ustunlar balandligi o'zgaradi (pastdan o'sadi) */
+@keyframes ec-bar {
+  0%, 100% { transform: scaleY(0.35); }
+  35% { transform: scaleY(1); }
+  70% { transform: scaleY(0.6); }
+}
+.ec-bar { transform-box: fill-box; transform-origin: bottom; animation: ec-bar 1.8s ease-in-out infinite; }
+
+/* Tutun uchinchi bulut */
+.ec-smoke-3 { animation-delay: 2.2s; }
+
+/* Chaqmoq rangi: qizil ↔ yashil */
+@keyframes ec-bolt { 0%, 100% { fill: #E5484D; } 50% { fill: #20B879; } }
+@keyframes ec-bolt-bg { 0%, 100% { fill: #FDECEC; } 50% { fill: #E6F8F0; } }
+.ec-bolt { animation: ec-bolt 3s ease-in-out infinite; }
+.ec-bolt-bg { animation: ec-bolt-bg 3s ease-in-out infinite; }
 
 /* Scroll bilan paydo bo'lish (Reveal komponenti) */
 .ec-reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
