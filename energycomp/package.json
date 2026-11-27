@@ -28,6 +28,8 @@
     "@hookform/resolvers": "^7.0.9",
     "@prisma/adapter-pg": "^7.10.1",
     "@prisma/client": "^7.10.1",
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.2",
     "bcryptjs": "^3.0.3",
     "lucide-react": "^1.81.0",
     "next": "^16.4.6",
@@ -37,6 +39,7 @@
     "react-hook-form": "^7.92.0",
     "recharts": "^3.11.1",
     "server-only": "^0.0.1",
+    "three": "^0.187.0",
     "zod": "^4.6.7"
   },
   "devDependencies": {
@@ -46,6 +49,7 @@
     "@types/pg": "^8.23.1",
     "@types/react": "^19.3.3",
     "@types/react-dom": "^19.3.0",
+    "@types/three": "^0.187.0",
     "dotenv": "^18.0.10",
     "eslint": "^10.15.0",
     "eslint-config-next": "^16.4.6",

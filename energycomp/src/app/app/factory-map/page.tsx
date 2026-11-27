@@ -9,9 +9,9 @@ import { FactoryMap, type MapEquipment } from '@/features/factory-map/factory-ma
 
 export const metadata: Metadata = { title: 'Factory Map' };
 
-export default async function FactoryMapPage({ searchParams }: { searchParams: Promise<{ factory?: string }> }) {
+export default async function FactoryMapPage({ searchParams }: { searchParams: Promise<{ factory?: string; view?: string }> }) {
   const ctx = await requirePageContext();
-  const { factory } = await searchParams;
+  const { factory, view } = await searchParams;
   const factories = await listFactories(ctx.org.id);
   const current = factories.find((f) => f.id === factory) ?? factories[0]!;
   const [layout, equipment, categories, has3d] = await Promise.all([
@@ -31,6 +31,7 @@ export default async function FactoryMapPage({ searchParams }: { searchParams: P
       canEdit={can(ctx.role, 'map.write')}
       canAddEquipment={can(ctx.role, 'equipment.write')}
       has3d={has3d}
+      initialView={view === '3d' ? '3d' : '2d'}
     />
   );
 }

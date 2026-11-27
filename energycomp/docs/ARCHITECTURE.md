@@ -38,6 +38,7 @@ Next.js App Router
 | AI javobidagi dalillar (evidence) doim bazadan | LLM faqat matn yozadi (facts/assumptions/recommendations), javob Zod sxemasi bilan tekshiriladi; xato yoki rad etishda rule-based fallback. Raqamlar to‘qilmaydi. |
 | Smart Control: so‘rov → boshqa Owner/Manager tasdig‘i → adapter | O‘z so‘rovini tasdiqlash taqiqlangan. Faqat `SIMULATION` rejimi va faqat DEMO uskunalar. Hammasi `AuditLog`ga. |
 | Tarif limitlari `Plan` jadvalida, tekshiruv transaction ichida | Narxlar kodda qotirilmagan (platform admin sozlaydi). |
+| 3D xarita (demo) — three.js + @react-three/fiber, `next/dynamic` (ssr:false) bilan faqat kerak bo‘lganda yuklanadi | 2D bilan bir xil ma’lumot (20 px = 1 birlik); og‘ir kutubxona boshqa sahifalar bundle’iga tushmaydi. Pro (`map3d`) tarifida ochiladi. |
 | Grafiklar — bitta y-o‘q | Ikki o‘qli grafik ishlatilmaydi: kWh ustunlar, kW — tooltip/jadvalda yoki alohida grafik. Har grafikda “Jadval ko‘rinishi”. Palitra CVD validatordan o‘tgan. |
 | Raqam formatlash qo‘lda (Intl emas) | `uz-Latn` lokal ma’lumotlari Node va brauzerda farq qilib, gidratatsiya xatosiga olib kelardi. |
 

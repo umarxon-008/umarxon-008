@@ -52,6 +52,11 @@ test.describe('EnergyComp E2E', () => {
     await expect(page.getByText('Joriy quvvat')).toBeVisible();
     await page.goto('/app/ai-inspector');
     await expect(page.getByRole('heading', { name: 'AI Inspector' })).toBeVisible();
+    await page.goto('/app/factory-map');
+    await page.getByRole('radio', { name: /3D/ }).click();
+    await expect(page).toHaveURL(/view=3d/);
+    // WebGL bo'lsa — canvas, bo'lmasa — tushunarli xabar
+    await expect(page.locator('canvas').or(page.getByText(/WebGL/))).toBeVisible({ timeout: 30_000 });
     await page.goto('/app/monitoring');
     await expect(page.getByText('Energiya (davr)')).toBeVisible();
     // Mobil: gorizontal skroll bo'lmasligi kerak

@@ -19,7 +19,7 @@ export interface PublicPlan {
 
 const FEATURE_LABELS: Record<string, string> = {
   map2d: '2D xarita',
-  map3d: '3D xarita (tez orada)',
+  map3d: '3D xarita (demo)',
   advancedAi: 'Kengaytirilgan AI',
   advancedAnalytics: 'Kengaytirilgan hisobotlar',
   integrations: 'Sensor integratsiyasi',

@@ -10,7 +10,7 @@
 | LLM | Ixtiyoriy; kalit bo‘lmasa qoidaga asoslangan tahlil. Server-side refusal fallback parametri o‘rniga lokal rule-based fallback ishlatiladi. |
 | Email | Ulanmagan: parol tiklash havolasi production’da yuborilmaydi; a’zolarga vaqtinchalik parol qo‘lda yetkaziladi; email manzilini o‘zgartirish yo‘q. |
 | To‘lov | Ulanmagan; obunalar demo. Narxlar belgilanmagan (platform admin sozlay oladi). |
-| 3D xarita | Yo‘q (Pro, keyingi bosqich). |
+| 3D xarita | Demo versiya: 2D koordinatalardan avtomatik quriladi; 3D’da tahrirlash, bino/devor modellari va real zavod rejasi yo‘q. WebGL bo‘lmasa xabar ko‘rsatiladi. |
 | Smart Control | Faqat simulyatsiya; real adapter yo‘q. |
 | Rate limit | Xotirada — bir nechta server instansiyasida umumiy saqlovchi (Redis) kerak. |
 | Ko‘p tillilik | Faqat o‘zbek (lotin). |
@@ -28,7 +28,7 @@
 4. **Inspector sozlamalari:** tashkilot/uskuna bo‘yicha chegaralar, smena jadvali (ish vaqtidan tashqari sarf qoidasi).
 5. **Telemetriya rollup:** soatlik/kunlik agregat jadvallar yoki TimescaleDB; eski xom ma’lumotni arxivlash.
 6. **To‘lov provayderi** (Payme/Click/Stripe — qaror kerak) va real obuna holatlari.
-7. **3D xarita** (texnologiya qarori: three.js / react-three-fiber).
+7. **3D xarita (to‘liq):** 3D’da tahrirlash, uskuna turlariga mos modellar (GLTF), qavatlar, real reja yuklash.
 8. **Hisobotlar:** PDF eksport, rejalashtirilgan hisobotlar, smenalar kesimi, mahsulot birligiga energiya (kWh/dona).
 9. **Smart Control (real):** faqat `docs/INTEGRATIONS.md` §4 dagi talablar bajarilgandan keyin.
 10. Ko‘p tillilik (rus, ingliz), Redis rate limit, observability (log/metrics), 2FA.

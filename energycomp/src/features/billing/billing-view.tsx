@@ -18,7 +18,7 @@ import type { PlanInfo } from '@/server/services/plans';
 
 const FEATURE_LABELS: Record<PlanFeature, string> = {
   map2d: '2D Factory Map',
-  map3d: '3D xarita (keyingi bosqichda)',
+  map3d: '3D xarita (demo)',
   advancedAi: 'Kengaytirilgan AI (LLM)',
   advancedAnalytics: 'Kengaytirilgan analytics',
   integrations: 'Integratsiyalar (HTTP ingest)',

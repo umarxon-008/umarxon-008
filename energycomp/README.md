@@ -18,7 +18,7 @@ aniqlash platformasi (MVP). Interfeys tili — o‘zbek (lotin).
 | Dashboard (kW, kWh, xarajat, holatlar, top iste’molchilar, AI tavsiyalar) | ✅ |
 | Uskunalar CRUD, kategoriyalar, zavodlar | ✅ |
 | 2D Factory Map (zoom/pan, drag-and-drop, klaviatura, zonalar, koordinatalar bazada) | ✅ |
-| 3D xarita | ⏳ Pro, keyingi bosqichda (UI’da ochiq ko‘rsatilgan, soxta tugma yo‘q) |
+| 3D xarita (demo) | ✅ Pro: three.js sahna — aylantirish/yaqinlashtirish, holat chiroqlari, uskunani tanlash. Joylashuvlar 2D’dan, tahrirlash 2D’da |
 | Energy Monitoring (davr, soat/kun/hafta/oy, uskuna/zavod filtri, CSV) | ✅ |
 | AI Inspector: 5 qoida, alertlar, holatlar, audit, AI tahlil + fallback, baholash | ✅ |
 | LLM tahlil (Anthropic) | ⚙️ ixtiyoriy — `ANTHROPIC_API_KEY` bilan, Pro tarifida |
@@ -29,7 +29,7 @@ aniqlash platformasi (MVP). Interfeys tili — o‘zbek (lotin).
 
 ## Texnologiyalar
 
-Next.js 16 (App Router) · TypeScript (strict) · Tailwind CSS 4 · PostgreSQL 16 · Prisma 7 (driver adapter `pg`) ·
+Next.js 16 (App Router) · TypeScript (strict) · Tailwind CSS 4 · three.js + React Three Fiber (3D demo) · PostgreSQL 16 · Prisma 7 (driver adapter `pg`) ·
 Zod 4 · React Hook Form · Recharts · Lucide · bcrypt · Vitest · Playwright. Batafsil: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Ishga tushirish (development)

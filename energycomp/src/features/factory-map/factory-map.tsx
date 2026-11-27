@@ -3,8 +3,9 @@
 import { RelTime } from '@/components/ui/rel-time';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import { Box, Hand, Minus, Move, Plus, RotateCcw, Save, Trash2, X } from 'lucide-react';
+import { Hand, Lock, Minus, Move, Plus, RotateCcw, Save, Trash2, X } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -15,11 +16,17 @@ import { useToast } from '@/components/ui/toast';
 import { EquipmentFormModal } from '@/features/equipment/equipment-form';
 import { api, errorMessage } from '@/lib/api-client';
 import { useApiData } from '@/lib/use-api';
-import { formatKw } from '@/lib/format';
+import { formatKw, formatKwh } from '@/lib/format';
 import { STATUS_LABELS, type EquipmentStatusName } from '@/lib/labels';
 import { STATUS_COLORS, ZONE_COLORS } from '@/lib/tokens';
 import { clamp, cn } from '@/lib/utils';
 import type { Zone } from '@/schemas/organization';
+
+// 3D sahna faqat brauzerda va kerak bo'lganda yuklanadi (three.js og'ir kutubxona)
+const Factory3D = dynamic(() => import('./factory-3d').then((m) => m.Factory3D), {
+  ssr: false,
+  loading: () => <div className="flex h-[420px] items-center justify-center text-sm text-muted sm:h-[520px]">3D xarita yuklanmoqda...</div>,
+});
 
 export interface MapEquipment {
   id: string;
@@ -67,6 +74,7 @@ export function FactoryMap({
   canEdit,
   canAddEquipment,
   has3d,
+  initialView = '2d',
 }: {
   factories: { id: string; name: string }[];
   factoryId: string;
@@ -76,7 +84,18 @@ export function FactoryMap({
   canEdit: boolean;
   canAddEquipment: boolean;
   has3d: boolean;
+  initialView?: '2d' | '3d';
 }) {
+  const [mapView, setMapView] = useState<'2d' | '3d'>(has3d ? initialView : '2d');
+  const [resetKey, setResetKey] = useState(0);
+  function switchView(v: '2d' | '3d') {
+    setMapView(v);
+    if (v === '3d') setEditMode(false);
+    const url = new URL(window.location.href);
+    if (v === '3d') url.searchParams.set('view', '3d');
+    else url.searchParams.delete('view');
+    window.history.replaceState(null, '', url);
+  }
   const router = useRouter();
   const { push } = useToast();
   const svgRef = useRef<SVGSVGElement>(null);
@@ -238,13 +257,30 @@ export function FactoryMap({
         description="Uskunani tanlang — ma’lumoti ochiladi"
         actions={
           <>
-            <span
-              className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-dashed border-line px-3 text-sm text-muted"
-              title={has3d ? '3D xarita tarifingizga kiradi — keyingi bosqichda ishga tushadi' : '3D xarita — Pro tarifi, keyingi bosqichda'}
-            >
-              <Box className="h-4 w-4" aria-hidden /> 3D <Badge tone="navy">Pro</Badge> <span className="text-xs">tez orada</span>
-            </span>
-            {canEdit && (
+            <div role="radiogroup" aria-label="Xarita ko‘rinishi" className="inline-flex rounded-xl bg-[#e9f0fa] p-1">
+              {(['2d', '3d'] as const).map((v) => {
+                const locked = v === '3d' && !has3d;
+                return (
+                  <button
+                    key={v}
+                    type="button"
+                    role="radio"
+                    aria-checked={mapView === v}
+                    disabled={locked}
+                    title={locked ? '3D xarita — Pro tarifida' : undefined}
+                    onClick={() => switchView(v)}
+                    className={cn(
+                      'inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60',
+                      mapView === v ? 'bg-white text-navy shadow-sm' : 'text-muted hover:text-navy',
+                    )}
+                  >
+                    {v.toUpperCase()}
+                    {v === '3d' && (locked ? <Lock className="h-3.5 w-3.5" aria-hidden /> : <Badge tone="violet">demo</Badge>)}
+                  </button>
+                );
+              })}
+            </div>
+            {canEdit && mapView === '2d' && (
               <Button variant={editMode ? 'primary' : 'outline'} onClick={() => setEditMode((v) => !v)} aria-pressed={editMode}>
                 {editMode ? <Hand className="h-4 w-4" aria-hidden /> : <Move className="h-4 w-4" aria-hidden />}
                 {editMode ? 'Tayyor' : 'Tahrirlash'}
@@ -290,17 +326,30 @@ export function FactoryMap({
                 </li>
               ))}
             </ul>
-            <div className="flex gap-1">
-              <Button size="sm" variant="outline" onClick={() => zoom(1.25)} aria-label="Yaqinlashtirish"><Plus className="h-4 w-4" /></Button>
-              <Button size="sm" variant="outline" onClick={() => zoom(0.8)} aria-label="Uzoqlashtirish"><Minus className="h-4 w-4" /></Button>
-              <Button size="sm" variant="outline" onClick={() => setView({ scale: 1, x: 0, y: 0 })} aria-label="Ko‘rinishni tiklash"><RotateCcw className="h-4 w-4" /></Button>
-            </div>
+            {mapView === '3d' ? (
+              <div className="flex items-center gap-2">
+                <span className="hidden text-xs text-muted sm:inline">Aylantirish: sudrang · yaqinlashtirish: g‘ildirak</span>
+                <Button size="sm" variant="outline" onClick={() => setResetKey((k) => k + 1)} aria-label="Ko‘rinishni tiklash"><RotateCcw className="h-4 w-4" /></Button>
+              </div>
+            ) : (
+              <div className="flex gap-1">
+                <Button size="sm" variant="outline" onClick={() => zoom(1.25)} aria-label="Yaqinlashtirish"><Plus className="h-4 w-4" /></Button>
+                <Button size="sm" variant="outline" onClick={() => zoom(0.8)} aria-label="Uzoqlashtirish"><Minus className="h-4 w-4" /></Button>
+                <Button size="sm" variant="outline" onClick={() => setView({ scale: 1, x: 0, y: 0 })} aria-label="Ko‘rinishni tiklash"><RotateCcw className="h-4 w-4" /></Button>
+              </div>
+            )}
           </div>
-          {editMode && (
+          {mapView === '3d' && (
+            <p className="bg-[#f6f3fe] px-4 py-2 text-xs text-navy">3D xarita — demo versiya. Joylashuvlar 2D xaritadan olinadi, tahrirlash 2D rejimida.</p>
+          )}
+          {editMode && mapView === '2d' && (
             <p className="bg-brand-50 px-4 py-2 text-xs text-navy">
               Uskunani suring yoki strelkalar bilan siljiting — avtomatik saqlanadi.
             </p>
           )}
+          {mapView === '3d' ? (
+            <Factory3D key={resetKey} layout={layout} equipment={equipment} selected={selected} onSelect={setSelected} />
+          ) : (
           <div className="relative bg-[#f8fbff]">
             <svg
               ref={svgRef}
@@ -376,6 +425,7 @@ export function FactoryMap({
               </div>
             )}
           </div>
+          )}
         </Card>
 
         <div className="space-y-5">
@@ -414,7 +464,7 @@ export function FactoryMap({
                   <div className="rounded-xl bg-surface p-3">
                     <dt className="text-xs text-muted">30 daqiqa energiya</dt>
                     <dd className="text-lg font-bold text-navy">
-                      {detail ? `${detail.readings.reduce((s, r) => s + r.energyKwh, 0).toFixed(2)} kWh` : '…'}
+                      {detail ? formatKwh(detail.readings.reduce((s, r) => s + r.energyKwh, 0)) : '…'}
                     </dd>
                   </div>
                 </dl>
