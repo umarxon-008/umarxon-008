@@ -30,8 +30,8 @@ export function EnergyRobot({ className, walking }: { className?: string; walkin
       {/* arms */}
       <path d="M62 168q-26 6-30 30" stroke="#102B5C" strokeWidth="5" fill="none" strokeLinecap="round" />
       <circle cx="31" cy="203" r="10" fill="#fff" stroke="#102B5C" strokeWidth="5" />
-      {/* o'ng qo'l — doimiy silkitadi (yelka nuqtasi atrofida aylanadi) */}
-      <g className="ec-wave">
+      {/* o'ng qo'l — yelka atrofida aylanadi: oddiy holatda doim silkitadi, yurish rejimida faqat joyida turganda */}
+      <g className={walking ? 'ec-wave-walk' : 'ec-wave'}>
         <path d="M158 168q24-10 32-38" stroke="#102B5C" strokeWidth="5" fill="none" strokeLinecap="round" />
         <circle cx="191" cy="125" r="10" fill="#fff" stroke="#102B5C" strokeWidth="5" />
       </g>
