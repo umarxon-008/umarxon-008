@@ -6,7 +6,8 @@ test.describe('EnergyComp E2E', () => {
   test('landing: asosiy CTA va soxta statistika yo‘q', async ({ page }) => {
     await page.goto('/');
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Energiya sarfini boshqaring');
-    await expect(page.getByRole('link', { name: /Boshqarishni boshlash/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /^Boshlash/ })).toBeVisible();
+    await expect(page.getByRole('list', { name: 'Imkoniyatlar' })).toBeVisible();
     const body = await page.locator('body').innerText();
     expect(body).not.toMatch(/98%|30% tejash/);
   });
@@ -48,7 +49,7 @@ test.describe('EnergyComp E2E', () => {
     await page.getByLabel('Parol', { exact: true }).fill(DEMO.password);
     await page.getByRole('button', { name: 'Kirish' }).click();
     await expect(page).toHaveURL(/\/app\/dashboard/);
-    await expect(page.getByText('Joriy umumiy quvvat')).toBeVisible();
+    await expect(page.getByText('Joriy quvvat')).toBeVisible();
     await page.goto('/app/ai-inspector');
     await expect(page.getByRole('heading', { name: 'AI Inspector' })).toBeVisible();
     await page.goto('/app/monitoring');

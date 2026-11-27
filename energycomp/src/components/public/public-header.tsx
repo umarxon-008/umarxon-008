@@ -10,7 +10,6 @@ import { cn } from '@/lib/utils';
 
 const NAV = [
   { href: '/', label: 'Bosh sahifa' },
-  { href: '/features', label: 'Imkoniyatlar' },
   { href: '/pricing', label: 'Tariflar' },
   { href: '/about', label: 'Biz haqimizda' },
   { href: '/about#yordam', label: 'Yordam' },

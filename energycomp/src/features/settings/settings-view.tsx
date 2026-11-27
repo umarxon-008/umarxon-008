@@ -44,7 +44,7 @@ function ProfileSection({ user, role, orgName }: { user: { name: string; email: 
           }}
         >
           <Field label="Ism-familiya" required>{(p) => <Input {...p} value={name} onChange={(e) => setName(e.target.value)} />}</Field>
-          <Field label="Email" hint="Email o‘zgartirish keyingi bosqichda (tasdiqlash xati kerak)">{(p) => <Input {...p} value={user.email} disabled />}</Field>
+          <Field label="Email">{(p) => <Input {...p} value={user.email} disabled />}</Field>
           <p className="text-sm text-muted">Faol tashkilot: <strong className="text-navy">{orgName}</strong> · rol: <strong className="text-navy">{ROLE_LABELS[role]}</strong></p>
           <div><Button type="submit" loading={busy}>Saqlash</Button></div>
         </form>
@@ -64,7 +64,7 @@ function SecuritySection({ timezone, mustChange }: { timezone: string; mustChang
   return (
     <div className="space-y-5">
       <Card>
-        <CardHeader title="Parolni almashtirish" description="Almashtirgandan so‘ng boshqa qurilmalardagi sessiyalar yopiladi." />
+        <CardHeader title="Parolni almashtirish" />
         <CardBody>
           {mustChange && <Notice tone="warning" className="mb-4">Siz vaqtinchalik parol bilan kirdingiz. Davom etish uchun yangi parol o‘rnating.</Notice>}
           <form
@@ -101,7 +101,7 @@ function SecuritySection({ timezone, mustChange }: { timezone: string; mustChang
       <Card>
         <CardHeader
           title="Faol sessiyalar"
-          description="Sessiya httpOnly cookie’da saqlanadi; “Meni eslab qolish” bo‘lmasa 12 soat, bo‘lsa 30 kun amal qiladi."
+
           action={<Button size="sm" variant="outline" disabled={!sessions || sessions.length <= 1} onClick={async () => { const r = await api<{ revoked: number }>('/api/auth/sessions', { method: 'DELETE' }); push('success', `${r.revoked} ta sessiya yopildi`); void loadSessions(); }}>Boshqa sessiyalarni yopish</Button>}
         />
         <CardBody>
@@ -141,12 +141,12 @@ function NotificationsSection() {
   };
   return (
     <Card>
-      <CardHeader title="Bildirishnoma sozlamalari" description="Joriy tashkilot uchun. Email/Telegram kanallari keyingi bosqichda — hozircha ilova ichida." />
+      <CardHeader title="Bildirishnomalar" />
       <CardBody className="space-y-4">
-        <Checkbox label="Jiddiy ogohlantirishlar" description="Masalan, uzoq vaqt ma’lumot kelmasligi, quvvat baseline’dan 50%+ yuqori" checked={prefs.notifyCritical} onChange={() => toggle('notifyCritical')} />
-        <Checkbox label="Ogohlantirishlar" description="Ishlab chiqarish signali yo‘q, keskin o‘zgarish va h.k." checked={prefs.notifyWarning} onChange={() => toggle('notifyWarning')} />
-        <Checkbox label="Ma’lumot darajasidagi xabarlar" description="Uzoq kutish rejimi" checked={prefs.notifyInfo} onChange={() => toggle('notifyInfo')} />
-        <Checkbox label="Boshqaruv so‘rovlari" description="Tasdiq kutayotgan va bajarilgan simulyatsiya so‘rovlari" checked={prefs.notifyControl} onChange={() => toggle('notifyControl')} />
+        <Checkbox label="Jiddiy ogohlantirishlar" checked={prefs.notifyCritical} onChange={() => toggle('notifyCritical')} />
+        <Checkbox label="Ogohlantirishlar" checked={prefs.notifyWarning} onChange={() => toggle('notifyWarning')} />
+        <Checkbox label="Ma’lumot xabarlari" checked={prefs.notifyInfo} onChange={() => toggle('notifyInfo')} />
+        <Checkbox label="Boshqaruv so‘rovlari" checked={prefs.notifyControl} onChange={() => toggle('notifyControl')} />
       </CardBody>
     </Card>
   );
@@ -178,35 +178,34 @@ function IntegrationsSection({ canManage, hasIntegrations, timezone, appUrl }: {
   return (
     <div className="space-y-5">
       <Card>
-        <CardHeader title="Integratsiyalar holati" description="Qaysi ulanishlar haqiqatan ishlayotgani ochiq ko‘rsatiladi." />
+        <CardHeader title="Integratsiyalar" />
         <CardBody>
           <ul className="divide-y divide-line">
             {data.providers.map((p) => (
               <li key={p.id} className="flex flex-wrap items-start justify-between gap-2 py-3">
                 <div className="max-w-2xl">
                   <p className="font-semibold text-navy">{p.name} <span className="text-xs font-normal text-muted">({p.source === 'DEMO' ? 'demo' : 'real'}, {p.mode})</span></p>
-                  <p className="text-sm text-muted">{p.description}</p>
                 </div>
                 <Status ok={p.implemented} label={p.implemented ? 'Mavjud' : 'Mavjud emas'} />
               </li>
             ))}
             <li className="flex flex-wrap items-start justify-between gap-2 py-3">
-              <div><p className="font-semibold text-navy">AI provayder (LLM)</p><p className="text-sm text-muted">{data.ai.configured ? `Model: ${data.ai.model}. Kalit faqat serverda saqlanadi.` : 'Sozlanmagan — qoidaga asoslangan fallback ishlaydi (AI_PROVIDER, ANTHROPIC_API_KEY).'}</p></div>
+              <div><p className="font-semibold text-navy">AI provayder (LLM)</p>{data.ai.configured && <p className="text-sm text-muted">{data.ai.model}</p>}</div>
               <Status ok={data.ai.configured} label={data.ai.configured ? 'Ulangan' : 'Ulanmagan'} />
             </li>
             <li className="flex flex-wrap items-start justify-between gap-2 py-3">
-              <div><p className="font-semibold text-navy">Email xizmati</p><p className="text-sm text-muted">Parolni tiklash va taklif xatlari hozircha yuborilmaydi.</p></div>
+              <div><p className="font-semibold text-navy">Email xizmati</p></div>
               <Status ok={data.email} label={data.email ? 'Ulangan' : 'Ulanmagan'} />
             </li>
             <li className="flex flex-wrap items-start justify-between gap-2 py-3">
-              <div><p className="font-semibold text-navy">To‘lov tizimi</p><p className="text-sm text-muted">Obunalar demo rejimda, to‘lov qabul qilinmaydi.</p></div>
+              <div><p className="font-semibold text-navy">To‘lov tizimi</p></div>
               <Status ok={data.payment} label={data.payment ? 'Ulangan' : 'Ulanmagan'} />
             </li>
           </ul>
         </CardBody>
       </Card>
       <Card>
-        <CardHeader title="HTTP ingest tokenlari" icon={<KeyRound className="h-5 w-5 text-brand" aria-hidden />} description="Gateway yoki skript real o‘lchovlarni yuborishi uchun. Token faqat bir marta ko‘rsatiladi; bazada faqat hash saqlanadi." action={!hasIntegrations && <Badge tone="navy">Pro</Badge>} />
+        <CardHeader title="HTTP ingest tokenlari" icon={<KeyRound className="h-5 w-5 text-brand" aria-hidden />} description="Real o‘lchovlarni yuborish uchun" action={!hasIntegrations && <Badge tone="navy">Pro</Badge>} />
         <CardBody className="space-y-4">
           {token && (
             <Notice tone="warning" title="Tokenni hozir saqlab oling">
@@ -250,7 +249,7 @@ function IntegrationsSection({ canManage, hasIntegrations, timezone, appUrl }: {
   -H "Content-Type: application/json" \\
   -d '{"readings":[{"sensorId":"GW-01-SVR","timestamp":"2026-01-01T10:00:00+05:00",
         "powerKw":8.4,"intervalSeconds":60,"isProducing":true}]}'`}</pre>
-            <p className="mt-2 text-xs text-muted">Uskunaning “Ma’lumot manbasi” — Real, “Sensor identifikatori” esa sensorId bilan bir xil bo‘lishi kerak. Batafsil: docs/INTEGRATIONS.md</p>
+            <p className="mt-2 text-xs text-muted">Uskunada manba “Real”, sensor identifikatori esa sensorId bilan bir xil bo‘lsin.</p>
           </details>
         </CardBody>
       </Card>
@@ -270,7 +269,7 @@ export function SettingsView(props: {
 }) {
   return (
     <div>
-      <PageHeader title="Sozlamalar" description="Profil, xavfsizlik, bildirishnomalar va integratsiyalar." />
+      <PageHeader title="Sozlamalar" />
       <Tabs
         tabs={[
           { id: 'profile', label: 'Profil', content: <ProfileSection user={props.user} role={props.role} orgName={props.org.name} /> },
@@ -282,7 +281,7 @@ export function SettingsView(props: {
             label: 'Tizim',
             content: (
               <Card>
-                <CardHeader title="Tizim sozlamalari" description="Tashkilot darajasidagi sozlamalar Korxona sahifasida boshqariladi." />
+                <CardHeader title="Tizim" />
                 <CardBody>
                   <dl className="grid max-w-xl grid-cols-2 gap-y-2 text-sm">
                     <dt className="text-muted">Vaqt zonasi</dt><dd className="font-medium text-navy">{props.org.timezone}</dd>

@@ -133,7 +133,7 @@ export function UsersView({ members, canManage, currentUserId, limit }: { member
       </Card>
 
       <Card className="mt-5">
-        <CardHeader title="Rollar va ruxsatlar" description="Ruxsatlar har bir so‘rovda serverda tekshiriladi." />
+        <CardHeader title="Rollar" />
         <CardBody>
           <div className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {ORG_ROLES.map((r) => (
@@ -144,7 +144,7 @@ export function UsersView({ members, canManage, currentUserId, limit }: { member
             ))}
           </div>
           <details>
-            <summary className="cursor-pointer text-sm font-semibold text-brand">Batafsil ruxsatlar matritsasi</summary>
+            <summary className="cursor-pointer text-sm font-semibold text-brand">Batafsil ruxsatlar</summary>
             <div className="mt-3 overflow-x-auto">
               <table className="w-full min-w-[560px] text-xs">
                 <thead className="text-left text-muted"><tr><th scope="col" className="px-2 py-1.5">Ruxsat</th>{ORG_ROLES.map((r) => <th key={r} scope="col" className="px-2 py-1.5 text-center">{ROLE_LABELS[r].split(' ')[0]}</th>)}</tr></thead>
@@ -159,7 +159,7 @@ export function UsersView({ members, canManage, currentUserId, limit }: { member
         </CardBody>
       </Card>
 
-      <Modal open={open} onClose={() => setOpen(false)} title="Foydalanuvchi qo‘shish" description="Email ro‘yxatdan o‘tgan bo‘lsa — mavjud hisob qo‘shiladi; aks holda vaqtinchalik parol bilan yangi hisob yaratiladi." footer={<><Button variant="outline" onClick={() => setOpen(false)}>Bekor qilish</Button><Button type="submit" form="member-form" loading={busy}>Qo‘shish</Button></>}>
+      <Modal open={open} onClose={() => setOpen(false)} title="Foydalanuvchi qo‘shish" footer={<><Button variant="outline" onClick={() => setOpen(false)}>Bekor qilish</Button><Button type="submit" form="member-form" loading={busy}>Qo‘shish</Button></>}>
         <form id="member-form" onSubmit={add} className="space-y-4" noValidate>
           <FormError message={error} />
           <Field label="Ism-familiya" required error={errs.name}>{(p) => <Input {...p} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />}</Field>

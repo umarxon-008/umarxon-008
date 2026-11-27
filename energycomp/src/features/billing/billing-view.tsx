@@ -85,9 +85,7 @@ export function BillingView({
   return (
     <div>
       <PageHeader title="Tarif va obuna" />
-      <Notice tone="demo" title="Demo obuna" className="mb-5">
-        To‘lov provayderi ulanmagan — real to‘lov qabul qilinmaydi. Tarifni almashtirish faqat demo rejimda limit va imkoniyatlarni o‘zgartiradi. Limitlar serverda tekshiriladi.
-      </Notice>
+      <Notice tone="demo" className="mb-5">Demo obuna — to‘lov olinmaydi.</Notice>
       <div className="grid gap-5 lg:grid-cols-3">
         <Card>
           <CardHeader title="Joriy tarif" action={<Badge tone="violet">{subscription.isDemo ? 'DEMO' : subscription.status}</Badge>} />
@@ -128,7 +126,7 @@ export function BillingView({
         open={Boolean(editing)}
         onClose={() => setEditing(null)}
         title={`Tarifni sozlash: ${editing?.name ?? ''}`}
-        description="Faqat platforma administratori. O‘zgarish barcha tashkilotlarga ta’sir qiladi va audit qilinadi."
+        description="Barcha tashkilotlarga ta’sir qiladi."
         size="lg"
         footer={<><Button variant="outline" onClick={() => setEditing(null)}>Bekor qilish</Button><Button onClick={savePlan}>Saqlash</Button></>}
       >

@@ -235,21 +235,19 @@ export function FactoryMap({
     <div>
       <PageHeader
         title="Factory Map"
-        description="Zavod rejasi va uskunalar holati. Uskunani tanlang — energiya ko‘rsatkichlari ochiladi."
+        description="Uskunani tanlang — ma’lumoti ochiladi"
         actions={
           <>
-            <span className="inline-flex h-10 items-center rounded-xl bg-navy px-3 text-sm font-semibold text-white">2D xarita</span>
             <span
-              className="inline-flex h-10 items-center gap-2 rounded-xl border border-dashed border-line px-3 text-sm text-muted"
-              title="3D xarita Pro tarifining rejalashtirilgan imkoniyati. Hozircha ishlab chiqilmagan, shuning uchun tugma yo‘q."
+              className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-dashed border-line px-3 text-sm text-muted"
+              title={has3d ? '3D xarita tarifingizga kiradi — keyingi bosqichda ishga tushadi' : '3D xarita — Pro tarifi, keyingi bosqichda'}
             >
-              <Box className="h-4 w-4" aria-hidden /> 3D <Badge tone="navy">Pro</Badge>
-              <span className="text-xs">{has3d ? 'Tarifingizda — keyingi bosqichda ishga tushadi' : 'Keyingi bosqichda'}</span>
+              <Box className="h-4 w-4" aria-hidden /> 3D <Badge tone="navy">Pro</Badge> <span className="text-xs">tez orada</span>
             </span>
             {canEdit && (
               <Button variant={editMode ? 'primary' : 'outline'} onClick={() => setEditMode((v) => !v)} aria-pressed={editMode}>
                 {editMode ? <Hand className="h-4 w-4" aria-hidden /> : <Move className="h-4 w-4" aria-hidden />}
-                {editMode ? 'Tahrirlash rejimi yoqilgan' : 'Joylashuvni tahrirlash'}
+                {editMode ? 'Tayyor' : 'Tahrirlash'}
               </Button>
             )}
             {canAddEquipment && (
@@ -300,7 +298,7 @@ export function FactoryMap({
           </div>
           {editMode && (
             <p className="bg-brand-50 px-4 py-2 text-xs text-navy">
-              Uskunani sichqoncha yoki barmoq bilan suring. Klaviatura: uskunani tanlab, strelkalar (Shift — katta qadam). Joylashuv avtomatik saqlanadi.
+              Uskunani suring yoki strelkalar bilan siljiting — avtomatik saqlanadi.
             </p>
           )}
           <div className="relative bg-[#f8fbff]">

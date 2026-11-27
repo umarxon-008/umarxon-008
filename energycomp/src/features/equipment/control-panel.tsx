@@ -101,7 +101,7 @@ export function ControlPanel({
       <CardHeader
         title="Smart Control"
         icon={<ShieldAlert className="h-5 w-5 text-orange" aria-hidden />}
-        description="AI uskunani hech qachon avtomatik boshqarmaydi."
+        description="AI uskunani o‘zi boshqarmaydi"
         action={mode && <Badge tone={mode === 'READ_ONLY' ? 'gray' : 'amber'}>{mode === 'READ_ONLY' ? 'READ-ONLY' : 'Simulyatsiya'}</Badge>}
       />
       <CardBody className="space-y-3">
@@ -110,8 +110,7 @@ export function ControlPanel({
         ) : (
           <>
             <Notice tone="warning">
-              Real boshqaruv adapteri ulanmagan. {mode === 'SIMULATION' ? 'Simulyatsiya rejimida buyruq faqat demo uskuna holatini o‘zgartiradi — real uskunaga hech narsa yuborilmaydi.' : 'Tashkilot READ-ONLY rejimida: faqat monitoring va tavsiya.'}{' '}
-              EnergyComp favqulodda to‘xtatish (E-stop) va xavfsizlik qurilmalari o‘rnini bosmaydi.
+              {mode === 'SIMULATION' ? 'Simulyatsiya: real uskunaga buyruq yuborilmaydi.' : 'Faqat kuzatuv rejimi (READ-ONLY).'}
             </Notice>
             {simulatedState === 'STOPPED' && <Badge tone="amber">Simulyatsiya holati: to‘xtatilgan</Badge>}
             {mode === 'SIMULATION' && dataSource === 'DEMO' && canRequest && !pending && (
@@ -164,7 +163,7 @@ export function ControlPanel({
         open={modal !== null}
         onClose={() => setModal(null)}
         title={modal === 'STOP' ? 'To‘xtatishni so‘rash' : 'Ishga tushirishni so‘rash'}
-        description="Simulyatsiya: real uskunaga buyruq yuborilmaydi. So‘rov, tasdiq va natija audit jurnaliga yoziladi."
+        description="Simulyatsiya — real uskunaga buyruq yuborilmaydi."
         footer={
           <>
             <Button variant="outline" onClick={() => setModal(null)}>Bekor qilish</Button>
@@ -176,14 +175,14 @@ export function ControlPanel({
       >
         <div className="space-y-4">
           <FormError message={error} />
-          <Field label="Sabab" required hint="Masalan: 5 daqiqadan beri ishlab chiqarish signali yo‘q, jarayon tekshirildi">
+          <Field label="Sabab" required>
             {(p) => <Textarea {...p} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={500} />}
           </Field>
           <Checkbox
             checked={safety}
             onChange={(e) => setSafety(e.target.checked)}
             label="Jarayon xavfsizligini tekshirdim"
-            description="Uskunada odam yo‘q, materiallar xavfsiz holatda va ishlab chiqaruvchining to‘xtatish tartibiga zid emas."
+            description="Uskuna yonida odam yo‘q, jarayon xavfsiz."
           />
         </div>
       </Modal>

@@ -66,7 +66,7 @@ function InfoSection({ org, canEdit }: { org: OrgData; canEdit: boolean }) {
   const [busy, setBusy] = useState(false);
   return (
     <Card>
-      <CardHeader title="Tashkilot ma’lumotlari" description="Vaqt zonasi “bugun” va grafik davrlarini, valyuta esa xarajat ko‘rsatkichlarini belgilaydi." />
+      <CardHeader title="Tashkilot ma’lumotlari" />
       <CardBody>
         <form
           className="grid gap-4 sm:grid-cols-2"
@@ -113,7 +113,7 @@ function TariffSection({ org, canEdit }: { org: OrgData; canEdit: boolean }) {
   const [errs, setErrs] = useState<Record<string, string>>({});
   return (
     <Card>
-      <CardHeader title="Energiya tarifi (kWh narxi)" description="Xarajat har bir davr uchun o‘sha vaqtda amal qilgan tarif bo‘yicha hisoblanadi." />
+      <CardHeader title="Energiya tarifi (kWh narxi)" />
       <CardBody className="space-y-4">
         <div className="overflow-x-auto rounded-xl border border-line">
           <table className="w-full text-sm">
@@ -225,7 +225,7 @@ function CategoriesSection({ org, canEdit }: { org: OrgData; canEdit: boolean })
   const [name, setName] = useState('');
   return (
     <Card>
-      <CardHeader title="Uskuna kategoriyalari" description="Platforma istalgan sanoat turiga moslashadi — kategoriyalarni o‘zingiz belgilang." />
+      <CardHeader title="Uskuna kategoriyalari" />
       <CardBody className="space-y-4">
         <ul className="flex flex-wrap gap-2">
           {org.categories.map((c) => (
@@ -246,7 +246,6 @@ function CategoriesSection({ org, canEdit }: { org: OrgData; canEdit: boolean })
             <Button type="submit" disabled={name.trim().length < 2}><Plus className="h-4 w-4" aria-hidden /> Qo‘shish</Button>
           </form>
         )}
-        <p className="text-xs text-muted">Kategoriya o‘chirilsa, unga tegishli uskunalar “Kategoriyasiz” bo‘lib qoladi.</p>
       </CardBody>
     </Card>
   );
@@ -256,15 +255,13 @@ function ControlSection({ org, canEdit }: { org: OrgData; canEdit: boolean }) {
   const save = useSaver();
   return (
     <Card>
-      <CardHeader title="Smart Control rejimi" description="Sanoat xavfsizligi eng muhim talab." />
+      <CardHeader title="Smart Control rejimi" />
       <CardBody className="space-y-4">
-        <Notice tone="warning" title="Real boshqaruv mavjud emas">
-          EnergyComp hozircha hech qanday real uskunaga buyruq yubormaydi. Real boshqaruv faqat alohida adapter, vakolatli operator tasdig‘i, uskunaga mos xavfsizlik interloklari va integrator tekshiruvidan keyin qo‘shiladi. AI hech qachon uskunani avtomatik boshqarmaydi.
-        </Notice>
+        <Notice tone="warning">Real uskunaga buyruq yuborilmaydi. AI uskunani o‘zi boshqarmaydi.</Notice>
         <div className="grid gap-3 md:grid-cols-2">
           {([
-            ['READ_ONLY', 'READ-ONLY (standart)', 'Faqat monitoring va tavsiyalar. Boshqaruv so‘rovlari o‘chirilgan.'],
-            ['SIMULATION', 'Simulyatsiya', 'Demo uskunalar uchun “to‘xtatish/ishga tushirish” so‘rovi → ikkinchi shaxs tasdig‘i → faqat demo holat o‘zgaradi. Hammasi audit qilinadi.'],
+            ['READ_ONLY', 'Faqat kuzatuv', 'Monitoring va tavsiyalar.'],
+            ['SIMULATION', 'Simulyatsiya', 'Demo uskunalarni to‘xtatish so‘rovi, ikkinchi shaxs tasdig‘i bilan.'],
           ] as const).map(([mode, title, desc]) => (
             <button
               key={mode}
@@ -290,9 +287,8 @@ function BaselineSection({ org, canEdit }: { org: OrgData; canEdit: boolean }) {
   const [errs, setErrs] = useState<Record<string, string>>({});
   return (
     <Card>
-      <CardHeader title="Tejash uchun baseline davri" description="Analytics’dagi “taxminiy tejash” shu davrning kunlik o‘rtacha iste’moli bilan taqqoslanadi." />
+      <CardHeader title="Baseline davri" description="Tejash shu davr bilan taqqoslanadi" />
       <CardBody className="space-y-4">
-        {!org.baselineStart && <Notice tone="info">Baseline belgilanmagan — tejash ko‘rsatkichi chiqarilmaydi.</Notice>}
         <form
           className="grid gap-3 sm:grid-cols-3 sm:items-end"
           onSubmit={async (e) => {
@@ -325,7 +321,7 @@ function AuditSection({ timezone }: { timezone: string }) {
     <Card>
       <CardHeader
         title="Audit jurnali"
-        description="Muhim amallar: kirish, o‘zgartirishlar, AI tahlillar, boshqaruv so‘rovlari."
+
         action={
           <Select value={action} onChange={(e) => { setAction(e.target.value); setPage(1); }} className="h-9 w-48" aria-label="Amal turi">
             <option value="">Barcha amallar</option>

@@ -55,14 +55,14 @@ export function MonitoringView({
     <div>
       <PageHeader
         title="Energy Monitoring"
-        description={<>Quvvat (kW) — lahzalik yuklama; energiya (kWh) — davr davomida iste’mol. Vaqt zonasi: {timezone}.</>}
+        description="Quvvat (kW) va energiya sarfi (kWh)"
         actions={
           <>
             <a href={exportUrl('aggregated')} className="inline-flex h-10 items-center gap-2 rounded-xl border border-line bg-white px-4 text-sm font-semibold text-navy hover:bg-surface" download>
-              <Download className="h-4 w-4" aria-hidden /> CSV (davrlar)
+              <Download className="h-4 w-4" aria-hidden /> CSV
             </a>
             <a href={exportUrl('raw')} className="inline-flex h-10 items-center gap-2 rounded-xl border border-line bg-white px-4 text-sm font-semibold text-navy hover:bg-surface" download>
-              <FileSpreadsheet className="h-4 w-4" aria-hidden /> CSV (xom o‘lchovlar)
+              <FileSpreadsheet className="h-4 w-4" aria-hidden /> Xom CSV
             </a>
           </>
         }
@@ -123,30 +123,28 @@ export function MonitoringView({
             {data.range.clampedByPlan && (
               <Notice tone="warning">Tarifingiz bo‘yicha tarix {historyDays} kun bilan cheklangan — boshlanish sanasi qisqartirildi.</Notice>
             )}
-            {data.range.granularityAdjusted && <Notice tone="info">Davr uzun bo‘lgani uchun ko‘rinish yiriklashtirildi.</Notice>}
             <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
               {formatDateTime(data.range.from, timezone)} — {formatDateTime(data.range.to, timezone)} · Manba:
               {data.sources.demoReadings > 0 && <SourceBadge source="DEMO" compact />}
               {data.sources.realReadings > 0 && <SourceBadge source="REAL" compact />}
               {data.sources.readings === 0 && 'o‘lchov yo‘q'}
-              <span>({formatNumber(data.sources.readings, 0)} ta o‘lchov)</span>
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
             <StatCard label="Energiya (davr)" value={formatKwh(data.totals.energyKwh)} tone="green" />
-            <StatCard label="Xarajat (davr)" value={formatMoney(data.totals.cost, data.currency)} tone="amber" sub={data.pricePerKwh ? `Joriy tarif: ${formatMoney(data.pricePerKwh, data.currency)}/kWh` : 'Tarif belgilanmagan'} />
-            <StatCard label="O‘rtacha quvvat" value={formatKw(data.totals.avgPowerKw)} sub="Energiya ÷ soatlar" />
-            <StatCard label="Maksimal quvvat" value={formatKw(data.totals.peakKw)} tone="orange" sub="Bir lahzadagi yig‘indi" />
-            <StatCard label="Joriy quvvat" value={formatKw(data.totals.currentPowerKw)} tone="navy" sub="Hozir, tanlangan uskunalar" />
+            <StatCard label="Xarajat (davr)" value={formatMoney(data.totals.cost, data.currency)} tone="amber" sub={data.pricePerKwh ? `${formatMoney(data.pricePerKwh, data.currency)}/kWh` : undefined} />
+            <StatCard label="O‘rtacha quvvat" value={formatKw(data.totals.avgPowerKw)} />
+            <StatCard label="Maksimal quvvat" value={formatKw(data.totals.peakKw)} tone="orange" />
+            <StatCard label="Joriy quvvat" value={formatKw(data.totals.currentPowerKw)} tone="navy" sub="Hozir" />
           </div>
           <Card className="mt-5">
-            <CardHeader title="Energiya sarfi (kWh)" description="Ustunga olib boring — o‘rtacha va maksimal quvvat, xarajat" />
+            <CardHeader title="Energiya sarfi (kWh)" />
             <CardBody>
               <EnergyBarChart data={data.series} granularity={data.range.granularity} timezone={timezone} currency={data.currency} height={300} />
             </CardBody>
           </Card>
           <Card className="mt-5">
-            <CardHeader title="Uskunalar kesimida" description="Davr bo‘yicha, sarf kamayish tartibida" />
+            <CardHeader title="Uskunalar bo‘yicha" />
             <div className="overflow-x-auto p-2">
               <table className="w-full min-w-[720px] text-sm">
                 <thead className="text-left text-xs text-muted">

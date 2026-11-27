@@ -6,7 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Checkbox, Field, FormError, Input, Select } from '@/components/ui/form';
 import { Modal } from '@/components/ui/modal';
-import { Notice } from '@/components/ui/notice';
 import { api, ApiClientError, errorMessage } from '@/lib/api-client';
 import { equipmentInputSchema, type EquipmentInput } from '@/schemas/equipment';
 
@@ -103,7 +102,6 @@ export function EquipmentFormModal({
       onClose={onClose}
       size="lg"
       title={editing ? 'Uskunani tahrirlash' : 'Yangi uskuna'}
-      description="Nominal quvvat — uskuna pasportidagi maksimal quvvat (kW)."
       footer={
         <>
           <Button variant="outline" onClick={onClose}>
@@ -190,13 +188,11 @@ export function EquipmentFormModal({
           <Checkbox
             className="mt-4"
             label="Ishlab chiqarish signali manbasi bor"
-            description="Uskuna yoki PLC “ishlab chiqaryapti / yo‘q” signalini yuboradi. Bu bo‘lmasa AI “ishlab chiqarmayapti” degan xulosa chiqarmaydi."
+            description="Uskuna “ishlab chiqaryapti / yo‘q” signalini yuboradi"
             {...register('hasProductionSignal')}
           />
           {dataSource === 'REAL' && (
-            <Notice tone="info" className="mt-4">
-              Real manbali uskuna uchun ma’lumot faqat HTTP ingest API orqali keladi (Sozlamalar → Integratsiyalar). Ma’lumot kelmaguncha holati “Aloqa yo‘q” bo‘ladi.
-            </Notice>
+            <p className="mt-3 text-xs text-muted">Ma’lumot Sozlamalar → Integratsiyalar orqali keladi.</p>
           )}
         </fieldset>
       </form>

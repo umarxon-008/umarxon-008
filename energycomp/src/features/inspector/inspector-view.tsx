@@ -8,7 +8,6 @@ import { Card, CardBody, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, Textarea } from '@/components/ui/form';
-import { Notice } from '@/components/ui/notice';
 import { PageHeader } from '@/components/ui/page-header';
 import { Pagination } from '@/components/ui/pagination';
 import { Segmented } from '@/components/ui/segmented';
@@ -147,13 +146,13 @@ export function InspectorView({
     <div>
       <PageHeader
         title="AI Inspector"
-        description="Noodatiy sarf, bekor ishlash va aloqa uzilishini aniqlaydi. AI tavsiyasi — operator qarorini almashtirmaydi."
+        description="Noodatiy sarf va uzilishlar"
         actions={
           <>
             <Badge tone={ai.configured && ai.planAllowsLlm ? 'violet' : 'gray'} icon={<Bot className="h-3 w-3" aria-hidden />}>
-              {ai.configured && ai.planAllowsLlm ? `LLM: ${ai.model}` : 'Qoidaga asoslangan rejim'}
+              {ai.configured && ai.planAllowsLlm ? `LLM: ${ai.model}` : 'Qoidaga asoslangan'}
             </Badge>
-            <Badge tone="blue">Bugungi AI tahlil: {quotaUsed}/{quota.limit}</Badge>
+            <Badge tone="blue" title="Bugungi AI tahlillar">AI: {quotaUsed}/{quota.limit}</Badge>
             {perms.run && (
               <Button onClick={runNow} loading={busy === 'run'}>
                 {busy !== 'run' && <PlayCircle className="h-4 w-4" aria-hidden />} Hozir tekshirish
@@ -162,15 +161,8 @@ export function InspectorView({
           </>
         }
       />
-      {!ai.configured && (
-        <Notice tone="info" className="mb-4">
-          LLM provayderi ulanmagan{ai.llmRequested ? ' (ANTHROPIC_API_KEY yo‘q)' : ''} — barcha tahlillar qoidaga asoslangan dvigatel tomonidan, faqat bazadagi o‘lchovlar asosida tuziladi.
-        </Notice>
-      )}
-      {ai.configured && !ai.planAllowsLlm && <Notice tone="info" className="mb-4">LLM tahlil Pro tarifida. Free tarifida qoidaga asoslangan tahlil ishlaydi.</Notice>}
-
       <details className="mb-4 rounded-xl border border-line bg-white p-4 shadow-card">
-        <summary className="cursor-pointer text-sm font-semibold text-navy">Aniqlash qoidalari (5 ta)</summary>
+        <summary className="cursor-pointer text-sm font-semibold text-navy">Qanday aniqlanadi?</summary>
         <ul className="mt-3 grid gap-2 text-sm text-muted md:grid-cols-2">
           {RULES_INFO.map((r) => (
             <li key={r.rule}>
@@ -227,14 +219,11 @@ export function InspectorView({
                       aria-current={a.id === selectedId}
                       className={cn('w-full px-4 py-3 text-left hover:bg-surface', a.id === selectedId && 'bg-brand-50')}
                     >
-                      <div className="flex flex-wrap items-center gap-1.5">
+                      <div className="flex items-center gap-1.5">
                         <SeverityBadge severity={a.severity} />
-                        <AlertStatusBadge status={a.status} />
-                        {a.source === 'DEMO' && <SourceBadge source="DEMO" compact />}
                         <span className="ml-auto text-xs text-muted">{formatRelative(a.detectedAt)}</span>
                       </div>
                       <p className="mt-1.5 text-sm font-semibold text-navy">{a.title}</p>
-                      <p className="text-xs text-muted">{RULE_LABELS[a.rule]}{!a.conditionActive && ' · holat hozir kuzatilmayapti'}</p>
                     </button>
                   </li>
                 ))}
@@ -258,20 +247,20 @@ export function InspectorView({
                     <SeverityBadge severity={detail.severity} />
                     <AlertStatusBadge status={detail.status} />
                     <ConfidenceBadge confidence={detail.confidence} />
-                    <SourceBadge source={detail.source} />
-                    <Badge tone={detail.conditionActive ? 'orange' : 'gray'}>{detail.conditionActive ? 'Holat davom etmoqda' : 'Holat hozir kuzatilmayapti'}</Badge>
+                    <SourceBadge source={detail.source} compact />
+                    {!detail.conditionActive && <Badge tone="gray">Hozir kuzatilmayapti</Badge>}
                   </div>
                   <h2 className="mt-3 text-lg font-bold text-navy">{detail.title}</h2>
                   <p className="mt-1 text-sm text-muted">
                     <Link href={`/app/equipment/${detail.equipment.id}`} className="font-semibold text-brand hover:underline">{detail.equipment.name}</Link>
-                    {' · '}Aniqlandi: {formatDateTime(detail.detectedAt, timezone)} · Oxirgi tekshiruv: {formatDateTime(detail.lastCheckedAt, timezone)}
+                    {' · '}{formatDateTime(detail.detectedAt, timezone)}
                   </p>
                   <p className="mt-3 text-sm text-navy">{detail.explanation}</p>
 
                   <div className="mt-4 overflow-x-auto rounded-xl border border-line">
                     <table className="w-full text-sm">
                       <caption className="bg-surface px-3 py-2 text-left text-xs font-semibold text-muted">
-                        Dalillar · oraliq {formatDateTime(detail.windowStart, timezone)} — {formatDateTime(detail.windowEnd, timezone)}
+                        Dalillar
                       </caption>
                       <tbody className="divide-y divide-line">
                         {detail.details.items.map((e) => (
@@ -304,7 +293,7 @@ export function InspectorView({
                   {perms.update && (
                     <div className="mt-4 space-y-2 border-t border-line pt-4">
                       <label htmlFor="alert-note" className="text-sm font-medium text-navy">Izoh (ixtiyoriy)</label>
-                      <Textarea id="alert-note" value={note} onChange={(e) => setNote(e.target.value)} maxLength={500} className="min-h-[60px]" placeholder="Masalan: operator tekshirdi, sozlama tuzatildi" />
+                      <Textarea id="alert-note" value={note} onChange={(e) => setNote(e.target.value)} maxLength={500} className="min-h-[60px]" />
                       <div className="flex flex-wrap gap-2">
                         {detail.status === 'NEW' && <Button variant="secondary" onClick={() => changeStatus('ACKNOWLEDGED')} loading={busy === 'ACKNOWLEDGED'}><Eye className="h-4 w-4" aria-hidden /> Ko‘rib chiqilmoqda</Button>}
                         {(detail.status === 'NEW' || detail.status === 'ACKNOWLEDGED') && (
@@ -324,12 +313,12 @@ export function InspectorView({
                 <CardHeader
                   title="AI tahlili"
                   icon={<Bot className="h-5 w-5 text-brand" aria-hidden />}
-                  description="Dalillar har doim bazadagi o‘lchovlardan olinadi; AI yangi raqam to‘qimaydi."
+
                   action={perms.analyze && <Button size="sm" variant="secondary" onClick={analyze} loading={busy === 'ai'}>AI tahlil so‘rash</Button>}
                 />
                 <CardBody className="space-y-3">
                   {detail.aiAnalyses.length === 0 ? (
-                    <p className="text-sm text-muted">Bu ogohlantirish uchun hali AI tahlil so‘ralmagan.</p>
+                    <p className="text-sm text-muted">Hali tahlil yo‘q.</p>
                   ) : (
                     detail.aiAnalyses.map((a) => <AnalysisCard key={a.id} analysis={a} timezone={timezone} canFeedback={perms.feedback} />)
                   )}
@@ -337,7 +326,7 @@ export function InspectorView({
               </Card>
 
               <Card>
-                <CardHeader title="Tarix" description="Kim va qachon ko‘rib chiqqani (audit)" />
+                <CardHeader title="Tarix" />
                 <CardBody>
                   <ol className="space-y-2 text-sm">
                     {detail.events.map((e) => (

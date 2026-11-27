@@ -1,43 +1,34 @@
 import type { Metadata } from 'next';
-import { HelpCircle, Mail, Target } from 'lucide-react';
 import { EnergyRobot } from '@/components/brand/illustrations';
 import { ContactForm } from '@/components/public/contact-form';
 
 export const metadata: Metadata = { title: 'Biz haqimizda' };
 
 const FAQ = [
-  { q: 'Sensor bo‘lmasa platformadan foydalansa bo‘ladimi?', a: 'Ha. Demo Data Provider simulyatsiya qilingan o‘lchovlar yaratadi. Bunday ma’lumotlar har doim “Demo ma’lumot” deb belgilanadi va real natija sifatida ko‘rsatilmaydi.' },
-  { q: 'Real sensorlarni qanday ulash mumkin?', a: 'Hozircha HTTP ingest API orqali: gateway o‘lchovlarni POST /api/ingest ga yuboradi (Pro tarifi). MQTT va Modbus adapterlari rejalashtirilgan.' },
-  { q: 'AI uskunani o‘zi o‘chira oladimi?', a: 'Yo‘q. AI faqat tahlil va tavsiya beradi. Boshqaruv MVPda faqat simulyatsiya rejimida, inson tasdig‘i bilan va audit jurnaliga yozilgan holda ishlaydi.' },
-  { q: 'Ma’lumotlarim boshqa korxonalarga ko‘rinadimi?', a: 'Yo‘q. Har bir tashkilot ma’lumotlari alohida; har bir so‘rovda a’zolik va rol serverda tekshiriladi.' },
+  { q: 'Sensor bo‘lmasa ishlatsa bo‘ladimi?', a: 'Ha. Platformani demo ma’lumotlar bilan sinab ko‘rish mumkin — ular har doim “Demo” deb belgilanadi.' },
+  { q: 'Real sensorni qanday ulayman?', a: 'Sozlamalar → Integratsiyalar bo‘limida token oling va gateway orqali o‘lchovlarni yuboring (Pro tarifi).' },
+  { q: 'AI uskunani o‘zi o‘chira oladimi?', a: 'Yo‘q. AI faqat tavsiya beradi, qarorni odam qabul qiladi.' },
+  { q: 'Ma’lumotlarim boshqalarga ko‘rinadimi?', a: 'Yo‘q. Har bir korxona ma’lumoti alohida saqlanadi.' },
 ];
 
 export default function AboutPage() {
   return (
-    <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-      <div className="grid items-center gap-10 md:grid-cols-[1fr_auto]">
-        <div>
+    <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6">
+      <div className="grid items-center gap-8 md:grid-cols-[1fr_auto]">
+        <div className="ec-fade-up">
           <h1 className="text-4xl font-extrabold tracking-tight text-navy">Biz haqimizda</h1>
           <p className="mt-4 text-lg text-muted">
-            EnergyComp — sanoat korxonalari uchun energiya boshqaruvi platformasi. Missiyamiz: korxonalarga energiya sarfini
-            tushunarli ko‘rsatish, ortiqcha sarfni erta aniqlash va ishlab chiqarish samaradorligini oshirishda yordam berish.
+            EnergyComp korxonalarga elektr sarfini tushunarli ko‘rsatadi va isrofni kamaytirishga yordam beradi.
           </p>
-          <div className="mt-6 flex items-start gap-3 rounded-card bg-surface p-5">
-            <Target className="mt-0.5 h-5 w-5 shrink-0 text-brand" aria-hidden />
-            <p className="text-sm text-muted">
-              Platforma MVP bosqichida. Real sensor integratsiyalari, 3D xarita va to‘lov tizimi keyingi bosqichlarda qo‘shiladi.
-            </p>
-          </div>
         </div>
-        <EnergyRobot className="mx-auto h-56 w-auto" />
+        <div className="ec-float mx-auto">
+          <EnergyRobot className="h-48 w-auto" />
+        </div>
       </div>
 
-      <section id="yordam" className="mt-16 scroll-mt-24" aria-labelledby="faq-title">
-        <div className="flex items-center gap-2">
-          <HelpCircle className="h-6 w-6 text-brand" aria-hidden />
-          <h2 id="faq-title" className="text-2xl font-bold text-navy">Yordam va ko‘p so‘raladigan savollar</h2>
-        </div>
-        <div className="mt-6 space-y-3">
+      <section id="yordam" className="mt-14 scroll-mt-24" aria-labelledby="faq-title">
+        <h2 id="faq-title" className="text-2xl font-bold text-navy">Savollar</h2>
+        <div className="mt-5 space-y-3">
           {FAQ.map((f) => (
             <details key={f.q} className="group rounded-xl border border-line bg-white p-4 shadow-card">
               <summary className="cursor-pointer list-none font-semibold text-navy marker:hidden">
@@ -51,16 +42,10 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="mt-16 grid gap-8 md:grid-cols-2" aria-labelledby="contact-title">
+      <section className="mt-14 grid gap-8 md:grid-cols-2" aria-labelledby="contact-title">
         <div>
-          <div className="flex items-center gap-2">
-            <Mail className="h-6 w-6 text-brand" aria-hidden />
-            <h2 id="contact-title" className="text-2xl font-bold text-navy">Biz bilan bog‘laning</h2>
-          </div>
-          <p className="mt-3 text-sm text-muted">
-            Pilot loyiha, integratsiya yoki hamkorlik bo‘yicha xabar qoldiring. Xabarlar platforma administratoriga audit
-            jurnali orqali yetkaziladi (email xizmati hali ulanmagan).
-          </p>
+          <h2 id="contact-title" className="text-2xl font-bold text-navy">Bog‘lanish</h2>
+          <p className="mt-2 text-sm text-muted">Savol yoki taklifingizni yozib qoldiring.</p>
         </div>
         <ContactForm />
       </section>

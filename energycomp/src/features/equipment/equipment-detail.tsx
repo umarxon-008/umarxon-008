@@ -11,7 +11,6 @@ import { Segmented } from '@/components/ui/segmented';
 import { StatCard } from '@/components/ui/stat-card';
 import { EmptyState } from '@/components/ui/states';
 import { AlertStatusBadge, SeverityBadge, SourceBadge, StatusBadge } from '@/components/ui/status';
-import { Notice } from '@/components/ui/notice';
 import { useToast } from '@/components/ui/toast';
 import { EnergyBarChart, PowerLineChart, type SeriesPoint } from '@/features/charts/charts';
 import { AnalysisCard, type AnalysisRecord } from '@/features/inspector/analysis-card';
@@ -115,21 +114,15 @@ export function EquipmentDetail(props: {
         </div>
       </div>
 
-      {eq.dataSource === 'DEMO' && (
-        <Notice tone="demo" className="mb-4">
-          Bu uskuna ko‘rsatkichlari Demo Data Provider tomonidan simulyatsiya qilingan.
-        </Notice>
-      )}
-
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Joriy quvvat" value={eq.status === 'OFFLINE' ? '—' : formatKw(eq.currentPowerKw)} sub={`Nominal: ${formatKw(eq.nominalPowerKw)}${eq.baselinePowerKw ? ` · baseline ${formatKw(eq.baselinePowerKw)}` : ''}`} />
-        <StatCard label="Bugungi energiya" value={formatKwh(props.todayKwh)} tone="green" sub="Kun boshidan" />
-        <StatCard label="Yig‘ilgan energiya" value={formatKwh(eq.totalEnergyKwh)} tone="navy" sub="EnergyComp’da qayd etilgan jami" />
+        <StatCard label="Joriy quvvat" value={eq.status === 'OFFLINE' ? '—' : formatKw(eq.currentPowerKw)} sub={`Nominal: ${formatKw(eq.nominalPowerKw)}`} />
+        <StatCard label="Bugungi energiya" value={formatKwh(props.todayKwh)} tone="green" />
+        <StatCard label="Jami energiya" value={formatKwh(eq.totalEnergyKwh)} tone="navy" />
         <StatCard
           label="Oxirgi aloqa"
           value={<RelTime value={eq.lastSeenAt} />}
           tone={eq.status === 'OFFLINE' ? 'red' : 'blue'}
-          sub={eq.hasProductionSignal ? PRODUCTION_LABEL[eq.productionState ?? 'NO_SIGNAL'] : 'Ishlab chiqarish signali manbasi yo‘q'}
+          sub={eq.hasProductionSignal ? PRODUCTION_LABEL[eq.productionState ?? 'NO_SIGNAL'] : undefined}
         />
       </div>
 
@@ -137,7 +130,6 @@ export function EquipmentDetail(props: {
         <Card className="xl:col-span-2">
           <CardHeader
             title="Quvvat (kW)"
-            description="O‘lchovlar har 30 soniyada yangilanadi"
             action={
               <Segmented
                 label="Davr"
@@ -223,7 +215,7 @@ export function EquipmentDetail(props: {
           </CardBody>
         </Card>
         <Card className="xl:col-span-2">
-          <CardHeader title="AI tahlillari" icon={<Bot className="h-5 w-5 text-brand" aria-hidden />} description="Har bir tahlil audit qilinadi" />
+          <CardHeader title="AI tahlillari" icon={<Bot className="h-5 w-5 text-brand" aria-hidden />} />
           <CardBody className="space-y-3">
             {analyses.length === 0 ? (
               <EmptyState title="Hali tahlil yo‘q" description={perms.analyze ? '“AI tahlil” tugmasini bosing.' : undefined} />

@@ -9,7 +9,13 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // Repozitoriy ildizida boshqa lockfile (MARIUS) bor — ildizni aniq ko'rsatamiz
+  turbopack: { root: process.cwd() },
   serverExternalPackages: ['pg', '@prisma/adapter-pg'],
+  async redirects() {
+    // Imkoniyatlar sahifasi olib tashlandi — eski havolalar bosh sahifaga
+    return [{ source: '/features', destination: '/', permanent: true }];
+  },
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];
   },

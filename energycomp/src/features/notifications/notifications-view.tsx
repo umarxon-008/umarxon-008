@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Bell, CheckCheck, ShieldAlert, TriangleAlert } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -66,7 +65,7 @@ export function NotificationsView({ timezone }: { timezone: string }) {
         ) : !data ? (
           <Spinner />
         ) : data.items.length === 0 ? (
-          <EmptyState title="Bildirishnoma yo‘q" description={<>Bildirishnoma turlarini <Link href="/app/settings#notifications" className="font-semibold text-brand">sozlamalarda</Link> tanlang.</>} />
+          <EmptyState title="Bildirishnoma yo‘q" />
         ) : (
           <>
             <ul className="divide-y divide-line">

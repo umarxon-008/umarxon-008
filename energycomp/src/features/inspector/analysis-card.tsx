@@ -81,14 +81,14 @@ export function AnalysisCard({ analysis, timezone, canFeedback }: { analysis: An
       </div>
       {o.evidence.length > 0 && (
         <p className="mt-3 text-xs text-muted">
-          <span className="font-semibold text-navy">Dalillar (bazadagi o‘lchovlar):</span>{' '}
+          <span className="font-semibold text-navy">Dalillar:</span>{' '}
           {o.evidence.map((e) => `${e.label}: ${formatEvidence(e, timezone)}`).join(' · ')}
         </p>
       )}
-      <p className="mt-2 text-xs italic text-muted">{o.disclaimer}</p>
+      <p className="mt-2 text-xs text-muted">AI tavsiyasi operator qarorini almashtirmaydi.</p>
       {canFeedback && (
         <div className="mt-3 flex items-center gap-2 text-xs text-muted">
-          Tavsiya foydali bo‘ldimi?
+          Foydali bo‘ldimi?
           <Button size="sm" variant={feedback === 'HELPFUL' ? 'success' : 'outline'} onClick={() => send('HELPFUL')} aria-pressed={feedback === 'HELPFUL'}>
             <ThumbsUp className="h-3.5 w-3.5" aria-hidden /> Foydali
           </Button>
