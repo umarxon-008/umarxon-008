@@ -102,6 +102,33 @@ body {
 .ec-blink { transform-box: fill-box; transform-origin: center; animation: ec-blink 5s ease-in-out infinite; }
 .ec-draw { stroke-dasharray: 60; animation: ec-draw 2.6s ease-in-out infinite alternate; }
 
+/* Robot yurib kelishi: kartaning chap chetidan zavodning o'rtasigacha (~4 soniya), keyin to'xtaydi.
+   Animatsiyasiz (reduced motion) holatda ham robot yakuniy joyida turadi. */
+@keyframes ec-walk-in {
+  from { left: -22%; }
+  to { left: 22%; }
+}
+.ec-walk-in { left: 22%; animation: ec-walk-in 4s cubic-bezier(0.35, 0.1, 0.45, 1) 0.3s both; }
+
+/* Yurayotganda tana tebranadi, to'xtagach sekin "suzadi" */
+@keyframes ec-walk-bob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-5px) rotate(-2deg); }
+  75% { transform: translateY(-5px) rotate(2deg); }
+}
+.ec-walk-bob {
+  transform-origin: 50% 100%;
+  animation: ec-walk-bob 0.9s ease-in-out 0.3s 4, ec-float 4s ease-in-out 3.9s infinite;
+}
+
+/* Oyoqlar navbatma-navbat ko'tariladi (faqat yurish davomida) */
+@keyframes ec-step {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+.ec-leg { transform-box: fill-box; animation: ec-step 0.45s ease-in-out 0.3s 8; }
+.ec-leg-b { animation-delay: 0.525s; }
+
 /* Robot qo'li: yelka (158,168) atrofida silkinadi */
 @keyframes ec-wave {
   0%, 100% { transform: rotate(0deg); }

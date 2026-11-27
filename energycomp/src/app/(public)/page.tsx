@@ -49,8 +49,13 @@ export default async function LandingPage() {
             <div className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-line/70">
               <FactoryScene className="h-auto w-full" />
             </div>
-            <div className="ec-float absolute -bottom-8 -left-4 lg:-left-12">
-              <EnergyRobot className="h-40 w-auto drop-shadow-sm sm:h-52" />
+            {/* Robot chapdan yurib kelib, zavodning yarmigacha yetib to'xtaydi */}
+            <div className="pointer-events-none absolute inset-x-0 -bottom-8 h-40 sm:h-52">
+              <div className="ec-walk-in absolute bottom-0">
+                <div className="ec-walk-bob">
+                  <EnergyRobot walking className="h-40 w-auto drop-shadow-sm sm:h-52" />
+                </div>
+              </div>
             </div>
           </div>
         </div>

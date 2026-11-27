@@ -1,6 +1,7 @@
 // Sodda, do'stona 2D illustratsiyalar (inline SVG). Tekis ranglar, yumaloq shakllar.
 
-export function EnergyRobot({ className }: { className?: string }) {
+/** walking — oyoqlar qadam tashlaydi (bosh sahifada kirib kelish paytida). */
+export function EnergyRobot({ className, walking }: { className?: string; walking?: boolean }) {
   return (
     <svg viewBox="0 0 220 260" className={className} role="img" aria-label="EnergyComp do'stona energiya roboti">
       <ellipse cx="110" cy="248" rx="70" ry="9" fill="#102B5C" opacity="0.08" />
@@ -35,8 +36,8 @@ export function EnergyRobot({ className }: { className?: string }) {
         <circle cx="191" cy="125" r="10" fill="#fff" stroke="#102B5C" strokeWidth="5" />
       </g>
       {/* legs */}
-      <rect x="80" y="222" width="18" height="22" rx="8" fill="#102B5C" />
-      <rect x="122" y="222" width="18" height="22" rx="8" fill="#102B5C" />
+      <rect className={walking ? 'ec-leg ec-leg-a' : undefined} x="80" y="222" width="18" height="22" rx="8" fill="#102B5C" />
+      <rect className={walking ? 'ec-leg ec-leg-b' : undefined} x="122" y="222" width="18" height="22" rx="8" fill="#102B5C" />
     </svg>
   );
 }
