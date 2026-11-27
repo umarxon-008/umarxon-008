@@ -1,0 +1,543 @@
+// EnergyComp — ma'lumotlar modeli.
+// Qoida: tenant'ga tegishli har bir jadvalda organizationId bor va so'rovlar shu bo'yicha cheklanadi.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum OrgRole {
+  OWNER
+  MANAGER
+  ENGINEER
+  VIEWER
+}
+
+enum EquipmentStatus {
+  RUNNING
+  STANDBY
+  STOPPED
+  WARNING
+  OFFLINE
+}
+
+enum DataSource {
+  DEMO
+  REAL
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum AlertStatus {
+  NEW
+  ACKNOWLEDGED
+  RESOLVED
+  DISMISSED
+}
+
+enum AlertRule {
+  NO_PRODUCTION_SIGNAL
+  ABOVE_BASELINE
+  NO_DATA
+  SUDDEN_CHANGE
+  LONG_STANDBY
+}
+
+enum Confidence {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum ControlMode {
+  READ_ONLY
+  SIMULATION
+}
+
+enum ControlAction {
+  STOP
+  START
+}
+
+enum ControlRequestStatus {
+  PENDING
+  EXECUTED_SIMULATED
+  REJECTED
+  CANCELLED
+  FAILED
+}
+
+enum SubscriptionStatus {
+  DEMO
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+enum IntegrationType {
+  DEMO_PROVIDER
+  HTTP_INGEST
+  MQTT
+  MODBUS
+}
+
+enum IntegrationStatus {
+  ACTIVE
+  DISABLED
+  NOT_CONFIGURED
+}
+
+enum NotificationType {
+  ALERT
+  CONTROL
+  SYSTEM
+}
+
+enum AIAnalysisStatus {
+  SUCCESS
+  FALLBACK
+  FAILED
+}
+
+enum AIFeedback {
+  HELPFUL
+  NOT_HELPFUL
+}
+
+model User {
+  id                 String    @id @default(cuid())
+  email              String    @unique
+  name               String
+  passwordHash       String
+  isPlatformAdmin    Boolean   @default(false)
+  mustChangePassword Boolean   @default(false)
+  lastLoginAt        DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  memberships   OrganizationMember[]
+  sessions      Session[]
+  resetTokens   PasswordResetToken[]
+  notifications Notification[]
+}
+
+/// Server-side session. id = SHA-256(token); xom token faqat httpOnly cookie'da.
+model Session {
+  id                   String   @id
+  userId               String
+  activeOrganizationId String?
+  userAgent            String?
+  ip                   String?
+  expiresAt            DateTime
+  lastSeenAt           DateTime @default(now())
+  createdAt            DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Organization {
+  id            String      @id @default(cuid())
+  name          String
+  slug          String      @unique
+  industry      String
+  timezone      String      @default("Asia/Tashkent")
+  currency      String      @default("UZS")
+  controlMode   ControlMode @default(READ_ONLY)
+  isDemo        Boolean     @default(false)
+  /// Tejashni hisoblash uchun baseline davri. Bo'sh bo'lsa tejash ko'rsatilmaydi.
+  baselineStart DateTime?
+  baselineEnd   DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  members          OrganizationMember[]
+  factories        Factory[]
+  equipment        Equipment[]
+  categories       EquipmentCategory[]
+  telemetry        EquipmentTelemetry[]
+  signals          ProductionSignal[]
+  alerts           Alert[]
+  alertEvents      AlertEvent[]
+  auditLogs        AuditLog[]
+  tariffs          EnergyTariff[]
+  subscription     Subscription?
+  notifications    Notification[]
+  mapLayouts       MapLayout[]
+  integrations     Integration[]
+  aiAnalyses       AIAnalysis[]
+  controlRequests  ControlRequest[]
+}
+
+model OrganizationMember {
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String
+  role           OrgRole
+  notifyCritical Boolean  @default(true)
+  notifyWarning  Boolean  @default(true)
+  notifyInfo     Boolean  @default(false)
+  notifyControl  Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@index([userId])
+}
+
+model Factory {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  address        String?
+  description    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  equipment    Equipment[]
+  mapLayout    MapLayout?
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+}
+
+/// Zavodning 2D rejasi. zones: [{id,name,x,y,width,height,color}]
+model MapLayout {
+  id             String   @id @default(cuid())
+  organizationId String
+  factoryId      String   @unique
+  width          Int      @default(1000)
+  height         Int      @default(600)
+  zones          Json     @default("[]")
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  factory      Factory      @relation(fields: [factoryId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+}
+
+model EquipmentCategory {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  equipment    Equipment[]
+
+  @@unique([organizationId, name])
+}
+
+model Equipment {
+  id                  String          @id @default(cuid())
+  organizationId      String
+  factoryId           String
+  categoryId          String?
+  name                String
+  code                String
+  manufacturer        String?
+  model               String?
+  location            String?
+  nominalPowerKw      Float
+  /// Shu quvvatdan past — "to'xtagan"
+  idleThresholdKw     Float?
+  /// Shu quvvatdan past — "kutish rejimi"
+  standbyThresholdKw  Float?
+  /// Ishlayotgandagi odatiy o'rtacha quvvat (baseline)
+  baselinePowerKw     Float?
+  mapX                Float           @default(100)
+  mapY                Float           @default(100)
+  sensorId            String?
+  dataSource          DataSource      @default(DEMO)
+  hasProductionSignal Boolean         @default(false)
+  /// Demo generator sozlamalari: { profile, offlineAfterMinutes? }
+  demoConfig          Json?
+  /// Simulyatsiya rejimidagi buyruq natijasi (faqat DEMO). Real uskunaga ta'sir qilmaydi.
+  simulatedState      String?
+  simulatedStateAt    DateTime?
+  status              EquipmentStatus @default(OFFLINE)
+  currentPowerKw      Float           @default(0)
+  totalEnergyKwh      Float           @default(0)
+  lastSeenAt          DateTime?       @db.Timestamptz(3)
+  productionState     String?
+  lastProductionAt    DateTime?       @db.Timestamptz(3)
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+
+  organization    Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  factory         Factory              @relation(fields: [factoryId], references: [id], onDelete: Cascade)
+  category        EquipmentCategory?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  telemetry       EquipmentTelemetry[]
+  signals         ProductionSignal[]
+  alerts          Alert[]
+  aiAnalyses      AIAnalysis[]
+  controlRequests ControlRequest[]
+
+  @@unique([organizationId, code])
+  @@unique([organizationId, sensorId])
+  @@index([organizationId, factoryId])
+}
+
+/// Bitta o'lchov: powerKw — o'rtacha quvvat (kW), energyKwh — shu interval ichidagi energiya (kWh).
+model EquipmentTelemetry {
+  id              BigInt     @id @default(autoincrement())
+  organizationId  String
+  equipmentId     String
+  timestamp       DateTime   @db.Timestamptz(3)
+  intervalSeconds Int
+  powerKw         Float
+  energyKwh       Float
+  source          DataSource
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  equipment    Equipment    @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+
+  @@unique([equipmentId, timestamp])
+  @@index([organizationId, timestamp])
+}
+
+model ProductionSignal {
+  id             BigInt     @id @default(autoincrement())
+  organizationId String
+  equipmentId    String
+  timestamp      DateTime   @db.Timestamptz(3)
+  isProducing    Boolean
+  count          Int?
+  source         DataSource
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  equipment    Equipment    @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+
+  @@unique([equipmentId, timestamp])
+  @@index([organizationId, timestamp])
+}
+
+model Alert {
+  id              String        @id @default(cuid())
+  organizationId  String
+  equipmentId     String
+  rule            AlertRule
+  title           String
+  severity        AlertSeverity
+  status          AlertStatus   @default(NEW)
+  explanation     String
+  recommendation  String
+  /// [{label, value, unit, at?}] — faqat haqiqiy o'lchovlardan
+  evidence        Json
+  confidence      Confidence
+  /// Holat hali davom etyaptimi (oxirgi tekshiruv bo'yicha)
+  conditionActive Boolean       @default(true)
+  source          DataSource
+  windowStart     DateTime      @db.Timestamptz(3)
+  windowEnd       DateTime      @db.Timestamptz(3)
+  detectedAt      DateTime      @default(now()) @db.Timestamptz(3)
+  lastCheckedAt   DateTime      @default(now()) @db.Timestamptz(3)
+  reviewedById    String?
+  reviewedAt      DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  equipment    Equipment    @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+  events       AlertEvent[]
+  aiAnalyses   AIAnalysis[]
+
+  @@index([organizationId, status])
+  @@index([organizationId, detectedAt])
+  @@index([equipmentId, rule, status])
+}
+
+model AlertEvent {
+  id             String       @id @default(cuid())
+  organizationId String
+  alertId        String
+  actorId        String?
+  fromStatus     AlertStatus?
+  toStatus       AlertStatus
+  note           String?
+  createdAt      DateTime     @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  alert        Alert        @relation(fields: [alertId], references: [id], onDelete: Cascade)
+
+  @@index([alertId])
+}
+
+model AuditLog {
+  id             String        @id @default(cuid())
+  organizationId String?
+  actorId        String?
+  action         String
+  entityType     String
+  entityId       String?
+  metadata       Json          @default("{}")
+  ip             String?
+  createdAt      DateTime      @default(now())
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, createdAt])
+  @@index([action])
+}
+
+model EnergyTariff {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  pricePerKwh    Decimal  @db.Decimal(14, 4)
+  currency       String
+  validFrom      DateTime @db.Timestamptz(3)
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, validFrom])
+}
+
+/// Tarif rejasi. Narx null — "narx belgilanmagan". Limitlar backendda tekshiriladi.
+model Plan {
+  id               String   @id @default(cuid())
+  key              String   @unique
+  name             String
+  description      String
+  priceMonthly     Decimal? @db.Decimal(14, 2)
+  currency         String   @default("UZS")
+  maxFactories     Int
+  maxEquipment     Int
+  maxUsers         Int
+  aiAnalysesPerDay Int
+  historyDays      Int
+  /// ["map2d","map3d","advancedAi","advancedAnalytics","integrations"]
+  features         Json     @default("[]")
+  isPublic         Boolean  @default(true)
+  sortOrder        Int      @default(0)
+  updatedAt        DateTime @updatedAt
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id               String             @id @default(cuid())
+  organizationId   String             @unique
+  planId           String
+  status           SubscriptionStatus @default(DEMO)
+  /// Payment provider ulanmagan — barcha obunalar demo.
+  isDemo           Boolean            @default(true)
+  currentPeriodEnd DateTime?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan         Plan         @relation(fields: [planId], references: [id])
+}
+
+model Notification {
+  id             String           @id @default(cuid())
+  organizationId String
+  userId         String
+  type           NotificationType
+  title          String
+  body           String
+  link           String?
+  readAt         DateTime?
+  createdAt      DateTime         @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, organizationId, readAt])
+}
+
+model Integration {
+  id             String            @id @default(cuid())
+  organizationId String
+  type           IntegrationType
+  name           String
+  status         IntegrationStatus @default(NOT_CONFIGURED)
+  config         Json              @default("{}")
+  tokenHash      String?           @unique
+  tokenPrefix    String?
+  lastUsedAt     DateTime?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+}
+
+model AIAnalysis {
+  id             String           @id @default(cuid())
+  organizationId String
+  equipmentId    String?
+  alertId        String?
+  provider       String
+  model          String?
+  status         AIAnalysisStatus
+  input          Json
+  output         Json
+  confidence     Confidence
+  errorMessage   String?
+  requestedById  String?
+  feedback       AIFeedback?
+  feedbackById   String?
+  feedbackAt     DateTime?
+  createdAt      DateTime         @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  equipment    Equipment?   @relation(fields: [equipmentId], references: [id], onDelete: SetNull)
+  alert        Alert?       @relation(fields: [alertId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, createdAt])
+  @@index([alertId])
+}
+
+/// Boshqaruv so'rovi. MVPda faqat SIMULATION; real adapter yo'q.
+model ControlRequest {
+  id             String               @id @default(cuid())
+  organizationId String
+  equipmentId    String
+  action         ControlAction
+  reason         String
+  mode           ControlMode
+  status         ControlRequestStatus @default(PENDING)
+  requestedById  String
+  reviewedById   String?
+  reviewNote     String?
+  reviewedAt     DateTime?
+  executedAt     DateTime?
+  result         String?
+  createdAt      DateTime             @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  equipment    Equipment    @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, status])
+}

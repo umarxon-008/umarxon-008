@@ -197,3 +197,9 @@ docs/          arxitektura, reja, risklar
 | Ilova ochilmayapti                      | `%APPDATA%\MARIUS\logs\marius.log` faylini tekshiring                                                              |
 | SmartScreen ogohlantirishi              | **More info → Run anyway** (imzosiz build)                                                                         |
 | Oq ekran                                | Sozlamalar buzilgan bo‘lishi mumkin: ilovani yoping va `%APPDATA%\MARIUS\marius.db` ni zaxira nusxa olib o‘chiring |
+
+## Repozitoriydagi boshqa loyiha: EnergyComp
+
+[`energycomp/`](energycomp/) papkasida mustaqil **EnergyComp** loyihasi joylashgan — sanoat korxonalari uchun
+energiya boshqaruvi platformasi (Next.js + PostgreSQL, MVP). U MARIUS bilan kod va paketlarni bo‘lishmaydi,
+o‘z CI’siga ega (`.github/workflows/energycomp-ci.yml`). Ishga tushirish: [`energycomp/README.md`](energycomp/README.md).

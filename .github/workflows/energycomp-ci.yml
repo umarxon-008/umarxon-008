@@ -1,0 +1,63 @@
+name: EnergyComp CI
+
+# energycomp/ papkasi uchun: typecheck → lint → unit + integratsion testlar (PostgreSQL) → build → E2E
+on:
+  push:
+    branches: ['**']
+    paths: ['energycomp/**', '.github/workflows/energycomp-ci.yml']
+  pull_request:
+    paths: ['energycomp/**', '.github/workflows/energycomp-ci.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: energycomp-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: energycomp
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: energycomp
+          POSTGRES_PASSWORD: energycomp
+          POSTGRES_DB: energycomp
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U energycomp" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://energycomp:energycomp@localhost:5432/energycomp
+      TEST_DATABASE_URL: postgresql://energycomp:energycomp@localhost:5432/energycomp_test
+      APP_URL: http://localhost:3100
+      AI_PROVIDER: rule-based
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: energycomp/package-lock.json
+      - name: Test bazasini yaratish
+        run: PGPASSWORD=energycomp psql -h localhost -U energycomp -c 'CREATE DATABASE energycomp_test;'
+      - run: npm ci
+      - name: Xavfsizlik (production paketlari)
+        run: npm audit --omit=dev --audit-level=high
+      - name: Migratsiyalar va demo seed
+        run: npx prisma migrate deploy && npm run db:seed
+      - run: npm run typecheck
+      - run: npm run lint
+      - name: Unit va integratsion testlar
+        run: npm test
+      - run: npm run build
+      - name: Playwright brauzeri
+        run: npx playwright install --with-deps chromium
+      - name: E2E testlar (desktop + mobil)
+        run: npx playwright test --trace off

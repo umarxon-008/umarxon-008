@@ -1,0 +1,69 @@
+@import 'tailwindcss';
+
+/* EnergyComp dizayn tokenlari — ranglar faqat shu yerda o'zgartiriladi */
+@theme {
+  --color-navy: #102b5c;
+  --color-navy-700: #1b3b75;
+  --color-navy-600: #284c8e;
+  --color-brand: #1677f2;
+  --color-brand-600: #0f63d1;
+  --color-brand-50: #e8f1fe;
+  --color-brand-100: #d3e5fd;
+  --color-energy: #20b879;
+  --color-energy-600: #179a64;
+  --color-energy-50: #e6f8f0;
+  --color-surface: #f3f8ff;
+  --color-muted: #52627a;
+  --color-line: #dfe7f2;
+  --color-amber: #f2b01e;
+  --color-amber-50: #fff6df;
+  --color-orange: #e8650f;
+  --color-orange-50: #fdeee3;
+  --color-danger: #d93f45;
+  --color-danger-50: #fdecec;
+  --color-gray-status: #7d8ba1;
+
+  --radius-card: 1rem;
+  --shadow-card: 0 1px 2px rgb(16 43 92 / 0.04), 0 4px 16px rgb(16 43 92 / 0.06);
+  --shadow-pop: 0 8px 32px rgb(16 43 92 / 0.16);
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  background: var(--color-surface);
+  color: var(--color-navy);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+}
+.skip-link:focus {
+  left: 1rem;
+  top: 1rem;
+  z-index: 100;
+  background: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
